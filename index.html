@@ -557,15 +557,580 @@
   </div>
 </section>
 <!-- HORARIOS -->
-<section id="horarios" style="padding: 100px 40px;">
-  <div class="horarios-header fade-up">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horarios Espacio Vuela</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  .horarios-section {
+    padding: 80px 24px;
+    background: #fff;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .horarios-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .horarios-header .section-label {
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #ff4e68;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .horarios-header h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(36px, 5vw, 56px);
+    color: #111;
+    margin-bottom: 16px;
+  }
+
+  /* Leyenda */
+  .leyenda {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+
+  .leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #444;
+  }
+
+  .leyenda-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .dot-vuela { background: #a183ff; }
+  .dot-muevete { background: #fecb29; }
+  .dot-gym { background: #00c8d4; }
+
+  /* Tabs días */
+  .dias-tabs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+
+  .dia-tab {
+    padding: 10px 20px;
+    border-radius: 100px;
+    border: 1.5px solid rgba(0,0,0,.1);
+    background: transparent;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #666;
+    transition: all .2s;
+  }
+
+  .dia-tab:hover { border-color: #ff4e68; color: #ff4e68; }
+  .dia-tab.active { background: #ff4e68; border-color: #ff4e68; color: white; }
+
+  /* Grid horario */
+  .horario-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    display: none;
+  }
+
+  .horario-grid.visible { display: block; }
+
+  /* Salas */
+  .salas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+  }
+
+  .sala-card {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1.5px solid rgba(0,0,0,.06);
+    background: #fafafa;
+  }
+
+  .sala-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sala-pelicano .sala-header { background: rgba(255,78,104,.08); }
+  .sala-pinguino .sala-header { background: rgba(254,203,41,.12); }
+  .sala-flamenco .sala-header { background: rgba(0,200,212,.08); }
+
+  .sala-icon { font-size: 20px; }
+
+  .sala-nombre {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #333;
+  }
+
+  .sala-clases {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Clase chip */
+  .clase-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid rgba(0,0,0,.06);
+    transition: transform .15s;
+  }
+
+  .clase-item:hover { transform: translateX(4px); }
+
+  .clase-hora {
+    font-size: 12px;
+    font-weight: 700;
+    color: #888;
+    min-width: 40px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .clase-nombre {
+    font-size: 13px;
+    font-weight: 600;
+    flex: 1;
+    color: #222;
+  }
+
+  .clase-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .clase-dot.vuela { background: #a183ff; }
+  .clase-dot.muevete { background: #fecb29; }
+  .clase-dot.gym { background: #00c8d4; }
+
+  .no-clases {
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+    color: #aaa;
+  }
+
+  /* AM/PM toggle */
+  .ampm-toggle {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .ampm-btn {
+    padding: 6px 20px;
+    border-radius: 100px;
+    border: 1.5px solid rgba(0,0,0,.1);
+    background: transparent;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #666;
+    transition: all .2s;
+  }
+
+  .ampm-btn.active { background: #111; border-color: #111; color: white; }
+
+  .turno-grid { display: none; }
+  .turno-grid.visible { display: block; }
+</style>
+</head>
+<body>
+
+<section class="horarios-section" id="horarios">
+  <div class="horarios-header">
     <p class="section-label">¿Cuándo venir?</p>
-    <h2 class="section-title">Horarios</h2>
-    <p class="section-sub" style="margin:0 auto 40px">Clases de lunes a sábado. GYM disponible Lun–Vie 7:00–21:00 y Sábado 9:00–15:00.</p>
+    <h2>Horarios</h2>
   </div>
-  <img src="images/foto2.jpg" alt="Horarios Espacio Vuela" class="schedule-img fade-up" style="max-width:600px;">
-  <p style="text-align:center; margin-top:24px; color:#888; font-size:14px">Para ver el horario completo y reservar, contáctanos por WhatsApp o Instagram.</p>
+
+  <!-- Leyenda -->
+  <div class="leyenda">
+    <div class="leyenda-item">
+      <div class="leyenda-dot dot-vuela"></div>
+      Plan Vuela (aéreo)
+    </div>
+    <div class="leyenda-item">
+      <div class="leyenda-dot dot-muevete"></div>
+      Plan Muévete (baile)
+    </div>
+    <div class="leyenda-item">
+      <div class="leyenda-dot dot-gym"></div>
+      Gym
+    </div>
+  </div>
+
+  <!-- Tabs días -->
+  <div class="dias-tabs">
+    <button class="dia-tab active" onclick="mostrarDia('lunes', this)">Lunes</button>
+    <button class="dia-tab" onclick="mostrarDia('martes', this)">Martes</button>
+    <button class="dia-tab" onclick="mostrarDia('miercoles', this)">Miércoles</button>
+    <button class="dia-tab" onclick="mostrarDia('jueves', this)">Jueves</button>
+    <button class="dia-tab" onclick="mostrarDia('viernes', this)">Viernes</button>
+    <button class="dia-tab" onclick="mostrarDia('sabado', this)">Sábado</button>
+  </div>
+
+  <!-- AM/PM -->
+  <div class="ampm-toggle">
+    <button class="ampm-btn active" id="btn-pm" onclick="mostrarTurno('pm')">PM</button>
+    <button class="ampm-btn" id="btn-am" onclick="mostrarTurno('am')">AM</button>
+  </div>
+
+  <!-- ═══════════════════ LUNES ═══════════════════ -->
+  <div class="horario-grid visible" id="dia-lunes">
+
+    <div class="turno-grid visible" id="lunes-pm">
+      <div class="salas-grid">
+        <div class="sala-card sala-pelicano">
+          <div class="sala-header"><span class="sala-icon">🦩</span><span class="sala-nombre">Sala Pelícano</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:00</span><span class="clase-nombre">Pole Sport</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">19:00</span><span class="clase-nombre">Pole Sport</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">19:30</span><span class="clase-nombre">Pilates Zen</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">20:00</span><span class="clase-nombre">E. Funcional</span><div class="clase-dot vuela"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-pinguino">
+          <div class="sala-header"><span class="sala-icon">🐧</span><span class="sala-nombre">Sala Pingüino</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:20</span><span class="clase-nombre">Aerial Yoga</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">20:30</span><span class="clase-nombre">Dancehall</span><div class="clase-dot muevete"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-flamenco">
+          <div class="sala-header"><span class="sala-icon">🦜</span><span class="sala-nombre">Sala Flamenco — Gym</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:00</span><span class="clase-nombre">Gym abierto</span><div class="clase-dot gym"></div></div>
+            <div class="clase-item"><span class="clase-hora">21:00</span><span class="clase-nombre">Cierre</span><div class="clase-dot gym"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="turno-grid" id="lunes-am">
+      <div class="salas-grid">
+        <div class="sala-card sala-flamenco">
+          <div class="sala-header"><span class="sala-icon">🦜</span><span class="sala-nombre">Sala Flamenco — Gym</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">07:00</span><span class="clase-nombre">Gym abierto</span><div class="clase-dot gym"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════ MARTES ═══════════════════ -->
+  <div class="horario-grid" id="dia-martes">
+
+    <div class="turno-grid visible" id="martes-pm">
+      <div class="salas-grid">
+        <div class="sala-card sala-pelicano">
+          <div class="sala-header"><span class="sala-icon">🦩</span><span class="sala-nombre">Sala Pelícano</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:00</span><span class="clase-nombre">Pole Sport</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">19:00</span><span class="clase-nombre">Lira</span><div class="clase-dot vuela"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-pinguino">
+          <div class="sala-header"><span class="sala-icon">🐧</span><span class="sala-nombre">Sala Pingüino</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:30</span><span class="clase-nombre">K-POP</span><div class="clase-dot muevete"></div></div>
+            <div class="clase-item"><span class="clase-hora">19:30</span><span class="clase-nombre">Hip Hop</span><div class="clase-dot muevete"></div></div>
+            <div class="clase-item"><span class="clase-hora">20:00</span><span class="clase-nombre">Handstand y Contorsión</span><div class="clase-dot vuela"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-flamenco">
+          <div class="sala-header"><span class="sala-icon">🦜</span><span class="sala-nombre">Sala Flamenco — Gym</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:00</span><span class="clase-nombre">Gym abierto</span><div class="clase-dot gym"></div></div>
+            <div class="clase-item"><span class="clase-hora">21:00</span><span class="clase-nombre">Cierre</span><div class="clase-dot gym"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="turno-grid" id="martes-am">
+      <div class="salas-grid">
+        <div class="sala-card sala-pelicano">
+          <div class="sala-header"><span class="sala-icon">🦩</span><span class="sala-nombre">Sala Pelícano</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">11:00</span><span class="clase-nombre">Lira</span><div class="clase-dot vuela"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-flamenco">
+          <div class="sala-header"><span class="sala-icon">🦜</span><span class="sala-nombre">Sala Flamenco — Gym</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">07:00</span><span class="clase-nombre">Gym abierto</span><div class="clase-dot gym"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════ MIÉRCOLES ═══════════════════ -->
+  <div class="horario-grid" id="dia-miercoles">
+
+    <div class="turno-grid visible" id="miercoles-pm">
+      <div class="salas-grid">
+        <div class="sala-card sala-pelicano">
+          <div class="sala-header"><span class="sala-icon">🦩</span><span class="sala-nombre">Sala Pelícano</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:00</span><span class="clase-nombre">Pole Sport</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">19:00</span><span class="clase-nombre">Pole Sport</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">19:30</span><span class="clase-nombre">Reggaetón Extended</span><div class="clase-dot muevete"></div></div>
+            <div class="clase-item"><span class="clase-hora">20:00</span><span class="clase-nombre">Pilates Zen</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">20:30</span><span class="clase-nombre">Extended</span><div class="clase-dot muevete"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-pinguino">
+          <div class="sala-header"><span class="sala-icon">🐧</span><span class="sala-nombre">Sala Pingüino</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">14:00</span><span class="clase-nombre">Aerial Yoga</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">18:30</span><span class="clase-nombre">Girly</span><div class="clase-dot muevete"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-flamenco">
+          <div class="sala-header"><span class="sala-icon">🦜</span><span class="sala-nombre">Sala Flamenco — Gym</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:00</span><span class="clase-nombre">Gym abierto</span><div class="clase-dot gym"></div></div>
+            <div class="clase-item"><span class="clase-hora">21:00</span><span class="clase-nombre">Cierre</span><div class="clase-dot gym"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="turno-grid" id="miercoles-am">
+      <div class="salas-grid">
+        <div class="sala-card sala-pinguino">
+          <div class="sala-header"><span class="sala-icon">🐧</span><span class="sala-nombre">Sala Pingüino</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">12:30</span><span class="clase-nombre">K-PoP</span><div class="clase-dot muevete"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-flamenco">
+          <div class="sala-header"><span class="sala-icon">🦜</span><span class="sala-nombre">Sala Flamenco — Gym</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">07:00</span><span class="clase-nombre">Gym abierto</span><div class="clase-dot gym"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════ JUEVES ═══════════════════ -->
+  <div class="horario-grid" id="dia-jueves">
+
+    <div class="turno-grid visible" id="jueves-pm">
+      <div class="salas-grid">
+        <div class="sala-card sala-pelicano">
+          <div class="sala-header"><span class="sala-icon">🦩</span><span class="sala-nombre">Sala Pelícano</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:00</span><span class="clase-nombre">Lira</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">19:00</span><span class="clase-nombre">E. Funcional</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">20:00</span><span class="clase-nombre">Flexibilidad</span><div class="clase-dot vuela"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-pinguino">
+          <div class="sala-header"><span class="sala-icon">🐧</span><span class="sala-nombre">Sala Pingüino</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:30</span><span class="clase-nombre">K-POP</span><div class="clase-dot muevete"></div></div>
+            <div class="clase-item"><span class="clase-hora">19:30</span><span class="clase-nombre">Hip Hop</span><div class="clase-dot muevete"></div></div>
+            <div class="clase-item"><span class="clase-hora">20:30</span><span class="clase-nombre">Girly</span><div class="clase-dot muevete"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-flamenco">
+          <div class="sala-header"><span class="sala-icon">🦜</span><span class="sala-nombre">Sala Flamenco — Gym</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:00</span><span class="clase-nombre">Gym abierto</span><div class="clase-dot gym"></div></div>
+            <div class="clase-item"><span class="clase-hora">21:00</span><span class="clase-nombre">Cierre</span><div class="clase-dot gym"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="turno-grid" id="jueves-am">
+      <div class="salas-grid">
+        <div class="sala-card sala-pinguino">
+          <div class="sala-header"><span class="sala-icon">🐧</span><span class="sala-nombre">Sala Pingüino</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">12:30</span><span class="clase-nombre">Reggaeton Fem</span><div class="clase-dot muevete"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-flamenco">
+          <div class="sala-header"><span class="sala-icon">🦜</span><span class="sala-nombre">Sala Flamenco — Gym</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">07:00</span><span class="clase-nombre">Gym abierto</span><div class="clase-dot gym"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════ VIERNES ═══════════════════ -->
+  <div class="horario-grid" id="dia-viernes">
+
+    <div class="turno-grid visible" id="viernes-pm">
+      <div class="salas-grid">
+        <div class="sala-card sala-pelicano">
+          <div class="sala-header"><span class="sala-icon">🦩</span><span class="sala-nombre">Sala Pelícano</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">17:00</span><span class="clase-nombre">Flexibilidad</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">17:00</span><span class="clase-nombre">Pilates Zen</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">18:00</span><span class="clase-nombre">Tabata</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">19:00</span><span class="clase-nombre">Pole Sport</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">19:30</span><span class="clase-nombre">Reggaetón Extended</span><div class="clase-dot muevete"></div></div>
+            <div class="clase-item"><span class="clase-hora">20:30</span><span class="clase-nombre">Extended</span><div class="clase-dot muevete"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-pinguino">
+          <div class="sala-header"><span class="sala-icon">🐧</span><span class="sala-nombre">Sala Pingüino</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:20</span><span class="clase-nombre">Aerial Yoga</span><div class="clase-dot vuela"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-flamenco">
+          <div class="sala-header"><span class="sala-icon">🦜</span><span class="sala-nombre">Sala Flamenco — Gym</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">18:00</span><span class="clase-nombre">Gym abierto</span><div class="clase-dot gym"></div></div>
+            <div class="clase-item"><span class="clase-hora">21:00</span><span class="clase-nombre">Cierre</span><div class="clase-dot gym"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="turno-grid" id="viernes-am">
+      <div class="salas-grid">
+        <div class="sala-card sala-flamenco">
+          <div class="sala-header"><span class="sala-icon">🦜</span><span class="sala-nombre">Sala Flamenco — Gym</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">07:00</span><span class="clase-nombre">Gym abierto</span><div class="clase-dot gym"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════ SÁBADO ═══════════════════ -->
+  <div class="horario-grid" id="dia-sabado">
+
+    <div class="turno-grid visible" id="sabado-pm">
+      <div class="salas-grid">
+        <div class="sala-card sala-pelicano">
+          <div class="sala-header"><span class="sala-icon">🦩</span><span class="sala-nombre">Sala Pelícano</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">12:30</span><span class="clase-nombre">Flexibilidad</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">14:00</span><span class="clase-nombre">Reggaetón</span><div class="clase-dot muevete"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-pinguino">
+          <div class="sala-header"><span class="sala-icon">🐧</span><span class="sala-nombre">Sala Pingüino</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">12:30</span><span class="clase-nombre">Heels</span><div class="clase-dot muevete"></div></div>
+            <div class="clase-item"><span class="clase-hora">15:30</span><span class="clase-nombre">K-pop</span><div class="clase-dot muevete"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-flamenco">
+          <div class="sala-header"><span class="sala-icon">🦜</span><span class="sala-nombre">Sala Flamenco — Gym</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">09:00</span><span class="clase-nombre">Gym abierto</span><div class="clase-dot gym"></div></div>
+            <div class="clase-item"><span class="clase-hora">15:00</span><span class="clase-nombre">Cierre</span><div class="clase-dot gym"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="turno-grid" id="sabado-am">
+      <div class="salas-grid">
+        <div class="sala-card sala-pelicano">
+          <div class="sala-header"><span class="sala-icon">🦩</span><span class="sala-nombre">Sala Pelícano</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">10:30</span><span class="clase-nombre">Lira</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">11:30</span><span class="clase-nombre">Pole Sport</span><div class="clase-dot vuela"></div></div>
+            <div class="clase-item"><span class="clase-hora">12:30</span><span class="clase-nombre">Flexibilidad</span><div class="clase-dot vuela"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-pinguino">
+          <div class="sala-header"><span class="sala-icon">🐧</span><span class="sala-nombre">Sala Pingüino</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">12:30</span><span class="clase-nombre">Heels</span><div class="clase-dot muevete"></div></div>
+          </div>
+        </div>
+        <div class="sala-card sala-flamenco">
+          <div class="sala-header"><span class="sala-icon">🦜</span><span class="sala-nombre">Sala Flamenco — Gym</span></div>
+          <div class="sala-clases">
+            <div class="clase-item"><span class="clase-hora">09:00</span><span class="clase-nombre">Gym abierto</span><div class="clase-dot gym"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
 </section>
+
+<script>
+  let diaActual = 'lunes';
+  let turnoActual = 'pm';
+
+  function mostrarDia(dia, btn) {
+    document.querySelectorAll('.horario-grid').forEach(g => g.classList.remove('visible'));
+    document.querySelectorAll('.dia-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('dia-' + dia).classList.add('visible');
+    btn.classList.add('active');
+    diaActual = dia;
+    mostrarTurno(turnoActual);
+  }
+
+  function mostrarTurno(turno) {
+    document.querySelectorAll('.turno-grid').forEach(g => g.classList.remove('visible'));
+    document.querySelectorAll('.ampm-btn').forEach(b => b.classList.remove('active'));
+    const grid = document.getElementById(diaActual + '-' + turno);
+    if (grid) grid.classList.add('visible');
+    document.getElementById('btn-' + turno).classList.add('active');
+    turnoActual = turno;
+  }
+</script>
+</body>
+</html>
 
 <!-- CONTACTO -->
 <section id="contacto">
@@ -592,7 +1157,7 @@
         <div class="contact-icon">📸</div>
         <div>
           <h4><a href="https://instagram.com/espacio_vuela" target="_blank" style="color:inherit;text-decoration:none;">Instagram</a></h4>
-          <p><a href="https://instagram.com/espacio_vuela" target="_blank" style="color:inherit;text-decoration:none;"></a>@espaciovuela</p>
+          <p>@espaciovuela</p>
         </div>
       </div>
     </div>
