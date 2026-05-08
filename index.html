@@ -554,7 +554,7 @@
 .pv-title{font-family:'Dancing Script',cursive;font-size:42px;font-weight:700;text-align:center;color:#111;margin:0 0 16px;}
 .info-bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
 .info-chip{border-radius:16px;padding:8px 16px;font-size:13px;font-weight:700;text-align:center;border:none;}
-.chip-matricula{background: #00f9ff;;color:#ffffff;}
+.chip-matricula{background: #00f9ff;;color:#000000;}
 .chip-prueba{background:#00f9ff;color:#000000;}
 .chip-suelta{background:#00f9ff;color:#000000;}
 .info-chip em{font-style:normal;font-weight:800;display:block;font-size:14px;}
@@ -757,6 +757,95 @@ function pvSelCard(el){
 </script>
 
 </section>
+
+
+
+
+-- prueba -- 
+
+<style>
+/* Estilos Generales */
+.pv{font-family:'Outfit',sans-serif;padding:1.5rem;}
+.outer-box{border:3px solid #00f9ff;border-radius:24px;padding:1.5rem;background:#fff;max-width:900px;margin:0 auto;}
+.pv-title{font-family:'Dancing Script',cursive;font-size:42px;font-weight:700;text-align:center;color:#111;margin:0 0 16px;}
+
+/* INFO CHIPS (Matrícula, Prueba, Suelta) */
+.info-bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
+.info-chip{border-radius:16px;padding:8px 16px;font-size:13px;font-weight:700;text-align:center;border:none;min-width:120px;}
+.info-chip em{font-style:normal;font-weight:800;display:block;font-size:14px;}
+
+.chip-matricula{background:#a183ff;color:#fff;}
+.chip-prueba{background:#fecb29;color:#5a4000;}
+.chip-suelta{background:#ff9bc3;color:#fff;}
+
+/* BOTONES SUPERIORES (PILLS) */
+.pill-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
+.pv-pill{padding:10px 26px;border-radius:100px;font-size:15px;font-weight:800;cursor:pointer;border:none;transition:all .2s;opacity:0.55;letter-spacing:0.5px;}
+.pv-pill.active{opacity:1;transform:scale(1.08);box-shadow:0 6px 18px rgba(0,0,0,0.15);}
+
+/* Colores individuales para cada botón */
+#pp-vuela { background: #00ffcc; color: #005544; }
+#pp-muevete { background: #fecb29; color: #5a4000; }
+#pp-ilimitado { background: #a183ff; color: #ffffff; }
+#pp-gym { background: #ff4e68; color: #ffffff; }
+
+/* REJILLA ILIMITADOS (Arreglo para celular) */
+.pv-ilim-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Por defecto uno abajo del otro */
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* En PC (pantallas mayores a 768px) se ponen al lado */
+@media (min-width: 768px) {
+    .pv-ilim-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* TARJETAS Y CONTENEDORES */
+.pv-panel{display:none;}
+.pv-panel.visible{display:block;}
+.pv-cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:10px;margin-bottom:10px;}
+.pv-plan-card{border-radius:18px;padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s;border:3px solid transparent;}
+.pv-plan-card.sel{border-color:#111;box-shadow:0 8px 20px rgba(0,0,0,0.18);}
+
+/* Colores de tarjetas de clases */
+.pv-v{background:#00ffcc;} 
+.pv-m{background:#fecb29;}
+.pv-g{background:#ff4e68;}
+
+.pv-v .pv-clases, .pv-v .pv-precio {color:#005544;}
+.pv-m .pv-clases, .pv-m .pv-precio {color:#5a4000;}
+.pv-g .pv-clases, .pv-g .pv-precio {color:#fff;}
+
+.pv-ilim-card{border-radius:18px;padding:1.2rem;cursor:pointer;border:3px solid transparent;transition:all .2s;}
+.pv-ilim-v{background:#00ffcc;}
+.pv-ilim-m{background:#fecb29;}
+.pv-ilim-v .pv-ilim-name, .pv-ilim-v .pv-ilim-price {color:#005544;}
+.pv-ilim-m .pv-ilim-name, .pv-ilim-m .pv-ilim-price {color:#3d2a00;}
+
+/* Otros */
+.pv-note{font-size:12px;color:#666;text-align:center;margin:6px 0 14px;font-style:italic;}
+.pv-clases-box{border-radius:18px;padding:1rem 1.25rem;border:3px solid;}
+.pv-box-v{background:#e0fff8;border-color:#00ffcc;}
+.pv-box-m{background:#fffbec;border-color:#fecb29;}
+.pv-box-all{background:#f0eaff;border-color:#a183ff;}
+.pv-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.pv-tag{font-size:12px;padding:5px 13px;border-radius:100px;font-weight:700;}
+.pv-tag-v{background:#00ffcc;color:#005544;}
+.pv-tag-m{background:#fecb29;color:#5a4000;}
+</style>
+
+<div class="info-bar">
+    <div class="info-chip chip-matricula"><em>$12.000</em>Matrícula (una vez)</div>
+    <div class="info-chip chip-prueba"><em>Vuela $7.000 · Muévete $5.000</em>Clase de prueba</div>
+    <div class="info-chip chip-suelta"><em>Vuela $12.000 · Muévete $9.000</em>Clase suelta</div>
+  </div>
+
+
+
 
 <!-- HORARIOS -->
 
