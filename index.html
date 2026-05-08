@@ -559,7 +559,37 @@
 .chip-suelta{background:#00f9ff;color:#000000;}
 .info-chip em{font-style:normal;font-weight:800;display:block;font-size:14px;}
 .pill-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
-.pv-pill{padding:10px 26px;border-radius:100px;font-size:15px;font-weight:800;cursor:pointer;border:none;transition:all .2s;background:#00ffcc;color:#005544;opacity:0.55;letter-spacing:0.5px;}
+.pv-pill{
+  padding:10px 26px;
+  border-radius:100px;
+  font-size:15px;
+  font-weight:800;
+  cursor:pointer;
+  border:none;
+  transition:all .2s;
+  opacity:0.55;
+  letter-spacing:0.5px;
+}
+
+.pv-pill-vuela{
+  background:#b9a2ff;
+  color:#fff;
+}
+
+.pv-pill-muevete{
+  background:#fecb29;
+  color:#5a4000;
+}
+
+.pv-pill-ilimitado{
+  background:#00ffcc;
+  color:#005544;
+}
+
+.pv-pill-gym{
+  background:#ff4e68;
+  color:#fff;
+}
 .pv-pill.active{opacity:1;transform:scale(1.08);box-shadow:0 6px 18px rgba(0,0,0,0.15);}
 .pv-panel{display:none;}
 .pv-panel.visible{display:block;}
@@ -635,10 +665,10 @@
   </div>
 
   <div class="pill-row">
-    <button class="pv-pill active" id="pp-vuela" onclick="pvShow('vuela')">Vuela</button>
-    <button class="pv-pill" id="pp-muevete" onclick="pvShow('muevete')">Muévete</button>
-    <button class="pv-pill" id="pp-ilimitado" onclick="pvShow('ilimitado')">Ilimitados</button>
-    <button class="pv-pill" id="pp-gym" onclick="pvShow('gym')">Gym</button>
+    <button class="pv-pill pv-pill-vuela active" id="pp-vuela" onclick="pvShow('vuela')">Vuela</button>
+    <button class="pv-pill pv-pill-muevete" id="pp-muevete" onclick="pvShow('muevete')">Muévete</button>
+    <button class="pv-pill pv-pill-ilimitado" id="pp-ilimitado" onclick="pvShow('ilimitado')">Ilimitados</button>
+    <button class="pv-pill pv-pill-gym" id="pp-gym" onclick="pvShow('gym')">Gym</button>
   </div>
 
   <!-- VUELA -->
