@@ -546,15 +546,228 @@
 </section>
 
 <!-- PLANES -->
-<section id="planes">
-  <div class="planes-header fade-up">
-    <p class="section-label">Invierte en ti</p>
-    <h2 class="section-title">Elige tu plan</h2>
-    <p class="section-sub">Sin contratos. Paga mes a mes y combina disciplinas a tu gusto.</p>
+<section id="planes" style="padding: 80px 24px; background: #f5f5f7;">
+
+<style>
+.pv{font-family:'Outfit',sans-serif;padding:1.5rem;}
+.outer-box{border:3px solid #00f9ff;border-radius:24px;padding:1.5rem;background:#fff;max-width:900px;margin:0 auto;}
+.pv-title{font-family:'Dancing Script',cursive;font-size:42px;font-weight:700;text-align:center;color:#111;margin:0 0 16px;}
+.info-bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
+.info-chip{border-radius:16px;padding:8px 16px;font-size:13px;font-weight:700;text-align:center;border:none;}
+.chip-matricula{background:#a183ff;color:#fff;}
+.chip-prueba{background:#fecb29;color:#5a4000;}
+.chip-suelta{background:#ff9bc3;color:#7a003a;}
+.info-chip em{font-style:normal;font-weight:800;display:block;font-size:14px;}
+.pill-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
+.pv-pill{padding:10px 26px;border-radius:100px;font-size:15px;font-weight:800;cursor:pointer;border:none;transition:all .2s;background:#00ffcc;color:#005544;opacity:0.55;letter-spacing:0.5px;}
+.pv-pill.active{opacity:1;transform:scale(1.08);box-shadow:0 6px 18px rgba(0,0,0,0.15);}
+.pv-panel{display:none;}
+.pv-panel.visible{display:block;}
+.pv-cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:10px;margin-bottom:10px;}
+.pv-plan-card{border-radius:18px;padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s;border:3px solid transparent;}
+.pv-plan-card:hover{transform:translateY(-4px);}
+.pv-plan-card.sel{border-color:#111;transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.18);}
+.pv-v{background:#b9a2ff;}
+.pv-m{background:#fecb29;}
+.pv-g{background:#ff4e68;}
+.pv-plan-card .pv-clases{font-size:11px;font-weight:700;margin-bottom:4px;opacity:0.85;letter-spacing:0.5px;text-transform:uppercase;}
+.pv-v .pv-clases{color:#fff;}
+.pv-m .pv-clases{color:#5a4000;}
+.pv-g .pv-clases{color:#fff;}
+.pv-plan-card .pv-precio{font-size:16px;font-weight:800;}
+.pv-v .pv-precio{color:#fff;}
+.pv-m .pv-precio{color:#3d2a00;}
+.pv-g .pv-precio{color:#fff;}
+.pv-plan-card .pv-extra{font-size:10px;margin-top:4px;opacity:0.75;}
+.pv-v .pv-extra{color:#eedeff;}
+.pv-m .pv-extra{color:#7a5500;}
+.pv-note{font-size:12px;color:#666;text-align:center;margin:6px 0 14px;font-style:italic;}
+.pv-clases-box{border-radius:18px;padding:1rem 1.25rem;border:3px solid;}
+.pv-box-v{background:#f0eaff;border-color:#b9a2ff;}
+.pv-box-m{background:#fffbec;border-color:#fecb29;}
+.pv-box-all{background:#e0fff8;border-color:#00ffcc;}
+.pv-clases-box h4{font-size:13px;font-weight:800;margin:0 0 10px;text-transform:uppercase;letter-spacing:1.5px;}
+.pv-box-v h4{color:#7b55cc;}
+.pv-box-m h4{color:#8a6400;}
+.pv-box-all h4{color:#007a66;}
+.pv-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.pv-tag{font-size:12px;padding:5px 13px;border-radius:100px;font-weight:700;}
+.pv-tag-v{background:#b9a2ff;color:#fff;}
+.pv-tag-m{background:#fecb29;color:#5a4000;}
+.pv-ilim-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.pv-ilim-card{border-radius:18px;padding:1.2rem;cursor:pointer;border:3px solid transparent;transition:all .2s;}
+.pv-ilim-card:hover{transform:translateY(-3px);}
+.pv-ilim-card.sel{border-color:#111;box-shadow:0 8px 20px rgba(0,0,0,.18);}
+.pv-ilim-v{background:#b9a2ff;}
+.pv-ilim-m{background:#fecb29;}
+.pv-ilim-card .pv-ilim-name{font-size:13px;font-weight:800;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
+.pv-ilim-v .pv-ilim-name{color:#fff;}
+.pv-ilim-m .pv-ilim-name{color:#3d2a00;}
+.pv-ilim-card .pv-ilim-price{font-family:'Dancing Script',cursive;font-size:36px;font-weight:700;}
+.pv-ilim-v .pv-ilim-price{color:#fff;}
+.pv-ilim-m .pv-ilim-price{color:#3d2a00;}
+.pv-ilim-card .pv-ilim-gym{font-size:11px;margin-top:2px;font-weight:600;}
+.pv-ilim-v .pv-ilim-gym{color:#eedeff;}
+.pv-ilim-m .pv-ilim-gym{color:#8a6400;}
+.pv-gym-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;}
+.pv-gym-plan{border-radius:18px;padding:14px 10px;text-align:center;}
+.pv-gc1{background:#ff4e68;}
+.pv-gc2{background:#ff9bc3;}
+.pv-gc3{background:#ff4e68;}
+.pv-gc4{background:#ff008d;}
+.pv-gym-plan .pv-gtipo{font-size:11px;font-weight:700;color:#fff;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;opacity:0.9;}
+.pv-gym-plan .pv-gval{font-family:'Dancing Script',cursive;font-size:26px;font-weight:700;color:#fff;}
+.pv-asesoria{background:#fff0f7;border:2px solid #ff9bc3;border-radius:16px;padding:1rem 1.25rem;margin-top:12px;}
+.pv-asesoria h4{font-size:13px;font-weight:800;color:#cc2255;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;}
+.pv-asesoria-row{display:flex;gap:14px;flex-wrap:wrap;}
+.pv-asesoria-item{font-size:13px;color:#994466;font-weight:600;}
+.pv-gym-note{font-size:12px;color:#666;text-align:center;margin-top:8px;font-style:italic;}
+</style>
+
+<div class="pv">
+<div class="outer-box">
+  <p class="pv-title">✨ Planes y valores</p>
+
+  <div class="info-bar">
+    <div class="info-chip chip-matricula"><em>$12.000</em>Matrícula (una vez)</div>
+    <div class="info-chip chip-prueba"><em>Vuela $7.000 · Muévete $5.000</em>Clase de prueba</div>
+    <div class="info-chip chip-suelta"><em>Vuela $12.000 · Muévete $9.000</em>Clase suelta</div>
   </div>
-  <div style="max-width:1200px; margin:0 auto;">
-    <iframe src="https://boxmagic.cl/market/EspacioVuela43" width="100%" height="900px" frameborder="0" scrolling="yes" allow="fullscreen">Cargando...</iframe>
+
+  <div class="pill-row">
+    <button class="pv-pill active" id="pp-vuela" onclick="pvShow('vuela')">Vuela</button>
+    <button class="pv-pill" id="pp-muevete" onclick="pvShow('muevete')">Muévete</button>
+    <button class="pv-pill" id="pp-ilimitado" onclick="pvShow('ilimitado')">Ilimitados</button>
+    <button class="pv-pill" id="pp-gym" onclick="pvShow('gym')">Gym</button>
   </div>
+
+  <!-- VUELA -->
+  <div id="pvpanel-vuela" class="pv-panel visible">
+    <div class="pv-cards-grid">
+      <div class="pv-plan-card pv-v" onclick="pvSelCard(this)"><div class="pv-clases">4 clases</div><div class="pv-precio">$38.990</div></div>
+      <div class="pv-plan-card pv-v" onclick="pvSelCard(this)"><div class="pv-clases">6 clases</div><div class="pv-precio">$49.990</div></div>
+      <div class="pv-plan-card pv-v" onclick="pvSelCard(this)"><div class="pv-clases">8 clases</div><div class="pv-precio">$65.990</div></div>
+      <div class="pv-plan-card pv-v" onclick="pvSelCard(this)"><div class="pv-clases">12 clases</div><div class="pv-precio">$82.990</div></div>
+      <div class="pv-plan-card pv-v" onclick="pvSelCard(this)"><div class="pv-clases">Ilimitado</div><div class="pv-precio">$99.990</div><div class="pv-extra">+ gym $112.990</div></div>
+    </div>
+    <p class="pv-note">+ $13.000 agrega acceso al gym durante el mes</p>
+    <div class="pv-clases-box pv-box-v">
+      <h4>Clases incluidas</h4>
+      <div class="pv-tags">
+        <span class="pv-tag pv-tag-v">Pole Sport</span>
+        <span class="pv-tag pv-tag-v">Aerial Yoga</span>
+        <span class="pv-tag pv-tag-v">Lira</span>
+        <span class="pv-tag pv-tag-v">E. Funcional</span>
+        <span class="pv-tag pv-tag-v">Pilates Zen</span>
+        <span class="pv-tag pv-tag-v">Flexibilidad</span>
+        <span class="pv-tag pv-tag-v">Handstand y Contorsión</span>
+        <span class="pv-tag pv-tag-v">Tabata</span>
+        <span class="pv-tag pv-tag-m">K-POP</span>
+        <span class="pv-tag pv-tag-m">Reggaetón Extended</span>
+        <span class="pv-tag pv-tag-m">Reggaetón Fem</span>
+        <span class="pv-tag pv-tag-m">Hip-Hop</span>
+        <span class="pv-tag pv-tag-m">Heels</span>
+        <span class="pv-tag pv-tag-m">Girly</span>
+        <span class="pv-tag pv-tag-m">Dancehall</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MUÉVETE -->
+  <div id="pvpanel-muevete" class="pv-panel">
+    <div class="pv-cards-grid">
+      <div class="pv-plan-card pv-m" onclick="pvSelCard(this)"><div class="pv-clases">4 clases</div><div class="pv-precio">$27.990</div></div>
+      <div class="pv-plan-card pv-m" onclick="pvSelCard(this)"><div class="pv-clases">6 clases</div><div class="pv-precio">$38.990</div></div>
+      <div class="pv-plan-card pv-m" onclick="pvSelCard(this)"><div class="pv-clases">8 clases</div><div class="pv-precio">$44.990</div></div>
+      <div class="pv-plan-card pv-m" onclick="pvSelCard(this)"><div class="pv-clases">12 clases</div><div class="pv-precio">$59.990</div></div>
+      <div class="pv-plan-card pv-m" onclick="pvSelCard(this)"><div class="pv-clases">Ilimitado</div><div class="pv-precio">$82.990</div><div class="pv-extra">+ gym $95.990</div></div>
+    </div>
+    <p class="pv-note">+ $13.000 agrega acceso al gym durante el mes</p>
+    <div class="pv-clases-box pv-box-m">
+      <h4>Clases incluidas</h4>
+      <div class="pv-tags">
+        <span class="pv-tag pv-tag-m">K-POP</span>
+        <span class="pv-tag pv-tag-m">Reggaetón</span>
+        <span class="pv-tag pv-tag-m">Reggaetón Fem</span>
+        <span class="pv-tag pv-tag-m">Hip Hop</span>
+        <span class="pv-tag pv-tag-m">Heels</span>
+        <span class="pv-tag pv-tag-m">Girly</span>
+        <span class="pv-tag pv-tag-m">Dancehall</span>
+        <span class="pv-tag pv-tag-m">Pilates Zen</span>
+        <span class="pv-tag pv-tag-m">Tabata</span>
+        <span class="pv-tag pv-tag-m">Flexibilidad</span>
+        <span class="pv-tag pv-tag-m">Handstand y Contorsión</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ILIMITADOS -->
+  <div id="pvpanel-ilimitado" class="pv-panel">
+    <div class="pv-ilim-grid">
+      <div class="pv-ilim-card pv-ilim-v" onclick="pvSelCard(this)">
+        <div class="pv-ilim-name">Vuela ilimitado</div>
+        <div class="pv-ilim-price">$99.990</div>
+        <div class="pv-ilim-gym">+ gym por $112.990</div>
+      </div>
+      <div class="pv-ilim-card pv-ilim-m" onclick="pvSelCard(this)">
+        <div class="pv-ilim-name">Muévete ilimitado</div>
+        <div class="pv-ilim-price">$82.990</div>
+        <div class="pv-ilim-gym">+ gym por $95.990</div>
+      </div>
+    </div>
+    <p class="pv-note">+ $13.000 agrega acceso al gym durante el mes de plan</p>
+    <div class="pv-clases-box pv-box-all">
+      <h4>Todas las clases del plan elegido, sin límite</h4>
+      <div class="pv-tags">
+        <span class="pv-tag pv-tag-v">Pole Sport</span>
+        <span class="pv-tag pv-tag-v">Aerial Yoga</span>
+        <span class="pv-tag pv-tag-v">Lira</span>
+        <span class="pv-tag pv-tag-v">E. Funcional</span>
+        <span class="pv-tag pv-tag-m">K-POP</span>
+        <span class="pv-tag pv-tag-m">Reggaetón</span>
+        <span class="pv-tag pv-tag-m">Hip Hop</span>
+        <span class="pv-tag pv-tag-m">Heels</span>
+        <span class="pv-tag pv-tag-m">Girly</span>
+        <span class="pv-tag pv-tag-m">Dancehall</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- GYM -->
+  <div id="pvpanel-gym" class="pv-panel">
+    <div class="pv-gym-grid">
+      <div class="pv-gym-plan pv-gc1"><div class="pv-gtipo">Mensual</div><div class="pv-gval">$22.500</div></div>
+      <div class="pv-gym-plan pv-gc2"><div class="pv-gtipo">Trimestral</div><div class="pv-gval">$57.000</div></div>
+      <div class="pv-gym-plan pv-gc1"><div class="pv-gtipo">Semestral</div><div class="pv-gval">$100.990</div></div>
+      <div class="pv-gym-plan pv-gc4"><div class="pv-gtipo">Anual</div><div class="pv-gval">$175.990</div></div>
+      <div class="pv-gym-plan pv-gc2"><div class="pv-gtipo">Pase diario</div><div class="pv-gval">$5.000</div></div>
+    </div>
+    <p class="pv-gym-note">Lun–Vie 7:00–21:00 · Sábado 9:00–15:00</p>
+    <div class="pv-asesoria">
+      <h4>Asesoría con entrenadora</h4>
+      <div class="pv-asesoria-row">
+        <span class="pv-asesoria-item">2 sesiones (90 min c/u) — $39.000</span>
+        <span class="pv-asesoria-item">4 sesiones (270 min) — $74.000</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+function pvShow(plan){
+  document.querySelectorAll('.pv-panel').forEach(p=>p.classList.remove('visible'));
+  document.getElementById('pvpanel-'+plan).classList.add('visible');
+  document.querySelectorAll('.pv-pill').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pp-'+plan).classList.add('active');
+}
+function pvSelCard(el){
+  el.closest('.pv-panel').querySelectorAll('.pv-plan-card,.pv-ilim-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+</script>
+
 </section>
 <!-- HORARIOS -->
 <!DOCTYPE html>
