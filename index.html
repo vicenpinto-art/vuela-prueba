@@ -665,16 +665,19 @@
   </div>
 
   <div class="pill-row">
-    <button class="pv-pill pv-pill-vuela active" id="pp-vuela" onclick="pvShow('vuela')">Vuela</button>
-    <button class="pv-pill pv-pill-muevete" id="pp-muevete" onclick="pvShow('muevete')">Muévete</button>
-    <button class="pv-pill pv-pill-ilimitado" id="pp-ilimitado" onclick="pvShow('ilimitado')">Ilimitados</button>
-    <button class="pv-pill pv-pill-gym" id="pp-gym" onclick="pvShow('gym')">Gym</button>
+    <button class="pv-pill pv-pill active" id="pp-vuela" onclick="pvShow('vuela')">Vuela</button>
+    <button class="pv-pill" id="pp-muevete" onclick="pvShow('muevete')">Muévete</button>
+    <button class="pv-pill" id="pp-ilimitado" onclick="pvShow('ilimitado')">Ilimitados</button>
+    <button class="pv-pill" id="pp-gym" onclick="pvShow('gym')">Gym</button>
   </div>
 
   <!-- VUELA -->
   <div id="pvpanel-vuela" class="pv-panel visible">
     <div class="pv-cards-grid">
-
+      <div class="pv-plan-card pv-v" onclick="pvSelCard(this)"><div class="pv-clases">4 clases</div><div class="pv-precio">$38.990</div></div>
+      <div class="pv-plan-card pv-v" onclick="pvSelCard(this)"><div class="pv-clases">6 clases</div><div class="pv-precio">$49.990</div></div>
+      <div class="pv-plan-card pv-v" onclick="pvSelCard(this)"><div class="pv-clases">8 clases</div><div class="pv-precio">$65.990</div></div>
+      <div class="pv-plan-card pv-v" onclick="pvSelCard(this)"><div class="pv-clases">12 clases</div><div class="pv-precio">$82.990</div></div>
     </div>
     <p class="pv-note">+ $13.000 agrega acceso al gym durante el mes</p>
     <div class="pv-clases-box pv-box-v">
@@ -777,7 +780,10 @@ function pvShow(plan){
   document.querySelectorAll('.pv-pill').forEach(p=>p.classList.remove('active'));
   document.getElementById('pp-'+plan).classList.add('active');
 }
-
+function pvSelCard(el){
+  el.closest('.pv-panel').querySelectorAll('.pv-plan-card,.pv-ilim-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+}
 </script>
 
 </section>
