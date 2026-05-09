@@ -363,13 +363,27 @@
     @media (max-width: 900px) {
       nav ul { display: none; }
       .hero-grid { grid-template-columns: 1fr; }
-      .hero-image { display: none; }
+      .hero-image { display: block !important; }
+      .hero-photo { max-width: 100%; aspect-ratio: 4/3; }
       .nosotros-grid { grid-template-columns: 1fr; }
       .nosotros-imgs { height: 300px; }
       .contacto-inner { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
       section { padding: 70px 24px; }
       nav { padding: 16px 24px; }
+    }
+
+    @media (max-width: 768px) {
+      #clases { padding: 60px 16px !important; }
+      #clases a[href] { padding: 10px 16px !important; font-size: 13px !important; }
+      #clases div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+      #clases img { height: 220px !important; grid-column: 1 !important; grid-row: auto !important; }
+      .outer-box { padding: 1rem !important; }
+      .pv-cards-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      .pv-gym-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      .salas-grid { grid-template-columns: 1fr !important; }
+      .dias-tabs { gap: 6px !important; }
+      .dia-tab { padding: 8px 12px !important; font-size: 12px !important; }
     }
   </style>
 </head>
@@ -439,7 +453,7 @@
       <p class="section-sub" style="margin-top:16px">Creemos que existen pocos espacios reservados donde las mujeres podamos jugar desde el cuerpo y no desde lo intelectual y cuando hablamos de deportes son pocas las disciplinas predominantemente femeninos a los que se les antepone la palabra juego. Por eso creemos importante brindar un espacio para que vengas a jugar con tus amigas o conocer amigas nuevas 💛</p>
       <p class="section-sub" style="margin-top:16px">En 2023 crecimos, se nos unió nuestra querida Glo y nos transformamos en el lugar que hoy conoces. En 2025, la Valito vino a completar y potenciar el equipo y juntas coordinamos un hermoso grupo multidisciplinario de 10 profesoras y trabajadoras que aman lo que hacen y se esfuerzan para que vivas la mejor experiencia posible 💖</p>
       <p class="section-sub" style="margin-top:16px">Te invitamos a un lugar donde no venimos a cambiar nuestros cuerpos, venimos a conectar con nosotras mismas y con otras ✨</p>
-      <p style="margin-top:48px; font-size:32px; font-weight:600; color:#111;">Bienvenida! 🪽</p>
+      <p style="margin-top:48px; font-size:20px; font-weight:600; color:#737272;">Bienvenida! 🪽</p>
     </div>
   </div>
 </section>
