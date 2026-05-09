@@ -3,10 +3,326 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fuerza — Espacio Vuela</title>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>Clases de Fuerza — Espacio Vuela</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --coral: #ff4e68;
+      --yellow: #fecb29;
+      --cyan: #00c8d4;
+      --purple: #a183ff;
+      --magenta: #ff008d;
+      --orange: #ff8700;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Outfit', sans-serif; background: #fff; color: #111; overflow-x: hidden; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      padding: 20px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    nav img { height: 44px; }
+    nav ul { list-style: none; display: flex; gap: 36px; align-items: center; }
+    nav ul a {
+      text-decoration: none; color: rgba(0,0,0,0.6);
+      font-size: 14px; font-weight: 500; letter-spacing: 0.5px;
+      transition: color .2s;
+    }
+    nav ul a:hover { color: var(--coral); }
+    .nav-cta {
+      background: var(--coral); color: #fff !important;
+      padding: 10px 22px; border-radius: 100px;
+      font-weight: 600 !important;
+      transition: transform .2s, box-shadow .2s !important;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,78,104,.4) !important; }
+
+    /* ── HERO ── */
+    .page-hero {
+      padding: 140px 40px 80px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(255,78,104,.06) 0%, rgba(255,135,0,.05) 50%, rgba(255,78,104,.04) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,78,104,.08), transparent);
+    }
+    .hero-tag {
+      display: inline-block;
+      background: var(--coral); color: #fff;
+      padding: 6px 20px; border-radius: 100px;
+      font-size: 12px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .page-hero h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(52px, 8vw, 100px);
+      color: #111; line-height: 1;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .page-hero p {
+      font-size: 18px; color: rgba(0,0,0,.5);
+      max-width: 500px; margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── DISCIPLINAS ── */
+    .disciplinas { max-width: 1200px; margin: 0 auto; padding: 80px 40px; }
+
+    .disciplina {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      padding: 60px 0;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .disciplina:last-child { border-bottom: none; }
+    .disciplina.reverse { direction: rtl; }
+    .disciplina.reverse > * { direction: ltr; }
+
+    .disciplina-numero {
+      font-size: 80px; font-weight: 800;
+      color: rgba(0,0,0,.04);
+      line-height: 1;
+      margin-bottom: -20px;
+    }
+    .disciplina-tag {
+      display: inline-block;
+      padding: 4px 14px; border-radius: 100px;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .tag-coral { background: rgba(255,78,104,.12); color: var(--coral); }
+    .tag-orange { background: rgba(255,135,0,.12); color: #cc6a00; }
+    .tag-cyan { background: rgba(0,200,212,.12); color: #007a82; }
+    .tag-purple { background: rgba(161,131,255,.15); color: #6b4fc8; }
+    .tag-yellow { background: rgba(254,203,41,.2); color: #8a6400; }
+    .tag-magenta { background: rgba(255,0,141,.1); color: var(--magenta); }
+
+    .disciplina-texto h2 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(40px, 5vw, 60px);
+      color: #111; line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .disciplina-texto p {
+      font-size: 16px; color: rgba(0,0,0,.55);
+      line-height: 1.8; margin-bottom: 24px;
+    }
+    .disciplina-info {
+      display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .info-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: #666; font-weight: 500;
+    }
+    .info-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--coral); flex-shrink: 0;
+    }
+
+    /* ── FOTOS ── */
+    .disciplina-fotos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+      height: 480px;
+    }
+    .disciplina-fotos img {
+      width: 100%; height: 100%;
+      object-fit: cover; border-radius: 16px;
+    }
+    .disciplina-fotos img:first-child {
+      grid-row: 1 / 3;
+      border-radius: 20px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 40px; text-align: center;
+      border-top: 1px solid rgba(0,0,0,.08);
+      background: #fff;
+    }
+    footer img { height: 36px; margin-bottom: 16px; }
+    footer p { font-size: 13px; color: #888; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 14px 16px; }
+      nav ul { gap: 16px; }
+      nav ul li:nth-child(2),
+      nav ul li:nth-child(3),
+      nav ul li:nth-child(4) { display: none; }
+      .page-hero { padding: 120px 20px 60px; }
+      .disciplinas { padding: 40px 20px; }
+      .disciplina { grid-template-columns: 1fr; gap: 32px; }
+      .disciplina.reverse { direction: ltr; }
+      .disciplina-fotos { height: 300px; }
+      .disciplina-numero { font-size: 48px; }
+    }
+  </style>
 </head>
 <body>
-  <p>Página de Fuerza</p>
+
+<!-- NAV -->
+<nav>
+  <img src="images/logo.png" alt="Espacio Vuela" onerror="this.style.display='none'; this.nextSibling.style.display='block'">
+  <span style="display:none; font-family:'Dancing Script',cursive; font-size:28px; color:var(--coral)">Vuela</span>
+  <ul>
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="index.html#clases">Clases</a></li>
+    <li><a href="index.html#planes">Planes</a></li>
+    <li><a href="index.html#horarios">Horarios</a></li>
+    <li><a href="index.html#contacto" class="nav-cta">Reserva tu clase</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero">
+  <span class="hero-tag">Fuerza</span>
+  <h1>Clases de Fuerza</h1>
+  <p>Tonifica, fortalece y conecta con tu cuerpo. Nuestras clases de fuerza están diseñadas para que te sientas poderosa desde adentro.</p>
+</div>
+
+<!-- DISCIPLINAS -->
+<div class="disciplinas">
+
+  <!-- 1. ENTRENAMIENTO FUNCIONAL -->
+  <div class="disciplina">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">01</div>
+      <span class="disciplina-tag tag-coral">Fuerza</span>
+      <h2>Entrenamiento Funcional</h2>
+      <p>Ejercicios que imitan los movimientos naturales del cuerpo para mejorar tu rendimiento en la vida diaria. Ganarás fuerza, resistencia y coordinación de forma integral, usando tu propio peso y herramientas simples. Una clase intensa y satisfactoria que te deja con energía para todo el día.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Vuela</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/fuerza/foto1.jpg" alt="Entrenamiento Funcional" onerror="this.style.background='#ff4e68'">
+      <img src="images/fuerza/foto2.jpg" alt="Entrenamiento Funcional" onerror="this.style.background='#ff9bc3'">
+      <img src="images/fuerza/foto3.jpg" alt="Entrenamiento Funcional" onerror="this.style.background='#fecb29'">
+    </div>
+  </div>
+
+  <!-- 2. PILATES ZEN -->
+  <div class="disciplina reverse">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">02</div>
+      <span class="disciplina-tag tag-cyan">Fuerza</span>
+      <h2>Pilates Zen</h2>
+      <p>Una fusión de Pilates clásico con elementos de meditación y mindfulness. Trabajarás la fuerza del core, la postura y la respiración en un ambiente tranquilo y consciente. Perfecta para quienes buscan un entrenamiento que conecte el cuerpo y la mente.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Vuela · Plan Muévete</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/fuerza/foto4.jpg" alt="Pilates Zen" onerror="this.style.background='#00c8d4'">
+      <img src="images/fuerza/foto5.jpg" alt="Pilates Zen" onerror="this.style.background='#00ffcc'">
+      <img src="images/fuerza/foto6.jpg" alt="Pilates Zen" onerror="this.style.background='#a183ff'">
+    </div>
+  </div>
+
+  <!-- 3. HANDSTAND Y CONTORSIÓN -->
+  <div class="disciplina">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">03</div>
+      <span class="disciplina-tag tag-purple">Fuerza</span>
+      <h2>Handstand y Contorsión</h2>
+      <p>Aprende a pararte en tus manos y a doblar tu cuerpo de formas que nunca imaginaste. Esta clase trabaja la fuerza de brazos y hombros, el equilibrio y la flexibilidad extrema de forma progresiva y segura. Un desafío que vale cada segundo de esfuerzo.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Vuela · Plan Muévete</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/fuerza/foto7.jpg" alt="Handstand y Contorsión" onerror="this.style.background='#a183ff'">
+      <img src="images/fuerza/foto8.jpg" alt="Handstand y Contorsión" onerror="this.style.background='#b9a2ff'">
+      <img src="images/fuerza/foto9.jpg" alt="Handstand y Contorsión" onerror="this.style.background='#fecb29'">
+    </div>
+  </div>
+
+  <!-- 4. FLEXIBILIDAD -->
+  <div class="disciplina reverse">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">04</div>
+      <span class="disciplina-tag tag-yellow">Fuerza</span>
+      <h2>Flexibilidad</h2>
+      <p>Recupera o desarrolla el rango de movimiento que tu cuerpo necesita. Esta clase trabaja de forma progresiva la elongación muscular, la movilidad articular y la conciencia corporal. Ideal como complemento de cualquier otra disciplina y para prevenir lesiones.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Vuela · Plan Muévete</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/fuerza/foto10.jpg" alt="Flexibilidad" onerror="this.style.background='#fecb29'">
+      <img src="images/fuerza/foto11.jpg" alt="Flexibilidad" onerror="this.style.background='#ff9bc3'">
+      <img src="images/fuerza/foto12.jpg" alt="Flexibilidad" onerror="this.style.background='#00c8d4'">
+    </div>
+  </div>
+
+  <!-- 5. TABATA -->
+  <div class="disciplina">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">05</div>
+      <span class="disciplina-tag tag-orange">Fuerza</span>
+      <h2>Tabata</h2>
+      <p>El entrenamiento de alta intensidad más efectivo en el menor tiempo posible. El método Tabata consiste en intervalos de 20 segundos de trabajo máximo y 10 segundos de descanso. Quemarás calorías, ganarás resistencia y saldrás de la clase sintiéndote invencible.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Nivel intermedio</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Vuela · Plan Muévete</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/fuerza/foto13.jpg" alt="Tabata" onerror="this.style.background='#ff8700'">
+      <img src="images/fuerza/foto14.jpg" alt="Tabata" onerror="this.style.background='#ff4e68'">
+      <img src="images/fuerza/foto15.jpg" alt="Tabata" onerror="this.style.background='#fecb29'">
+    </div>
+  </div>
+
+  <!-- 6. BARRE -->
+  <div class="disciplina reverse">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">06</div>
+      <span class="disciplina-tag tag-magenta">Fuerza</span>
+      <h2>Barre</h2>
+      <p>Inspirada en el ballet clásico, la clase de Barre usa la barra como apoyo para trabajar piernas, glúteos y core con movimientos elegantes y precisos. No necesitas ser bailarina — esta clase está diseñada para todas y te dará fuerza, postura y gracia en partes iguales.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Vuela · Plan Muévete</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/fuerza/foto16.jpg" alt="Barre" onerror="this.style.background='#ff008d'">
+      <img src="images/fuerza/foto17.jpg" alt="Barre" onerror="this.style.background='#ff9bc3'">
+      <img src="images/fuerza/foto18.jpg" alt="Barre" onerror="this.style.background='#a183ff'">
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <img src="images/logo.png" alt="Espacio Vuela" onerror="this.style.display='none'">
+  <p style="margin-bottom:8px">© 2026 Espacio Vuela — Solo para mujeres 💜</p>
+  <p style="font-size:12px; color:#bbb;">Dr. Luis Middleton 1638, Providencia</p>
+</footer>
+
 </body>
 </html>
