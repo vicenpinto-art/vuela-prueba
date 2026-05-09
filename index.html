@@ -379,6 +379,13 @@
   html { font-size: 14px; }
   section { padding: 56px 16px !important; }
   nav { padding: 14px 16px; }
+  nav ul { display: flex !important; gap: 0 !important; }
+  nav ul li { display: none; }
+  nav ul li:nth-child(3) { display: block; }
+  nav ul li:nth-child(5) { display: block; }
+  nav ul li:nth-child(6) { display: block; }
+  nav ul li:nth-child(3) a,
+  nav ul li:nth-child(5) a { font-size: 12px !important; padding: 6px 8px !important; }
 
   /* ── 1. HERO FOTO ── */
   .hero-image { display: block !important; width: 100%; }
@@ -395,6 +402,7 @@
   .hero-text { order: 1; }
   .hero-image { order: 2; }
   .hero-text h1 { font-size: 44px !important; }
+  .hero-text h2 { font-size: 13px !important; letter-spacing: 2px !important; }
   .hero-float { display: none; }
 
   /* ── 2. BOTONES BAILE/AÉREAS/FUERZA/GYM ── */
