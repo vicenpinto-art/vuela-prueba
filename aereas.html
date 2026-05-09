@@ -4,9 +4,264 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clases Aéreas — Espacio Vuela</title>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --coral: #ff4e68;
+      --yellow: #fecb29;
+      --cyan: #00c8d4;
+      --purple: #a183ff;
+      --magenta: #ff008d;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Outfit', sans-serif; background: #fff; color: #111; overflow-x: hidden; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      padding: 20px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    nav img { height: 44px; }
+    nav ul { list-style: none; display: flex; gap: 36px; align-items: center; }
+    nav ul a {
+      text-decoration: none; color: rgba(0,0,0,0.6);
+      font-size: 14px; font-weight: 500; letter-spacing: 0.5px;
+      transition: color .2s;
+    }
+    nav ul a:hover { color: var(--purple); }
+    .nav-cta {
+      background: var(--coral); color: #fff !important;
+      padding: 10px 22px; border-radius: 100px;
+      font-weight: 600 !important;
+      transition: transform .2s, box-shadow .2s !important;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,78,104,.4) !important; }
+
+    /* ── HERO ── */
+    .page-hero {
+      padding: 140px 40px 80px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(161,131,255,.07) 0%, rgba(0,200,212,.04) 50%, rgba(161,131,255,.04) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(161,131,255,.1), transparent);
+    }
+    .hero-tag {
+      display: inline-block;
+      background: var(--purple); color: #fff;
+      padding: 6px 20px; border-radius: 100px;
+      font-size: 12px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .page-hero h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(52px, 8vw, 100px);
+      color: #111; line-height: 1;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .page-hero p {
+      font-size: 18px; color: rgba(0,0,0,.5);
+      max-width: 500px; margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── DISCIPLINAS ── */
+    .disciplinas { max-width: 1200px; margin: 0 auto; padding: 80px 40px; }
+
+    .disciplina {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      padding: 60px 0;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .disciplina:last-child { border-bottom: none; }
+    .disciplina.reverse { direction: rtl; }
+    .disciplina.reverse > * { direction: ltr; }
+
+    .disciplina-numero {
+      font-size: 80px; font-weight: 800;
+      color: rgba(0,0,0,.04);
+      line-height: 1;
+      margin-bottom: -20px;
+    }
+    .disciplina-tag {
+      display: inline-block;
+      padding: 4px 14px; border-radius: 100px;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .tag-purple { background: rgba(161,131,255,.15); color: #6b4fc8; }
+    .tag-cyan { background: rgba(0,200,212,.12); color: #007a82; }
+    .tag-coral { background: rgba(255,78,104,.12); color: var(--coral); }
+
+    .disciplina-texto h2 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(40px, 5vw, 60px);
+      color: #111; line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .disciplina-texto p {
+      font-size: 16px; color: rgba(0,0,0,.55);
+      line-height: 1.8; margin-bottom: 24px;
+    }
+    .disciplina-info {
+      display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .info-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: #666; font-weight: 500;
+    }
+    .info-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--purple); flex-shrink: 0;
+    }
+
+    /* ── FOTOS ── */
+    .disciplina-fotos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+      height: 480px;
+    }
+    .disciplina-fotos img {
+      width: 100%; height: 100%;
+      object-fit: cover; border-radius: 16px;
+    }
+    .disciplina-fotos img:first-child {
+      grid-row: 1 / 3;
+      border-radius: 20px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 40px; text-align: center;
+      border-top: 1px solid rgba(0,0,0,.08);
+      background: #fff;
+    }
+    footer img { height: 36px; margin-bottom: 16px; }
+    footer p { font-size: 13px; color: #888; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 14px 16px; }
+      nav ul { gap: 16px; }
+      nav ul li:nth-child(2),
+      nav ul li:nth-child(3),
+      nav ul li:nth-child(4) { display: none; }
+      .page-hero { padding: 120px 20px 60px; }
+      .disciplinas { padding: 40px 20px; }
+      .disciplina { grid-template-columns: 1fr; gap: 32px; }
+      .disciplina.reverse { direction: ltr; }
+      .disciplina-fotos { height: 300px; }
+      .disciplina-numero { font-size: 48px; }
+    }
+  </style>
 </head>
 <body>
-  <p>Página de Aéreas</p>
+
+<!-- NAV -->
+<nav>
+  <img src="images/logo.png" alt="Espacio Vuela" onerror="this.style.display='none'; this.nextSibling.style.display='block'">
+  <span style="display:none; font-family:'Dancing Script',cursive; font-size:28px; color:var(--coral)">Vuela</span>
+  <ul>
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="index.html#clases">Clases</a></li>
+    <li><a href="index.html#planes">Planes</a></li>
+    <li><a href="index.html#horarios">Horarios</a></li>
+    <li><a href="index.html#contacto" class="nav-cta">Reserva tu clase</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero">
+  <span class="hero-tag">Vuela</span>
+  <h1>Clases Aéreas</h1>
+  <p>Desafía la gravedad. Nuestras disciplinas aéreas combinan fuerza, arte y expresión para llevarte a un nivel completamente nuevo.</p>
+</div>
+
+<!-- DISCIPLINAS -->
+<div class="disciplinas">
+
+  <!-- 1. AERIAL YOGA -->
+  <div class="disciplina">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">01</div>
+      <span class="disciplina-tag tag-purple">Aérea</span>
+      <h2>Aerial Yoga</h2>
+      <p>El yoga tradicional elevado al aire. Suspendida en una tela resistente, podrás realizar posturas que en el suelo serían imposibles, descomprimiendo la columna, ganando flexibilidad y conectando profundamente con tu cuerpo y tu respiración.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Vuela</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/aereas/foto1.jpg" alt="Aerial Yoga" onerror="this.style.background='#a183ff'">
+      <img src="images/aereas/foto2.jpg" alt="Aerial Yoga" onerror="this.style.background='#b9a2ff'">
+      <img src="images/aereas/foto3.jpg" alt="Aerial Yoga" onerror="this.style.background='#00c8d4'">
+    </div>
+  </div>
+
+  <!-- 2. POLE SPORT -->
+  <div class="disciplina reverse">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">02</div>
+      <span class="disciplina-tag tag-coral">Aérea</span>
+      <h2>Pole Sport</h2>
+      <p>El pole dance como deporte de alto rendimiento. Combina acrobacia, fuerza, flexibilidad y arte en una disciplina que transforma tu cuerpo y tu confianza. En Espacio Vuela tenemos clases para todos los niveles, desde tu primera vez hasta coreografías avanzadas.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Vuela</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/aereas/foto4.jpg" alt="Pole Sport" onerror="this.style.background='#ff4e68'">
+      <img src="images/aereas/foto5.jpg" alt="Pole Sport" onerror="this.style.background='#ff9bc3'">
+      <img src="images/aereas/foto6.jpg" alt="Pole Sport" onerror="this.style.background='#fecb29'">
+    </div>
+  </div>
+
+  <!-- 3. LIRA -->
+  <div class="disciplina">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">03</div>
+      <span class="disciplina-tag tag-cyan">Aérea</span>
+      <h2>Lira</h2>
+      <p>El aro aéreo es una disciplina que combina la danza y la acrobacia dentro de un aro metálico suspendido en el aire. Trabajarás fuerza en brazos y core mientras creas figuras hermosas y fluidas. Una disciplina artística que te va a enamorar desde la primera clase.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Vuela</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/aereas/foto7.jpg" alt="Lira" onerror="this.style.background='#00c8d4'">
+      <img src="images/aereas/foto8.jpg" alt="Lira" onerror="this.style.background='#00ffcc'">
+      <img src="images/aereas/foto9.jpg" alt="Lira" onerror="this.style.background='#a183ff'">
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <img src="images/logo.png" alt="Espacio Vuela" onerror="this.style.display='none'">
+  <p style="margin-bottom:8px">© 2026 Espacio Vuela — Solo para mujeres 💜</p>
+  <p style="font-size:12px; color:#bbb;">Dr. Luis Middleton 1638, Providencia</p>
+</footer>
+
 </body>
 </html>
