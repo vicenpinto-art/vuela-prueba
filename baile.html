@@ -4,9 +4,345 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clases de Baile — Espacio Vuela</title>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --coral: #ff4e68;
+      --yellow: #fecb29;
+      --cyan: #00c8d4;
+      --purple: #a183ff;
+      --magenta: #ff008d;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Outfit', sans-serif; background: #fff; color: #111; overflow-x: hidden; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      padding: 20px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    nav img { height: 44px; }
+    nav ul { list-style: none; display: flex; gap: 36px; align-items: center; }
+    nav ul a {
+      text-decoration: none; color: rgba(0,0,0,0.6);
+      font-size: 14px; font-weight: 500; letter-spacing: 0.5px;
+      transition: color .2s;
+    }
+    nav ul a:hover { color: var(--coral); }
+    .nav-cta {
+      background: var(--coral); color: #fff !important;
+      padding: 10px 22px; border-radius: 100px;
+      font-weight: 600 !important;
+      transition: transform .2s, box-shadow .2s !important;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,78,104,.4) !important; }
+
+    /* ── HERO ── */
+    .page-hero {
+      padding: 140px 40px 80px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(254,203,41,.06) 0%, rgba(255,78,104,.04) 50%, rgba(161,131,255,.04) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(254,203,41,.08), transparent);
+    }
+    .hero-tag {
+      display: inline-block;
+      background: var(--yellow); color: #5a4000;
+      padding: 6px 20px; border-radius: 100px;
+      font-size: 12px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .page-hero h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(52px, 8vw, 100px);
+      color: #111; line-height: 1;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .page-hero p {
+      font-size: 18px; color: rgba(0,0,0,.5);
+      max-width: 500px; margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── DISCIPLINAS ── */
+    .disciplinas { max-width: 1200px; margin: 0 auto; padding: 80px 40px; }
+
+    .disciplina {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      padding: 60px 0;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      position: relative;
+    }
+    .disciplina:last-child { border-bottom: none; }
+    .disciplina.reverse { direction: rtl; }
+    .disciplina.reverse > * { direction: ltr; }
+
+    .disciplina-texto { }
+    .disciplina-numero {
+      font-size: 80px; font-weight: 800;
+      color: rgba(0,0,0,.04);
+      line-height: 1;
+      margin-bottom: -20px;
+      font-variant-numeric: tabular-nums;
+    }
+    .disciplina-tag {
+      display: inline-block;
+      padding: 4px 14px; border-radius: 100px;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .tag-yellow { background: rgba(254,203,41,.2); color: #8a6400; }
+    .tag-coral { background: rgba(255,78,104,.12); color: var(--coral); }
+    .tag-purple { background: rgba(161,131,255,.15); color: #6b4fc8; }
+    .tag-cyan { background: rgba(0,200,212,.12); color: #007a82; }
+    .tag-magenta { background: rgba(255,0,141,.1); color: var(--magenta); }
+
+    .disciplina-texto h2 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(40px, 5vw, 60px);
+      color: #111; line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .disciplina-texto p {
+      font-size: 16px; color: rgba(0,0,0,.55);
+      line-height: 1.8; margin-bottom: 24px;
+    }
+    .disciplina-info {
+      display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .info-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: #666; font-weight: 500;
+    }
+    .info-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--coral); flex-shrink: 0;
+    }
+
+    /* ── FOTOS ── */
+    .disciplina-fotos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+      height: 480px;
+    }
+    .disciplina-fotos img {
+      width: 100%; height: 100%;
+      object-fit: cover; border-radius: 16px;
+    }
+    .disciplina-fotos img:first-child {
+      grid-row: 1 / 3;
+      border-radius: 20px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 40px; text-align: center;
+      border-top: 1px solid rgba(0,0,0,.08);
+      background: #fff;
+    }
+    footer img { height: 36px; margin-bottom: 16px; }
+    footer p { font-size: 13px; color: #888; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 14px 16px; }
+      nav ul { gap: 16px; }
+      nav ul li:nth-child(2),
+      nav ul li:nth-child(3),
+      nav ul li:nth-child(4) { display: none; }
+      .page-hero { padding: 120px 20px 60px; }
+      .disciplinas { padding: 40px 20px; }
+      .disciplina { grid-template-columns: 1fr; gap: 32px; }
+      .disciplina.reverse { direction: ltr; }
+      .disciplina-fotos { height: 300px; }
+      .disciplina-numero { font-size: 48px; }
+    }
+  </style>
 </head>
 <body>
-  <p>Página de Baile</p>
+
+<!-- NAV -->
+<nav>
+  <img src="images/logo.png" alt="Espacio Vuela" onerror="this.style.display='none'; this.nextSibling.style.display='block'">
+  <span style="display:none; font-family:'Dancing Script',cursive; font-size:28px; color:var(--coral)">Vuela</span>
+  <ul>
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="index.html#clases">Clases</a></li>
+    <li><a href="index.html#planes">Planes</a></li>
+    <li><a href="index.html#horarios">Horarios</a></li>
+    <li><a href="index.html#contacto" class="nav-cta">Reserva tu clase</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero">
+  <span class="hero-tag">Muévete</span>
+  <h1>Clases de Baile</h1>
+  <p>Desde el reggaetón hasta el K-POP, nuestras clases de baile están pensadas para que te muevas, te expreses y la pases increíble.</p>
+</div>
+
+<!-- DISCIPLINAS -->
+<div class="disciplinas">
+
+  <!-- 1. HEELS -->
+  <div class="disciplina">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">01</div>
+      <span class="disciplina-tag tag-coral">Baile</span>
+      <h2>Heels</h2>
+      <p>Baila con tacones y descubre el poder de tu feminidad. Esta clase combina técnica de danza con actitud y confianza, desarrollando fuerza en piernas y una postura impecable. No importa si nunca has bailado — aquí todas aprendemos juntas.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Muévete</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/baile/foto1.jpg" alt="Heels" onerror="this.style.background='#fecb29'; this.style.display='block'">
+      <img src="images/baile/foto2.jpg" alt="Heels" onerror="this.style.background='#ff9bc3'; this.style.display='block'">
+      <img src="images/baile/foto3.jpg" alt="Heels" onerror="this.style.background='#ff4e68'; this.style.display='block'">
+    </div>
+  </div>
+
+  <!-- 2. REGGAETÓN EXTENDED -->
+  <div class="disciplina reverse">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">02</div>
+      <span class="disciplina-tag tag-yellow">Baile</span>
+      <h2>Reggaetón Extended</h2>
+      <p>Una clase de reggaetón extendida para las que quieren más. Más tiempo, más coreografía, más sudor y más diversión. Perfecta para quienes ya tienen experiencia o simplemente quieren profundizar en el género.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Nivel intermedio</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Muévete</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/baile/foto4.jpg" alt="Reggaetón Extended" onerror="this.style.background='#fecb29'">
+      <img src="images/baile/foto5.jpg" alt="Reggaetón Extended" onerror="this.style.background='#a183ff'">
+      <img src="images/baile/foto6.jpg" alt="Reggaetón Extended" onerror="this.style.background='#ff4e68'">
+    </div>
+  </div>
+
+  <!-- 3. REGGAETÓN FEM -->
+  <div class="disciplina">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">03</div>
+      <span class="disciplina-tag tag-magenta">Baile</span>
+      <h2>Reggaetón Fem</h2>
+      <p>El reggaetón desde una perspectiva femenina y empoderada. Coreografías que celebran el cuerpo y la sensualidad con libertad y sin juicios. Una clase para conectar contigo misma al ritmo del reggaetón.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Muévete</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/baile/foto7.jpg" alt="Reggaetón Fem" onerror="this.style.background='#ff008d'">
+      <img src="images/baile/foto8.jpg" alt="Reggaetón Fem" onerror="this.style.background='#ff9bc3'">
+      <img src="images/baile/foto9.jpg" alt="Reggaetón Fem" onerror="this.style.background='#fecb29'">
+    </div>
+  </div>
+
+  <!-- 4. DANCEHALL -->
+  <div class="disciplina reverse">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">04</div>
+      <span class="disciplina-tag tag-yellow">Baile</span>
+      <h2>Dancehall</h2>
+      <p>El dancehall jamaicano llega a Espacio Vuela con toda su energía y sabor. Aprende los pasos originales de este género lleno de actitud, ritmo y expresión cultural. Una clase única que te va a dejar con ganas de más.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Muévete</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/baile/foto10.jpg" alt="Dancehall" onerror="this.style.background='#00ffcc'">
+      <img src="images/baile/foto11.jpg" alt="Dancehall" onerror="this.style.background='#a183ff'">
+      <img src="images/baile/foto12.jpg" alt="Dancehall" onerror="this.style.background='#fecb29'">
+    </div>
+  </div>
+
+  <!-- 5. K-POP -->
+  <div class="disciplina">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">05</div>
+      <span class="disciplina-tag tag-purple">Baile</span>
+      <h2>K-POP</h2>
+      <p>¿Fanática del K-POP? Esta clase es para ti. Aprende las coreografías exactas de tus artistas favoritos en un ambiente lleno de energía y entusiasmo. Cambia de canción según las peticiones del grupo, porque aquí el setlist lo decides tú.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Muévete</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/baile/foto13.jpg" alt="K-POP" onerror="this.style.background='#a183ff'">
+      <img src="images/baile/foto14.jpg" alt="K-POP" onerror="this.style.background='#fecb29'">
+      <img src="images/baile/foto15.jpg" alt="K-POP" onerror="this.style.background='#ff4e68'">
+    </div>
+  </div>
+
+  <!-- 6. GIRLY -->
+  <div class="disciplina reverse">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">06</div>
+      <span class="disciplina-tag tag-coral">Baile</span>
+      <h2>Girly</h2>
+      <p>Movimientos femeninos, expresivos y delicados al ritmo de pop. Una clase para explorar la feminidad desde el baile, con coreografías fluidas que combinan distintos estilos. La clase más "cute" de Espacio Vuela.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Muévete</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/baile/foto16.jpg" alt="Girly" onerror="this.style.background='#ff9bc3'">
+      <img src="images/baile/foto17.jpg" alt="Girly" onerror="this.style.background='#fecb29'">
+      <img src="images/baile/foto18.jpg" alt="Girly" onerror="this.style.background='#a183ff'">
+    </div>
+  </div>
+
+  <!-- 7. HIP-HOP -->
+  <div class="disciplina">
+    <div class="disciplina-texto">
+      <div class="disciplina-numero">07</div>
+      <span class="disciplina-tag tag-cyan">Baile</span>
+      <h2>Hip-Hop</h2>
+      <p>Freestyle, coreografías urbanas y mucha actitud. El hip-hop en Espacio Vuela es una clase de expresión libre donde aprenderás los fundamentos del estilo urbano en un ambiente sin juicios. Para todas las que quieren bailar con potencia y autenticidad.</p>
+      <div class="disciplina-info">
+        <div class="info-item"><div class="info-dot"></div>Todos los niveles</div>
+        <div class="info-item"><div class="info-dot"></div>Plan Muévete</div>
+      </div>
+    </div>
+    <div class="disciplina-fotos">
+      <img src="images/baile/foto19.jpg" alt="Hip-Hop" onerror="this.style.background='#00c8d4'">
+      <img src="images/baile/foto20.jpg" alt="Hip-Hop" onerror="this.style.background='#fecb29'">
+      <img src="images/baile/foto21.jpg" alt="Hip-Hop" onerror="this.style.background='#ff4e68'">
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <img src="images/logo.png" alt="Espacio Vuela" onerror="this.style.display='none'">
+  <p style="margin-bottom:8px">© 2026 Espacio Vuela — Solo para mujeres 💜</p>
+  <p style="font-size:12px; color:#bbb;">Dr. Luis Middleton 1638, Providencia</p>
+</footer>
+
 </body>
 </html>
