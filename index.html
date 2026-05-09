@@ -476,24 +476,16 @@
     gap: 8px !important;
     overflow-x: unset !important;
     padding-bottom: 8px !important;
-    align-items: start !important;
+    align-items: stretch !important;
   }
+  .sala-card { min-width: 0 !important; flex-shrink: unset !important; display: flex !important; flex-direction: column !important; width: 100% !important; box-sizing: border-box !important; }
+  .sala-clases { flex: 1 !important; }
+  .clase-nombre { font-size: 11px !important; white-space: normal !important; word-break: break-word !important; }
+  .salas-grid { align-items: stretch !important; }
   .sala-card:last-child {
     grid-column: 1 / 3 !important;
     width: calc(50% - 4px) !important;
     margin: 0 auto !important;
-  }
-  .sala-card { min-width: 0 !important; flex-shrink: unset !important; display: flex !important; flex-direction: column !important; height: 210px !important; width: 100% !important; box-sizing: border-box !important; }
-  .sala-card:last-child { height: 210px !important; width: 100% !important; }
-  .salas-grid { align-items: start !important; }
-  .sala-clases { flex: 1 !important; overflow: hidden !important; }
-  .clase-nombre { font-size: 11px !important; white-space: normal !important; word-break: break-word !important; }
-  .salas-grid { align-items: start !important; }
-  .sala-card:last-child {
-    grid-column: 1 / 3 !important;
-    width: 50% !important;
-    margin: 0 auto !important;
-    height: auto !important;
   }
   .sala-header { padding: 10px 12px !important; }
   .sala-nombre { font-size: 10px !important; letter-spacing: 0.5px !important; }
