@@ -828,6 +828,19 @@ function pvSelCard(el){
     gap: 20px;
   }
 
+  @media (max-width: 768px) {
+    .salas-grid {
+      grid-template-columns: 1fr !important;
+      overflow-x: auto;
+    }
+    .horarios-section {
+      padding: 40px 12px;
+    }
+    .sala-card {
+      min-width: 0;
+    }
+  }
+
   .sala-card {
     border-radius: 20px;
     overflow: hidden;
