@@ -1251,6 +1251,14 @@ function pvSelCard(el){
 </script>
 
 <!-- CONTACTO -->
+<style>
+@media (max-width: 600px) {
+  .contact-info { justify-content: center; gap: 16px !important; }
+  .contact-info .contact-item { width: calc(50% - 8px); display: flex; justify-content: center; }
+  .contact-info .contact-item:nth-child(2) { order: 3; width: 100%; justify-content: center; }
+  .contact-info .contact-item:nth-child(3) { order: 2; }
+}
+</style>
 <section id="contacto">
   <div style="max-width:600px; margin:0 auto; text-align:center;">
     <p class="section-label">Contáctanos</p>
