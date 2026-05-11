@@ -550,6 +550,23 @@
   }
   nav > ul li:last-child a { border-bottom: none; }
   .nav-mobile-bar { display: flex; align-items: center; gap: 10px; }
+  .nav-mobile-bar a { text-decoration: none; }
+  nav > ul li, nav > ul li * {
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    padding: 12px 4px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    color: rgba(0,0,0,.7) !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    text-decoration: none !important;
+    display: block !important;
+    width: 100% !important;
+    letter-spacing: normal !important;
+  }
+  nav > ul li:last-child, nav > ul li:last-child * { border-bottom: none !important; }
   .nav-menu-btn {
     background: none;
     border: 1.5px solid rgba(0,0,0,.15);
@@ -559,6 +576,10 @@
   }
 }
 </style>
+<div class="nav-mobile-bar">
+    <a href="index.html#contacto" class="nav-cta" style="font-size:13px; padding:8px 18px;">Reserva tu clase</a>
+    <button class="nav-menu-btn" onclick="document.querySelector('nav ul').classList.toggle('nav-open')">☰</button>
+  </div>
 <nav>
   <img src="images/logo.png" alt="Espacio Vuela" onerror="this.style.display='none'; this.nextSibling.style.display='block'">
   <span style="display:none; font-family:'Dancing Script',cursive; font-size:28px; color:var(--coral)">Vuela</span>
