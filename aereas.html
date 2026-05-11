@@ -182,6 +182,35 @@
 <body>
 
 <!-- NAV -->
+<style>
+.nav-mobile-bar { display: none; }
+@media (max-width: 768px) {
+  nav { flex-wrap: wrap; }
+  nav > ul {
+    display: none !important;
+    flex-direction: column;
+    width: 100%; padding: 8px 0;
+    gap: 0; border-top: 1px solid rgba(0,0,0,.08);
+    margin-top: 8px; order: 3;
+  }
+  nav > ul.nav-open { display: flex !important; }
+  nav > ul li { display: block !important; }
+  nav > ul a {
+    display: block; padding: 12px 4px;
+    font-size: 15px; color: rgba(0,0,0,.7);
+    border-bottom: 1px solid rgba(0,0,0,.05);
+  }
+  nav > ul li:last-child a { border-bottom: none; }
+  .nav-mobile-bar { display: flex; align-items: center; gap: 10px; }
+  .nav-menu-btn {
+    background: none;
+    border: 1.5px solid rgba(0,0,0,.15);
+    border-radius: 8px; padding: 6px 10px;
+    cursor: pointer; font-size: 18px;
+    color: #333; line-height: 1;
+  }
+}
+</style>
 <nav>
   <img src="images/logo.png" alt="Espacio Vuela" onerror="this.style.display='none'; this.nextSibling.style.display='block'">
   <span style="display:none; font-family:'Dancing Script',cursive; font-size:28px; color:var(--coral)">Vuela</span>
@@ -190,6 +219,7 @@
     <li><a href="index.html#clases">Clases</a></li>
     <li><a href="index.html#planes">Planes</a></li>
     <li><a href="index.html#horarios">Horarios</a></li>
+    <li><a href="profes.html">Profes</a></li>
     <li><a href="index.html#contacto" class="nav-cta">Reserva tu clase</a></li>
   </ul>
 </nav>
