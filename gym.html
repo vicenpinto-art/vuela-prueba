@@ -249,6 +249,16 @@
   }
   nav > ul li:last-child a { border-bottom: none; }
   .nav-mobile-bar { display: flex; align-items: center; gap: 10px; }
+  .nav-mobile-bar a { text-decoration: none; }
+  nav > ul a, nav > ul .nav-cta {
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    padding: 12px 4px !important;
+    background: none !important;
+    color: rgba(0,0,0,.7) !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
   .nav-menu-btn {
     background: none;
     border: 1.5px solid rgba(0,0,0,.15);
@@ -270,6 +280,10 @@
     <li><a href="profes.html">Profes</a></li>
     <li><a href="index.html#contacto" class="nav-cta">Reserva tu clase</a></li>
   </ul>
+  <div class="nav-mobile-bar">
+    <a href="index.html#contacto" class="nav-cta" style="font-size:13px; padding:8px 18px;">Reserva tu clase</a>
+    <button class="nav-menu-btn" onclick="document.querySelector('nav ul').classList.toggle('nav-open')">☰</button>
+  </div>
 </nav>
 
 <!-- HERO -->
