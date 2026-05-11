@@ -238,7 +238,7 @@
     <li><a href="index.html#contacto" class="nav-cta">Reserva tu clase</a></li>
   </ul>
   <div class="nav-mobile-bar">
-    <a href="index.html#contacto" class="nav-cta" style="font-size:13px; padding:8px 18px;">Reserva tu clase</a>
+    <a href="index.html#contacto" class="nav-cta" style="font-size:14px; padding:10px 20px;">Reserva tu clase</a>
     <button class="nav-menu-btn" onclick="document.querySelector('nav ul').classList.toggle('nav-open')">☰</button>
   </div>
 </nav>
@@ -395,5 +395,13 @@
   <p style="font-size:12px; color:#bbb;">Dr. Luis Middleton 1638, Providencia</p>
 </footer>
 
+<script>
+  // Cerrar menú mobile al seleccionar un enlace
+  document.querySelectorAll("nav ul a").forEach(link => {
+    link.addEventListener("click", () => {
+      document.querySelector("nav ul").classList.remove("nav-open");
+    });
+  });
+</script>
 </body>
 </html>

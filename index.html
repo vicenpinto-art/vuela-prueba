@@ -387,14 +387,7 @@
   section { padding: 56px 16px !important; }
   nav { padding: 14px 16px; }
   #inicio { padding-top: 90px !important; }
-  nav ul { display: flex !important; gap: 0 !important; }
-  nav ul li { display: none; }
-  nav ul li:nth-child(3) { display: block; }
-  nav ul li:nth-child(5) { display: block; }
-  nav ul li:nth-child(6) { display: block; }
-  nav ul li:nth-child(3) a,
-  nav ul li:nth-child(5) a { font-size: 11px !important; padding: 4px 6px !important; }
-  .nav-cta { font-size: 11px !important; padding: 6px 10px !important; }
+  nav ul { display: none !important; }
 
   /* ── 1. HERO FOTO ── */
   .hero-image { display: block !important; width: 100%; }
@@ -576,10 +569,6 @@
   }
 }
 </style>
-<div class="nav-mobile-bar">
-    <a href="index.html#contacto" class="nav-cta" style="font-size:13px; padding:8px 18px;">Reserva tu clase</a>
-    <button class="nav-menu-btn" onclick="document.querySelector('nav ul').classList.toggle('nav-open')">☰</button>
-  </div>
 <nav>
   <img src="images/logo.png" alt="Espacio Vuela" onerror="this.style.display='none'; this.nextSibling.style.display='block'">
   <span style="display:none; font-family:'Dancing Script',cursive; font-size:28px; color:var(--coral)">Vuela</span>
@@ -593,7 +582,7 @@
     <li><a href="#contacto" class="nav-cta">Reserva tu clase</a></li>
   </ul>
   <div class="nav-mobile-bar">
-    <a href="#contacto" class="nav-cta" style="font-size:13px; padding:8px 18px;">Reserva tu clase</a>
+    <a href="#contacto" class="nav-cta" style="font-size:14px; padding:10px 20px;">Reserva tu clase</a>
     <button class="nav-menu-btn" onclick="document.querySelector('nav ul').classList.toggle('nav-open')">☰</button>
   </div>
 </nav>
@@ -1369,6 +1358,13 @@ function pvSelCard(el){
     });
   }, { threshold: 0.1 });
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Cerrar menú mobile al seleccionar un enlace
+  document.querySelectorAll('nav ul a').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelector('nav ul').classList.remove('nav-open');
+    });
+  });
 </script>
 </body>
 </html>
