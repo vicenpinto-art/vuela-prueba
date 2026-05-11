@@ -1253,10 +1253,19 @@ function pvSelCard(el){
 <!-- CONTACTO -->
 <style>
 @media (max-width: 600px) {
-  .contact-info { justify-content: center; gap: 16px !important; }
-  .contact-info .contact-item { width: calc(50% - 8px); display: flex; justify-content: center; }
-  .contact-info .contact-item:nth-child(2) { order: 3; width: 100%; justify-content: center; }
-  .contact-info .contact-item:nth-child(3) { order: 2; }
+  .contact-info {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px !important;
+    justify-items: center;
+  }
+  .contact-info .contact-item:nth-child(2) {
+    order: 3;
+    grid-column: 1 / 3;
+  }
+  .contact-info .contact-item:nth-child(3) {
+    order: 2;
+  }
 }
 </style>
 <section id="contacto">
