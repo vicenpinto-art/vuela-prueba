@@ -1432,7 +1432,7 @@ onAuthStateChanged(auth, async (user) => {
     navLi.innerHTML = '';
     navLi.appendChild(a);
   } else {
-    navLi.innerHTML = '<a href="login.html" style="text-decoration:none;color:rgba(0,0,0,0.6);font-size:14px;font-weight:500;">Mi cuenta</a>';
+    navLi.innerHTML = `<a href="login.html" title="Mi cuenta" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;overflow:hidden;background:#f0f0f3;border:2px solid rgba(0,0,0,0.1);text-decoration:none;transition:transform .2s;cursor:pointer;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>`;
   }
 });
 </script>
