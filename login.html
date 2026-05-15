@@ -274,7 +274,7 @@
 
   const firebaseConfig = {
     apiKey:            "AIzaSyCE3qm-Fs0hPM_D56K-UlZ9Ka4cXwikA3Q",
-    authDomain:        "espaciovuela.cl",
+    authDomain:        "espacio-vuela-91a84.firebaseapp.com",
     projectId:         "espacio-vuela-91a84",
     storageBucket:     "espacio-vuela-91a84.firebasestorage.app",
     messagingSenderId: "515497928481",
@@ -433,21 +433,15 @@
   };
 
   // ── Google ──────────────────────────────────
-  getRedirectResult(auth).then(async (cred) => {
-    if (!cred) return;
-    const user = cred.user;
-    const ref  = doc(db, 'usuarios', user.uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) await setDoc(ref, { nombre: user.displayName || '', email: user.email, foto: user.photoURL || '' });
-  }).catch((e) => {
-    if (e.code !== 'auth/popup-closed-by-user') showMsg(translateError(e.code));
-  });
-
   window.loginGoogle = async function() {
     clearMsg();
     try {
-      await signInWithRedirect(auth, provider);
-    } catch (e) { showMsg(translateError(e.code)); }
+      const cred = await signInWithPopup(auth, provider);
+      const user = cred.user;
+      const ref  = doc(db, 'usuarios', user.uid);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) await setDoc(ref, { nombre: user.displayName || '', email: user.email, foto: user.photoURL || '' });
+    } catch (e) { if (e.code !== 'auth/popup-closed-by-user') showMsg(translateError(e.code)); }
   };
 
   // ── Recuperar contraseña ────────────────────
