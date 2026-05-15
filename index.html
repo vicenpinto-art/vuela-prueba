@@ -1437,7 +1437,8 @@ onAuthStateChanged(auth, async (user) => {
     // Mobile
     const mob = document.getElementById('mobile-avatar');
     if (mob) {
-      mob.style.cssText = avatarActive;
+      mob.style.cssText = avatarActive + 'overflow:hidden;';
+      mob.innerHTML = '';
       mob.innerHTML = content;
     }
   } else {
