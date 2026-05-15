@@ -416,17 +416,6 @@ const firebaseConfig = {
   projectId:         "espacio-vuela-91a84",
   storageBucket:     "espacio-vuela-91a84.firebasestorage.app",
   messagingSenderId: "515497928481",
-<script type="module">
-import { initializeApp }             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey:            "AIzaSyCE3qm-Fs0hPM_D56K-UlZ9Ka4cXwikA3Q",
-  authDomain:        "espacio-vuela-91a84.firebaseapp.com",
-  projectId:         "espacio-vuela-91a84",
-  storageBucket:     "espacio-vuela-91a84.firebasestorage.app",
-  messagingSenderId: "515497928481",
   appId:             "1:515497928481:web:627883d783124ea1f00060",
   measurementId:     "G-K1H2LQYDH5"
 };
@@ -448,7 +437,7 @@ onAuthStateChanged(auth, async (user) => {
   const silhouette     = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
 
   function buildAvatarContent(foto, name) {
-    if (foto) return `<img src="${foto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    if (foto) return `<img src="${foto}" style="width:36px;height:36px;min-width:36px;object-fit:cover;border-radius:50%;display:block;">`;
     return `<span style="font-family:Outfit,sans-serif;font-size:15px;font-weight:700;color:#fff;">${name[0].toUpperCase()}</span>`;
   }
 
