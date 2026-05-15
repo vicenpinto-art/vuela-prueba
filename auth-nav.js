@@ -1,4 +1,4 @@
-import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp }             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -17,59 +17,79 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 
 onAuthStateChanged(auth, async (user) => {
-  // Buscar el link "Mi cuenta" en el nav y reemplazarlo
-  const navLink = document.querySelector('nav ul a[href="login.html"]');
-  if (!navLink) return;
+  // Buscar el <li> que contiene el link a login.html
+  const allLinks = document.querySelectorAll('nav ul li a');
+  let navLi = null;
+  for (const link of allLinks) {
+    if (link.getAttribute('href') === 'login.html') {
+      navLi = link.parentElement;
+      break;
+    }
+  }
+  if (!navLi) return;
 
   if (user) {
-    // Cargar foto desde Firestore
-    const snap = await getDoc(doc(db, 'usuarios', user.uid));
-    const data = snap.exists() ? snap.data() : {};
-    const foto = data.foto || user.photoURL || null;
-    const name = data.nombre || user.displayName || user.email.split('@')[0];
+    // Cargar datos desde Firestore
+    let foto = user.photoURL || null;
+    let name = user.displayName || user.email.split('@')[0];
+    try {
+      const snap = await getDoc(doc(db, 'usuarios', user.uid));
+      if (snap.exists()) {
+        const d = snap.data();
+        if (d.foto)   foto = d.foto;
+        if (d.nombre) name = d.nombre;
+      }
+    } catch(e) { /* si falla Firestore igual mostramos avatar básico */ }
 
-    // Crear el avatar
-    const avatar = document.createElement('a');
-    avatar.href  = 'login.html';
-    avatar.title = name;
-    avatar.style.cssText = `
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      overflow: hidden;
-      background: linear-gradient(135deg, #a183ff, #ff4e68);
-      font-family: 'Outfit', sans-serif;
-      font-size: 15px; font-weight: 700;
-      color: #fff;
-      text-decoration: none;
-      flex-shrink: 0;
-      border: 2px solid rgba(255,255,255,0.8);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      transition: transform 0.2s, box-shadow 0.2s;
-    `;
-    avatar.onmouseenter = () => { avatar.style.transform = 'scale(1.08)'; avatar.style.boxShadow = '0 4px 16px rgba(161,131,255,0.4)'; };
-    avatar.onmouseleave = () => { avatar.style.transform = 'scale(1)';    avatar.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)'; };
+    // Construir avatar
+    const a = document.createElement('a');
+    a.href  = 'login.html';
+    a.title = name;
+    a.style.cssText = [
+      'display:inline-flex',
+      'align-items:center',
+      'justify-content:center',
+      'width:36px',
+      'height:36px',
+      'border-radius:50%',
+      'overflow:hidden',
+      'background:linear-gradient(135deg,#a183ff,#ff4e68)',
+      'font-family:Outfit,sans-serif',
+      'font-size:15px',
+      'font-weight:700',
+      'color:#fff',
+      'text-decoration:none',
+      'flex-shrink:0',
+      'border:2.5px solid rgba(255,255,255,0.85)',
+      'box-shadow:0 2px 10px rgba(161,131,255,0.35)',
+      'transition:transform .2s,box-shadow .2s',
+      'cursor:pointer'
+    ].join(';');
+
+    a.addEventListener('mouseenter', () => {
+      a.style.transform  = 'scale(1.1)';
+      a.style.boxShadow  = '0 4px 18px rgba(161,131,255,0.5)';
+    });
+    a.addEventListener('mouseleave', () => {
+      a.style.transform  = 'scale(1)';
+      a.style.boxShadow  = '0 2px 10px rgba(161,131,255,0.35)';
+    });
 
     if (foto) {
       const img = document.createElement('img');
       img.src = foto;
-      img.style.cssText = 'width:100%; height:100%; object-fit:cover; border-radius:50%;';
-      avatar.appendChild(img);
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+      img.onerror = () => { a.innerHTML = ''; a.textContent = name[0].toUpperCase(); };
+      a.appendChild(img);
     } else {
-      avatar.textContent = name[0].toUpperCase();
+      a.textContent = name[0].toUpperCase();
     }
 
-    // Reemplazar el li que contiene el link
-    navLink.parentElement.replaceWith((() => {
-      const li = document.createElement('li');
-      li.appendChild(avatar);
-      return li;
-    })());
+    navLi.innerHTML = '';
+    navLi.appendChild(a);
 
   } else {
-    // No hay sesión: mostrar "Mi cuenta" normal
-    navLink.textContent = 'Mi cuenta';
+    // Sin sesión: restaurar texto normal
+    navLi.innerHTML = '<a href="login.html" style="text-decoration:none;color:rgba(0,0,0,0.6);font-size:14px;font-weight:500;">Mi cuenta</a>';
   }
 });
