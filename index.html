@@ -545,7 +545,7 @@
   nav > ul li:last-child a { border-bottom: none; }
   .nav-mobile-bar { display: flex; align-items: center; gap: 10px; }
   .nav-mobile-bar a { text-decoration: none; }
-  nav > ul li, nav > ul li * {
+  nav > ul li:not(:last-child), nav > ul li:not(:last-child) * {
     font-size: 15px !important;
     font-weight: 500 !important;
     padding: 12px 4px !important;
@@ -1437,8 +1437,7 @@ onAuthStateChanged(auth, async (user) => {
     // Mobile
     const mob = document.getElementById('mobile-avatar');
     if (mob) {
-      mob.style.cssText = avatarActive + 'overflow:hidden;';
-      mob.innerHTML = '';
+      mob.style.cssText = avatarActive + 'overflow:hidden;display:inline-flex;align-items:center;justify-content:center;';
       mob.innerHTML = content;
     }
   } else {

@@ -432,7 +432,7 @@ onAuthStateChanged(auth, async (user) => {
     const content = buildAvatarContent(foto, name);
     if (navLi) navLi.innerHTML = `<a href="login.html" title="${name}" style="${avatarActive}">${content}</a>`;
     const mob = document.getElementById('mobile-avatar');
-    if (mob) { mob.style.cssText = avatarActive; mob.innerHTML = content; }
+    if (mob) { mob.style.cssText = avatarActive + 'overflow:hidden;display:inline-flex;align-items:center;justify-content:center;'; mob.innerHTML = content; }
   } else {
     if (navLi) navLi.innerHTML = `<a href="login.html" title="Mi cuenta" style="${avatarInactive}">${silhouette}</a>`;
   }
