@@ -409,9 +409,6 @@ onAuthStateChanged(auth, async (user) => {
     if (navCuenta) navCuenta.innerHTML = `<a href="login.html" title="${name}" style="${active}">${inner}</a>`;
     if (mob) { mob.setAttribute('style', active); mob.innerHTML = inner; }
 
-  } else {
-    if (navCuenta) navCuenta.innerHTML = `<a href="login.html" title="Mi cuenta" style="${inactive}">${svgIcon}</a>`;
-    if (mob) { mob.setAttribute('style', inactive); mob.innerHTML = svgIcon; }
   }
 });
 </script>
