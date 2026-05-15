@@ -536,7 +536,7 @@
     margin-top: 8px; order: 3;
   }
   nav > ul.nav-open { display: flex !important; }
-  nav > ul li { display: block !important; }
+  nav > ul li:not(:last-child) { display: block !important; }
   nav > ul a {
     display: block; padding: 12px 4px;
     font-size: 15px; color: rgba(0,0,0,.7);
@@ -560,7 +560,8 @@
     width: 100% !important;
     letter-spacing: normal !important;
   }
-  nav > ul li:last-child, nav > ul li:last-child * { border-bottom: none !important; }
+  nav > ul li:last-child { display: flex !important; align-items: center !important; justify-content: center !important; padding: 8px 4px !important; border-bottom: none !important; }
+  nav > ul li:last-child a { display: inline-flex !important; width: 36px !important; height: 36px !important; border-radius: 50% !important; overflow: hidden !important; padding: 0 !important; background: none !important; border: none !important; }
   .nav-menu-btn {
     background: none;
     border: 1.5px solid rgba(0,0,0,.15);
