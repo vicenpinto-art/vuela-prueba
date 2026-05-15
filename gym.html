@@ -241,7 +241,7 @@
     margin-top: 8px; order: 3;
   }
   nav > ul.nav-open { display: flex !important; }
-  nav > ul li:not(:last-child) { display: block !important; }
+  nav > ul li { display: block !important; }
   nav > ul a {
     display: block; padding: 12px 4px;
     font-size: 15px; color: rgba(0,0,0,.7);
@@ -259,6 +259,9 @@
     box-shadow: none !important;
     border-radius: 0 !important;
   }
+  /* Ocultar Mi cuenta y Reserva tu clase del menú sandwich */
+  nav > ul li#nav-cuenta-desktop { display: none !important; }
+  nav > ul li:last-child { display: none !important; }
   .nav-menu-btn {
     background: none;
     border: 1.5px solid rgba(0,0,0,.15);
@@ -278,8 +281,7 @@
     <li><a href="index.html#planes">Planes</a></li>
     <li><a href="index.html#horarios">Horarios</a></li>
     <li><a href="profes.html">Profes</a></li>
-
-    <li id="nav-cuenta-desktop"><a href="login.html">Mi cuenta</a></li>
+    <li><a href="login.html">Mi cuenta</a></li>
     <li><a href="index.html#contacto" class="nav-cta">Reserva tu clase</a></li>
   </ul>
   <div class="nav-mobile-bar">
@@ -386,13 +388,21 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 
 onAuthStateChanged(auth, async (user) => {
-  const navCuenta = document.getElementById('nav-cuenta-desktop');
-  const mob       = document.getElementById('mobile-avatar');
+  const allLinks = document.querySelectorAll('nav ul li a');
+  let navLi = null;
+  for (const link of allLinks) {
+    if (link.getAttribute('href') === 'login.html') { navLi = link.parentElement; break; }
+  }
 
-  const base     = 'display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;min-width:36px;min-height:36px;border-radius:50%;overflow:hidden;text-decoration:none;flex-shrink:0;cursor:pointer;';
-  const active   = base + 'background:linear-gradient(135deg,#a183ff,#ff4e68);border:2.5px solid rgba(255,255,255,0.85);box-shadow:0 2px 10px rgba(161,131,255,0.35);';
-  const inactive = base + 'background:#f0f0f3;border:2px solid rgba(0,0,0,0.1);';
-  const svgIcon  = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+  const avatarStyle    = 'display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;overflow:hidden;text-decoration:none;flex-shrink:0;cursor:pointer;transition:transform .2s;';
+  const avatarActive   = avatarStyle + 'background:linear-gradient(135deg,#a183ff,#ff4e68);border:2.5px solid rgba(255,255,255,0.85);box-shadow:0 2px 10px rgba(161,131,255,0.35);';
+  const avatarInactive = avatarStyle + 'background:#f0f0f3;border:2px solid rgba(0,0,0,0.1);';
+  const silhouette     = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+
+  function buildAvatarContent(foto, name) {
+    if (foto) return `<img src="${foto}" style="width:36px;height:36px;min-width:36px;object-fit:cover;border-radius:50%;display:block;">`;
+    return `<span style="font-family:Outfit,sans-serif;font-size:15px;font-weight:700;color:#fff;">${name[0].toUpperCase()}</span>`;
+  }
 
   if (user) {
     let foto = user.photoURL || null;
@@ -402,16 +412,12 @@ onAuthStateChanged(auth, async (user) => {
       if (snap.exists()) { const d = snap.data(); if (d.foto) foto = d.foto; if (d.nombre) name = d.nombre; }
     } catch(e) {}
 
-    const inner = foto
-      ? `<img src="${foto}" style="width:36px;height:36px;object-fit:cover;display:block;">`
-      : `<span style="font-size:15px;font-weight:700;color:#fff;line-height:1;">${name[0].toUpperCase()}</span>`;
-
-    if (navCuenta) navCuenta.innerHTML = `<a href="login.html" title="${name}" style="${active}">${inner}</a>`;
-    if (mob) { mob.setAttribute('style', active); mob.innerHTML = inner; }
-
+    const content = buildAvatarContent(foto, name);
+    if (navLi) navLi.innerHTML = `<a href="login.html" title="${name}" style="${avatarActive}">${content}</a>`;
+    const mob = document.getElementById('mobile-avatar');
+    if (mob) { mob.style.cssText = avatarActive; mob.innerHTML = content; }
   } else {
-    if (navCuenta) navCuenta.innerHTML = `<a href="login.html" title="Mi cuenta" style="${inactive}">${svgIcon}</a>`;
-    if (mob) { mob.setAttribute('style', inactive); mob.innerHTML = svgIcon; }
+    if (navLi) navLi.innerHTML = `<a href="login.html" title="Mi cuenta" style="${avatarInactive}">${silhouette}</a>`;
   }
 });
 </script>
