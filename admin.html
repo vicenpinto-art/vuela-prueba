@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Espacio Vuela</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --coral: #ff4e68; --purple: #a183ff; --cyan: #00c8d4; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Outfit', sans-serif; background: #f5f5f7; color: #111; min-height: 100vh; }
+
+    /* ── ACCESO ── */
+    .gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    .gate-card { background: #fff; border-radius: 24px; padding: 48px 40px; max-width: 400px; width: 100%; box-shadow: 0 2px 40px rgba(0,0,0,.08); text-align: center; }
+    .gate-card h1 { font-family: 'Dancing Script', cursive; font-size: 32px; color: var(--coral); margin-bottom: 8px; }
+    .gate-card p  { font-size: 14px; color: rgba(0,0,0,.4); margin-bottom: 28px; }
+    .gate-card input { width: 100%; padding: 13px 16px; border: 1.5px solid rgba(0,0,0,.1); border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 15px; outline: none; margin-bottom: 12px; transition: border-color .2s; }
+    .gate-card input:focus { border-color: var(--purple); }
+    .gate-card button { width: 100%; padding: 14px; background: var(--coral); color: #fff; border: none; border-radius: 100px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .gate-card button:hover { opacity: .88; }
+    .gate-msg { font-size: 13px; color: var(--coral); margin-top: 12px; min-height: 18px; }
+
+    /* ── PANEL ADMIN ── */
+    #admin-panel { display: none; }
+
+    header { background: #fff; padding: 20px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,.08); position: sticky; top: 0; z-index: 10; }
+    .header-brand { font-family: 'Dancing Script', cursive; font-size: 26px; color: var(--coral); }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .btn-export { padding: 10px 22px; background: #111; color: #fff; border: none; border-radius: 100px; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-export:hover { opacity: .8; }
+    .btn-salir { padding: 10px 18px; background: none; border: 1.5px solid rgba(0,0,0,.15); border-radius: 100px; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; color: #666; cursor: pointer; transition: border-color .2s; }
+    .btn-salir:hover { border-color: var(--coral); color: var(--coral); }
+
+    .stats { display: flex; gap: 16px; padding: 24px 40px; flex-wrap: wrap; }
+    .stat-card { background: #fff; border-radius: 16px; padding: 20px 24px; flex: 1; min-width: 140px; }
+    .stat-card .num { font-size: 32px; font-weight: 800; color: #111; }
+    .stat-card .lbl { font-size: 12px; color: rgba(0,0,0,.4); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+    .table-wrap { padding: 0 40px 40px; overflow-x: auto; }
+    .search-bar { display: flex; gap: 12px; margin-bottom: 16px; }
+    .search-bar input { flex: 1; padding: 11px 16px; border: 1.5px solid rgba(0,0,0,.1); border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 14px; outline: none; background: #fff; transition: border-color .2s; }
+    .search-bar input:focus { border-color: var(--purple); }
+
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 12px rgba(0,0,0,.05); }
+    thead tr { background: #f9f9fb; }
+    th { padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(0,0,0,.35); text-align: left; white-space: nowrap; }
+    td { padding: 14px 16px; font-size: 14px; color: #333; border-top: 1px solid rgba(0,0,0,.05); vertical-align: middle; }
+    tr:hover td { background: #fafafa; }
+
+    .avatar-mini { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--coral)); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; overflow: hidden; flex-shrink: 0; }
+    .avatar-mini img { width: 100%; height: 100%; object-fit: cover; }
+    .user-cell { display: flex; align-items: center; gap: 10px; }
+    .user-cell .nombre { font-weight: 600; font-size: 14px; }
+    .user-cell .email  { font-size: 12px; color: rgba(0,0,0,.4); }
+
+    .empty { text-align: center; padding: 60px 20px; color: rgba(0,0,0,.3); font-size: 15px; }
+    .loading { text-align: center; padding: 60px 20px; color: rgba(0,0,0,.3); }
+    .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid rgba(0,0,0,.1); border-top-color: var(--coral); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 600px) {
+      header { padding: 14px 16px; }
+      .stats { padding: 16px; }
+      .table-wrap { padding: 0 16px 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── PANTALLA DE ACCESO ── -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <h1>Espacio Vuela</h1>
+    <p>Panel de administración 🔐</p>
+    <input type="email"    id="adm-email" placeholder="Tu correo de admin">
+    <input type="password" id="adm-pass"  placeholder="Contraseña" onkeydown="if(event.key==='Enter') adminLogin()">
+    <button onclick="adminLogin()">Entrar</button>
+    <div class="gate-msg" id="gate-msg"></div>
+  </div>
+</div>
+
+<!-- ── PANEL ADMIN ── -->
+<div id="admin-panel">
+  <header>
+    <span class="header-brand">Admin — Espacio Vuela</span>
+    <div class="header-right">
+      <button class="btn-export" onclick="exportarExcel()">⬇ Exportar Excel</button>
+      <button class="btn-salir"  onclick="adminLogout()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat-card"><div class="num" id="stat-total">—</div><div class="lbl">Usuarias registradas</div></div>
+    <div class="stat-card"><div class="num" id="stat-completo">—</div><div class="lbl">Con perfil completo</div></div>
+    <div class="stat-card"><div class="num" id="stat-foto">—</div><div class="lbl">Con foto de perfil</div></div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="search-bar">
+      <input type="text" id="buscar" placeholder="Buscar por nombre, correo o comuna…" oninput="filtrarTabla()">
+    </div>
+    <div id="tabla-wrap">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, getDocs }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCE3qm-Fs0hPM_D56K-UlZ9Ka4cXwikA3Q",
+    authDomain:        "espacio-vuela-91a84.firebaseapp.com",
+    projectId:         "espacio-vuela-91a84",
+    storageBucket:     "espacio-vuela-91a84.firebasestorage.app",
+    messagingSenderId: "515497928481",
+    appId:             "1:515497928481:web:627883d783124ea1f00060",
+    measurementId:     "G-K1H2LQYDH5"
+  };
+
+  // ─────────────────────────────────────────────
+  // ⚠️  Agrega aquí tu correo de administradora
+  // Solo este correo podrá ver el panel
+  // ─────────────────────────────────────────────
+  const ADMIN_EMAIL = "espaciovuela@gmail.com";
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  let todasUsuarias = [];
+
+  // ── Estado sesión ───────────────────────────
+  onAuthStateChanged(auth, async (user) => {
+    if (user && user.email === ADMIN_EMAIL) {
+      document.getElementById('gate').style.display         = 'none';
+      document.getElementById('admin-panel').style.display  = 'block';
+      await cargarUsuarias();
+    } else if (user) {
+      await signOut(auth);
+      document.getElementById('gate-msg').textContent = 'Este correo no tiene acceso al panel.';
+    }
+  });
+
+  // ── Login admin ─────────────────────────────
+  window.adminLogin = async function() {
+    const email = document.getElementById('adm-email').value.trim();
+    const pass  = document.getElementById('adm-pass').value;
+    const msg   = document.getElementById('gate-msg');
+    msg.textContent = '';
+    if (!email || !pass) { msg.textContent = 'Completa ambos campos.'; return; }
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch(e) {
+      msg.textContent = 'Correo o contraseña incorrectos.';
+    }
+  };
+
+  window.adminLogout = () => signOut(auth).then(() => location.reload());
+
+  // ── Cargar usuarias desde Firestore ─────────
+  async function cargarUsuarias() {
+    const snap = await getDocs(collection(db, 'usuarios'));
+    todasUsuarias = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+
+    const total    = todasUsuarias.length;
+    const completo = todasUsuarias.filter(u => u.telefono && u.nacimiento && u.comuna).length;
+    const conFoto  = todasUsuarias.filter(u => u.foto).length;
+
+    document.getElementById('stat-total').textContent    = total;
+    document.getElementById('stat-completo').textContent = completo;
+    document.getElementById('stat-foto').textContent     = conFoto;
+
+    renderTabla(todasUsuarias);
+  }
+
+  // ── Renderizar tabla ────────────────────────
+  function renderTabla(usuarias) {
+    const wrap = document.getElementById('tabla-wrap');
+    if (!usuarias.length) { wrap.innerHTML = '<div class="empty">No hay usuarias registradas todavía.</div>'; return; }
+
+    const filas = usuarias.map(u => {
+      const foto  = u.foto ? `<img src="${u.foto}" alt="">` : (u.nombre || '?')[0].toUpperCase();
+      const edad  = u.nacimiento ? calcEdad(u.nacimiento) + ' años' : '—';
+      return `<tr>
+        <td>
+          <div class="user-cell">
+            <div class="avatar-mini">${typeof foto === 'string' && foto.startsWith('<img') ? foto : foto}</div>
+            <div>
+              <div class="nombre">${u.nombre || '—'}</div>
+              <div class="email">${u.email || '—'}</div>
+            </div>
+          </div>
+        </td>
+        <td>${u.telefono || '—'}</td>
+        <td>${u.nacimiento || '—'}</td>
+        <td>${edad}</td>
+        <td>${u.comuna || '—'}</td>
+      </tr>`;
+    }).join('');
+
+    wrap.innerHTML = `
+      <table>
+        <thead><tr>
+          <th>Usuaria</th>
+          <th>Teléfono</th>
+          <th>Nacimiento</th>
+          <th>Edad</th>
+          <th>Comuna</th>
+        </tr></thead>
+        <tbody>${filas}</tbody>
+      </table>`;
+  }
+
+  // ── Filtrar ─────────────────────────────────
+  window.filtrarTabla = function() {
+    const q = document.getElementById('buscar').value.toLowerCase();
+    const filtradas = todasUsuarias.filter(u =>
+      (u.nombre  || '').toLowerCase().includes(q) ||
+      (u.email   || '').toLowerCase().includes(q) ||
+      (u.comuna  || '').toLowerCase().includes(q)
+    );
+    renderTabla(filtradas);
+  };
+
+  // ── Exportar Excel ───────────────────────────
+  window.exportarExcel = function() {
+    const headers = ['Nombre', 'Email', 'Teléfono', 'Fecha nacimiento', 'Edad', 'Comuna'];
+    const filas   = todasUsuarias.map(u => [
+      u.nombre      || '',
+      u.email       || '',
+      u.telefono    || '',
+      u.nacimiento  || '',
+      u.nacimiento  ? calcEdad(u.nacimiento) : '',
+      u.comuna      || ''
+    ]);
+
+    const csv = [headers, ...filas]
+      .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const bom  = '\uFEFF'; // para que Excel abra correctamente con tildes
+    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `usuarias-espacio-vuela-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // ── Calcular edad ────────────────────────────
+  function calcEdad(nacimiento) {
+    const hoy = new Date(), nac = new Date(nacimiento);
+    let edad  = hoy.getFullYear() - nac.getFullYear();
+    const mes = hoy.getMonth() - nac.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nac.getDate())) edad--;
+    return edad;
+  }
+</script>
+
+</body>
+</html>
