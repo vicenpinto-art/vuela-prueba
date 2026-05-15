@@ -433,20 +433,14 @@
   };
 
   // ── Google ──────────────────────────────────
-  // Manejar resultado de redirect al cargar la página
-  getRedirectResult(auth).then(async (result) => {
-    if (result && result.user) {
+  window.loginGoogle = async function() {
+    clearMsg();
+    try {
+      const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const ref  = doc(db, 'usuarios', user.uid);
       const snap = await getDoc(ref);
       if (!snap.exists()) await setDoc(ref, { nombre: user.displayName || '', email: user.email, foto: user.photoURL || '' });
-    }
-  }).catch((e) => { if (e.code) showMsg(translateError(e.code)); });
-
-  window.loginGoogle = async function() {
-    clearMsg();
-    try {
-      await signInWithRedirect(auth, provider);
     } catch (e) { showMsg(translateError(e.code)); }
   };
 
