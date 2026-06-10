@@ -179,42 +179,66 @@
     renderTabla(todasUsuarias);
   }
 
+  // ── Helper: texto seguro (evita XSS en datos de Firestore) ──
+  function txt(val, fallback = '—') {
+    return String(val || fallback);
+  }
+
   // ── Renderizar tabla ────────────────────────
   function renderTabla(usuarias) {
     const wrap = document.getElementById('tabla-wrap');
     if (!usuarias.length) { wrap.innerHTML = '<div class="empty">No hay usuarias registradas todavía.</div>'; return; }
 
-    const filas = usuarias.map(u => {
-      const foto  = u.foto ? `<img src="${u.foto}" alt="">` : (u.nombre || '?')[0].toUpperCase();
-      const edad  = u.nacimiento ? calcEdad(u.nacimiento) + ' años' : '—';
-      return `<tr>
-        <td>
-          <div class="user-cell">
-            <div class="avatar-mini">${typeof foto === 'string' && foto.startsWith('<img') ? foto : foto}</div>
-            <div>
-              <div class="nombre">${u.nombre || '—'}</div>
-              <div class="email">${u.email || '—'}</div>
-            </div>
-          </div>
-        </td>
-        <td>${u.telefono || '—'}</td>
-        <td>${u.nacimiento || '—'}</td>
-        <td>${edad}</td>
-        <td>${u.comuna || '—'}</td>
-      </tr>`;
-    }).join('');
+    // Construir tabla con DOM seguro para evitar XSS con datos de Firestore
+    const table  = document.createElement('table');
+    table.innerHTML = `<thead><tr>
+      <th>Usuaria</th><th>Teléfono</th><th>Nacimiento</th><th>Edad</th><th>Comuna</th>
+    </tr></thead>`;
+    const tbody = document.createElement('tbody');
 
-    wrap.innerHTML = `
-      <table>
-        <thead><tr>
-          <th>Usuaria</th>
-          <th>Teléfono</th>
-          <th>Nacimiento</th>
-          <th>Edad</th>
-          <th>Comuna</th>
-        </tr></thead>
-        <tbody>${filas}</tbody>
-      </table>`;
+    usuarias.forEach(u => {
+      const edad = u.nacimiento ? calcEdad(u.nacimiento) + ' años' : '—';
+      const tr   = document.createElement('tr');
+
+      // Celda usuaria (avatar + nombre + email)
+      const tdUser = document.createElement('td');
+      const cell   = document.createElement('div'); cell.className = 'user-cell';
+      const avatar = document.createElement('div'); avatar.className = 'avatar-mini';
+
+      // Foto: solo se acepta si es un data URL de imagen (lo que guarda comprimirImagen)
+      const fotoVal = u.foto || '';
+      if (fotoVal.startsWith('data:image/')) {
+        const img = document.createElement('img');
+        img.src   = fotoVal;  // seguro: solo data URIs de imagen llegan aquí
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+        avatar.appendChild(img);
+      } else {
+        avatar.textContent = txt(u.nombre, '?')[0].toUpperCase();
+      }
+
+      const info    = document.createElement('div');
+      const nombre  = document.createElement('div'); nombre.className = 'nombre';
+      nombre.textContent = txt(u.nombre);            // textContent evita HTML injection
+      const email   = document.createElement('div'); email.className = 'email';
+      email.textContent = txt(u.email);
+
+      info.append(nombre, email);
+      cell.append(avatar, info);
+      tdUser.appendChild(cell);
+
+      // Resto de celdas — textContent siempre
+      const tdTel  = document.createElement('td'); tdTel.textContent  = txt(u.telefono);
+      const tdNac  = document.createElement('td'); tdNac.textContent  = txt(u.nacimiento);
+      const tdEdad = document.createElement('td'); tdEdad.textContent = edad;
+      const tdCom  = document.createElement('td'); tdCom.textContent  = txt(u.comuna);
+
+      tr.append(tdUser, tdTel, tdNac, tdEdad, tdCom);
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    wrap.innerHTML = '';
+    wrap.appendChild(table);
   }
 
   // ── Filtrar ─────────────────────────────────

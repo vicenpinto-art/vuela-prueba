@@ -165,8 +165,7 @@
     banner.innerHTML = `
       <div class="ev-cb-icon">🍪</div>
       <div class="ev-cb-text">
-        <p>Usamos cookies de <strong>Google Analytics</strong> para entender cómo se usa el sitio y mejorarlo. Tus datos son anónimos.</p>
-        <p style="margin-top:4px"><a href="privacidad.html">Política de privacidad</a></p>
+        <p>Usamos cookies para mejorar tu experiencia. <a href="privacidad.html">Más información</a></p>
       </div>
       <div class="ev-cb-btns">
         <button class="ev-cb-reject" id="ev-cb-reject-btn">Rechazar</button>

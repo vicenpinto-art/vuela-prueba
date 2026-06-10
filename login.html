@@ -381,19 +381,61 @@
   document.getElementById('foto-input').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Límite de tamaño: 8MB antes de comprimir
+    const MAX_BYTES = 8 * 1024 * 1024;
+    if (file.size > MAX_BYTES) {
+      alert('La imagen es demasiado grande. Usa una imagen de menos de 8 MB.');
+      e.target.value = '';
+      return;
+    }
+
+    // Verificar que sea un tipo de imagen válido
+    const TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!TIPOS_PERMITIDOS.includes(file.type)) {
+      alert('Solo se permiten imágenes en formato JPG, PNG, GIF o WebP.');
+      e.target.value = '';
+      return;
+    }
+
     const user = auth.currentUser;
-    const comprimida = await comprimirImagen(file, 800, 0.75);
+    const btnSave = document.getElementById('btn-save-perfil');
+    btnSave.disabled = true;
+    btnSave.innerHTML = '<span class="spinner"></span> Subiendo foto…';
+
     try {
+      const comprimida = await comprimirImagen(file, 800, 0.75);
+
+      // Verificar que el resultado base64 no supere ~700KB (límite seguro para Firestore)
+      // base64 de 700KB ≈ 950KB real, suficiente margen bajo el límite de 1MB del documento
+      if (comprimida.length > 700_000) {
+        alert('La imagen es demasiado grande incluso después de comprimirla. Prueba con una más pequeña.');
+        return;
+      }
+
       await setDoc(doc(db, 'usuarios', user.uid), { foto: comprimida }, { merge: true });
-      document.getElementById('user-avatar-el').innerHTML = `<img src="${comprimida}" alt="foto">`;
-    } catch(err) { alert('Error al guardar la foto. Intenta de nuevo.'); }
+      const avatarEl = document.getElementById('user-avatar-el');
+      avatarEl.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = comprimida;
+      img.alt = 'foto';
+      avatarEl.appendChild(img);
+    } catch(err) {
+      alert('Error al guardar la foto. Intenta de nuevo.');
+    } finally {
+      btnSave.disabled = false;
+      btnSave.textContent = 'Guardar cambios';
+      e.target.value = '';
+    }
   });
 
   function comprimirImagen(file, maxSize, calidad) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
+      reader.onerror = () => reject(new Error('No se pudo leer el archivo.'));
       reader.onload = (ev) => {
         const img = new Image();
+        img.onerror = () => reject(new Error('El archivo no es una imagen válida.'));
         img.onload = () => {
           const canvas = document.createElement('canvas');
           let w = img.width, h = img.height;
