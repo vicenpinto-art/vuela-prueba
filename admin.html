@@ -46,7 +46,8 @@
     thead tr { background: #f9f9fb; }
     th { padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(0,0,0,.35); text-align: left; white-space: nowrap; }
     td { padding: 14px 16px; font-size: 14px; color: #333; border-top: 1px solid rgba(0,0,0,.05); vertical-align: middle; }
-    tr:hover td { background: #fafafa; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover td { background: #fafafa; }
 
     .avatar-mini { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--coral)); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; overflow: hidden; flex-shrink: 0; }
     .avatar-mini img { width: 100%; height: 100%; object-fit: cover; }
@@ -54,15 +55,44 @@
     .user-cell .nombre { font-weight: 600; font-size: 14px; }
     .user-cell .email  { font-size: 12px; color: rgba(0,0,0,.4); }
 
+    /* botón eliminar inline en la tabla */
+    .btn-del { padding: 6px 14px; background: none; border: 1.5px solid rgba(255,78,104,.3); border-radius: 100px; color: var(--coral); font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .2s, border-color .2s; white-space: nowrap; }
+    .btn-del:hover { background: rgba(255,78,104,.08); border-color: var(--coral); }
+
     .empty { text-align: center; padding: 60px 20px; color: rgba(0,0,0,.3); font-size: 15px; }
     .loading { text-align: center; padding: 60px 20px; color: rgba(0,0,0,.3); }
     .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid rgba(0,0,0,.1); border-top-color: var(--coral); border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── PANEL LATERAL (DRAWER) ── */
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 200; opacity: 0; pointer-events: none; transition: opacity .3s; }
+    .drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+    .drawer { position: fixed; top: 0; right: 0; height: 100%; width: 380px; max-width: 100vw; background: #fff; z-index: 201; transform: translateX(110%); transition: transform .35s cubic-bezier(.4,0,.2,1); overflow-y: auto; display: flex; flex-direction: column; box-shadow: -8px 0 40px rgba(0,0,0,.12); }
+    .drawer.open { transform: translateX(0); }
+
+    .drawer-header { padding: 24px 24px 20px; border-bottom: 1px solid rgba(0,0,0,.07); display: flex; align-items: center; gap: 16px; }
+    .drawer-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--coral)); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #fff; overflow: hidden; flex-shrink: 0; }
+    .drawer-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .drawer-title .drawer-name  { font-size: 17px; font-weight: 700; color: #111; }
+    .drawer-title .drawer-email { font-size: 13px; color: rgba(0,0,0,.4); margin-top: 3px; }
+    .drawer-close { margin-left: auto; background: none; border: none; font-size: 24px; color: #bbb; cursor: pointer; line-height: 1; padding: 4px; transition: color .2s; flex-shrink: 0; }
+    .drawer-close:hover { color: #555; }
+
+    .drawer-body { padding: 24px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+    .drawer-field label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(0,0,0,.35); margin-bottom: 5px; }
+    .drawer-field span  { font-size: 15px; color: #222; display: block; }
+
+    .drawer-footer { padding: 20px 24px; border-top: 1px solid rgba(0,0,0,.07); }
+    .btn-del-full { width: 100%; padding: 13px; background: none; border: 1.5px solid rgba(255,78,104,.4); border-radius: 100px; color: var(--coral); font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .2s, border-color .2s; }
+    .btn-del-full:hover { background: rgba(255,78,104,.07); border-color: var(--coral); }
+    .btn-del-full:disabled { opacity: .5; cursor: not-allowed; }
+
     @media (max-width: 600px) {
       header { padding: 14px 16px; }
       .stats { padding: 16px; }
       .table-wrap { padding: 0 16px 32px; }
+      .drawer { width: 100vw; }
     }
   </style>
 </head>
@@ -106,11 +136,34 @@
   </div>
 </div>
 
+<!-- ── DRAWER (panel lateral de usuaria) ── -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="cerrarDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-avatar" id="dr-avatar"></div>
+    <div class="drawer-title">
+      <div class="drawer-name"  id="dr-nombre"></div>
+      <div class="drawer-email" id="dr-email"></div>
+    </div>
+    <button class="drawer-close" onclick="cerrarDrawer()">×</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-field"><label>Teléfono</label><span id="dr-telefono"></span></div>
+    <div class="drawer-field"><label>Fecha de nacimiento</label><span id="dr-nacimiento"></span></div>
+    <div class="drawer-field"><label>Edad</label><span id="dr-edad"></span></div>
+    <div class="drawer-field"><label>Comuna</label><span id="dr-comuna"></span></div>
+    <div class="drawer-field"><label>UID Firebase</label><span id="dr-uid" style="font-size:12px;color:#aaa;word-break:break-all;"></span></div>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn-del-full" id="dr-btn-del" onclick="eliminarUsuaria()">Eliminar usuaria</button>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, collection, getDocs }
+  import { getFirestore, collection, getDocs, doc, deleteDoc }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -123,23 +176,20 @@
     measurementId:     "G-K1H2LQYDH5"
   };
 
-  // ─────────────────────────────────────────────
-  // ⚠️  Agrega aquí tu correo de administradora
-  // Solo este correo podrá ver el panel
-  // ─────────────────────────────────────────────
   const ADMIN_EMAIL = "espaciovuela@gmail.com";
 
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db   = getFirestore(app);
 
-  let todasUsuarias = [];
+  let todasUsuarias  = [];
+  let usuariaActiva  = null;   // la que está abierta en el drawer
 
   // ── Estado sesión ───────────────────────────
   onAuthStateChanged(auth, async (user) => {
     if (user && user.email === ADMIN_EMAIL) {
-      document.getElementById('gate').style.display         = 'none';
-      document.getElementById('admin-panel').style.display  = 'block';
+      document.getElementById('gate').style.display        = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
       await cargarUsuarias();
     } else if (user) {
       await signOut(auth);
@@ -147,7 +197,7 @@
     }
   });
 
-  // ── Login admin ─────────────────────────────
+  // ── Login / Logout ──────────────────────────
   window.adminLogin = async function() {
     const email = document.getElementById('adm-email').value.trim();
     const pass  = document.getElementById('adm-pass').value;
@@ -163,25 +213,41 @@
 
   window.adminLogout = () => signOut(auth).then(() => location.reload());
 
-  // ── Cargar usuarias desde Firestore ─────────
+  // ── Cargar usuarias ─────────────────────────
   async function cargarUsuarias() {
     const snap = await getDocs(collection(db, 'usuarios'));
     todasUsuarias = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
-
-    const total    = todasUsuarias.length;
-    const completo = todasUsuarias.filter(u => u.telefono && u.nacimiento && u.comuna).length;
-    const conFoto  = todasUsuarias.filter(u => u.foto).length;
-
-    document.getElementById('stat-total').textContent    = total;
-    document.getElementById('stat-completo').textContent = completo;
-    document.getElementById('stat-foto').textContent     = conFoto;
-
+    actualizarStats();
     renderTabla(todasUsuarias);
   }
 
-  // ── Helper: texto seguro (evita XSS en datos de Firestore) ──
-  function txt(val, fallback = '—') {
-    return String(val || fallback);
+  function actualizarStats() {
+    document.getElementById('stat-total').textContent    = todasUsuarias.length;
+    document.getElementById('stat-completo').textContent = todasUsuarias.filter(u => u.telefono && u.nacimiento && u.comuna).length;
+    document.getElementById('stat-foto').textContent     = todasUsuarias.filter(u => u.foto).length;
+  }
+
+  // ── Helper ──────────────────────────────────
+  function txt(val, fallback = '—') { return String(val || fallback); }
+
+  function calcEdad(nacimiento) {
+    const hoy = new Date(), nac = new Date(nacimiento);
+    let edad  = hoy.getFullYear() - nac.getFullYear();
+    const mes = hoy.getMonth() - nac.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nac.getDate())) edad--;
+    return edad;
+  }
+
+  function buildAvatar(u, el) {
+    el.innerHTML = '';
+    const fotoVal = u.foto || '';
+    if (fotoVal.startsWith('data:image/')) {
+      const img = document.createElement('img');
+      img.src = fotoVal;
+      el.appendChild(img);
+    } else {
+      el.textContent = txt(u.nombre, '?')[0].toUpperCase();
+    }
   }
 
   // ── Renderizar tabla ────────────────────────
@@ -189,10 +255,9 @@
     const wrap = document.getElementById('tabla-wrap');
     if (!usuarias.length) { wrap.innerHTML = '<div class="empty">No hay usuarias registradas todavía.</div>'; return; }
 
-    // Construir tabla con DOM seguro para evitar XSS con datos de Firestore
-    const table  = document.createElement('table');
+    const table = document.createElement('table');
     table.innerHTML = `<thead><tr>
-      <th>Usuaria</th><th>Teléfono</th><th>Nacimiento</th><th>Edad</th><th>Comuna</th>
+      <th>Usuaria</th><th>Teléfono</th><th>Nacimiento</th><th>Edad</th><th>Comuna</th><th></th>
     </tr></thead>`;
     const tbody = document.createElement('tbody');
 
@@ -200,39 +265,38 @@
       const edad = u.nacimiento ? calcEdad(u.nacimiento) + ' años' : '—';
       const tr   = document.createElement('tr');
 
-      // Celda usuaria (avatar + nombre + email)
+      // clic en la fila → abre drawer (excepto si es el botón eliminar)
+      tr.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-del')) return;
+        abrirDrawer(u);
+      });
+
+      // celda avatar + nombre + email
       const tdUser = document.createElement('td');
       const cell   = document.createElement('div'); cell.className = 'user-cell';
       const avatar = document.createElement('div'); avatar.className = 'avatar-mini';
-
-      // Foto: solo se acepta si es un data URL de imagen (lo que guarda comprimirImagen)
-      const fotoVal = u.foto || '';
-      if (fotoVal.startsWith('data:image/')) {
-        const img = document.createElement('img');
-        img.src   = fotoVal;  // seguro: solo data URIs de imagen llegan aquí
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
-        avatar.appendChild(img);
-      } else {
-        avatar.textContent = txt(u.nombre, '?')[0].toUpperCase();
-      }
-
-      const info    = document.createElement('div');
-      const nombre  = document.createElement('div'); nombre.className = 'nombre';
-      nombre.textContent = txt(u.nombre);            // textContent evita HTML injection
-      const email   = document.createElement('div'); email.className = 'email';
-      email.textContent = txt(u.email);
-
+      buildAvatar(u, avatar);
+      const info   = document.createElement('div');
+      const nombre = document.createElement('div'); nombre.className = 'nombre'; nombre.textContent = txt(u.nombre);
+      const email  = document.createElement('div'); email.className  = 'email';  email.textContent  = txt(u.email);
       info.append(nombre, email);
       cell.append(avatar, info);
       tdUser.appendChild(cell);
 
-      // Resto de celdas — textContent siempre
       const tdTel  = document.createElement('td'); tdTel.textContent  = txt(u.telefono);
       const tdNac  = document.createElement('td'); tdNac.textContent  = txt(u.nacimiento);
       const tdEdad = document.createElement('td'); tdEdad.textContent = edad;
       const tdCom  = document.createElement('td'); tdCom.textContent  = txt(u.comuna);
 
-      tr.append(tdUser, tdTel, tdNac, tdEdad, tdCom);
+      // botón eliminar inline
+      const tdAcc  = document.createElement('td');
+      const btnDel = document.createElement('button');
+      btnDel.className = 'btn-del';
+      btnDel.textContent = 'Eliminar';
+      btnDel.addEventListener('click', (e) => { e.stopPropagation(); confirmarEliminar(u); });
+      tdAcc.appendChild(btnDel);
+
+      tr.append(tdUser, tdTel, tdNac, tdEdad, tdCom, tdAcc);
       tbody.appendChild(tr);
     });
 
@@ -241,51 +305,95 @@
     wrap.appendChild(table);
   }
 
+  // ── Drawer ──────────────────────────────────
+  function abrirDrawer(u) {
+    usuariaActiva = u;
+    const edad = u.nacimiento ? calcEdad(u.nacimiento) + ' años' : '—';
+
+    buildAvatar(u, document.getElementById('dr-avatar'));
+    document.getElementById('dr-nombre').textContent    = txt(u.nombre);
+    document.getElementById('dr-email').textContent     = txt(u.email);
+    document.getElementById('dr-telefono').textContent  = txt(u.telefono);
+    document.getElementById('dr-nacimiento').textContent= txt(u.nacimiento);
+    document.getElementById('dr-edad').textContent      = edad;
+    document.getElementById('dr-comuna').textContent    = txt(u.comuna);
+    document.getElementById('dr-uid').textContent       = u.uid;
+
+    document.getElementById('dr-btn-del').disabled = false;
+    document.getElementById('drawer-overlay').classList.add('open');
+    document.getElementById('drawer').classList.add('open');
+  }
+
+  window.cerrarDrawer = function() {
+    document.getElementById('drawer-overlay').classList.remove('open');
+    document.getElementById('drawer').classList.remove('open');
+    usuariaActiva = null;
+  };
+
+  // ── Eliminar ────────────────────────────────
+  function confirmarEliminar(u) {
+    const nombre = u.nombre || u.email || 'esta usuaria';
+    if (!confirm(`¿Eliminar a ${nombre}?\n\nSe eliminará su perfil de la base de datos. La sesión activa se cerrará automáticamente al recargar.`)) return;
+    ejecutarEliminar(u);
+  }
+
+  window.eliminarUsuaria = function() {
+    if (!usuariaActiva) return;
+    confirmarEliminar(usuariaActiva);
+  };
+
+  async function ejecutarEliminar(u) {
+    const btn = document.getElementById('dr-btn-del');
+    if (btn) { btn.disabled = true; btn.textContent = 'Eliminando…'; }
+
+    try {
+      await deleteDoc(doc(db, 'usuarios', u.uid));
+
+      // Quitar del array local y re-renderizar
+      todasUsuarias = todasUsuarias.filter(x => x.uid !== u.uid);
+      actualizarStats();
+      renderTabla(document.getElementById('buscar').value
+        ? todasUsuarias.filter(x =>
+            (x.nombre || '').toLowerCase().includes(document.getElementById('buscar').value.toLowerCase()) ||
+            (x.email  || '').toLowerCase().includes(document.getElementById('buscar').value.toLowerCase()) ||
+            (x.comuna || '').toLowerCase().includes(document.getElementById('buscar').value.toLowerCase()))
+        : todasUsuarias);
+
+      cerrarDrawer();
+    } catch(err) {
+      alert('Error al eliminar. Intenta de nuevo.');
+      if (btn) { btn.disabled = false; btn.textContent = 'Eliminar usuaria'; }
+    }
+  }
+
   // ── Filtrar ─────────────────────────────────
   window.filtrarTabla = function() {
     const q = document.getElementById('buscar').value.toLowerCase();
-    const filtradas = todasUsuarias.filter(u =>
-      (u.nombre  || '').toLowerCase().includes(q) ||
-      (u.email   || '').toLowerCase().includes(q) ||
-      (u.comuna  || '').toLowerCase().includes(q)
-    );
-    renderTabla(filtradas);
+    renderTabla(todasUsuarias.filter(u =>
+      (u.nombre || '').toLowerCase().includes(q) ||
+      (u.email  || '').toLowerCase().includes(q) ||
+      (u.comuna || '').toLowerCase().includes(q)
+    ));
   };
 
-  // ── Exportar Excel ───────────────────────────
+  // ── Exportar CSV ─────────────────────────────
   window.exportarExcel = function() {
     const headers = ['Nombre', 'Email', 'Teléfono', 'Fecha nacimiento', 'Edad', 'Comuna'];
     const filas   = todasUsuarias.map(u => [
-      u.nombre      || '',
-      u.email       || '',
-      u.telefono    || '',
-      u.nacimiento  || '',
-      u.nacimiento  ? calcEdad(u.nacimiento) : '',
-      u.comuna      || ''
+      u.nombre     || '',
+      u.email      || '',
+      u.telefono   || '',
+      u.nacimiento || '',
+      u.nacimiento ? calcEdad(u.nacimiento) : '',
+      u.comuna     || ''
     ]);
-
-    const csv = [headers, ...filas]
-      .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
-      .join('\n');
-
-    const bom  = '\uFEFF'; // para que Excel abra correctamente con tildes
-    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+    const csv  = [headers, ...filas].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `usuarias-espacio-vuela-${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    a.href = url; a.download = `usuarias-espacio-vuela-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click(); URL.revokeObjectURL(url);
   };
-
-  // ── Calcular edad ────────────────────────────
-  function calcEdad(nacimiento) {
-    const hoy = new Date(), nac = new Date(nacimiento);
-    let edad  = hoy.getFullYear() - nac.getFullYear();
-    const mes = hoy.getMonth() - nac.getMonth();
-    if (mes < 0 || (mes === 0 && hoy.getDate() < nac.getDate())) edad--;
-    return edad;
-  }
 </script>
 
 </body>
