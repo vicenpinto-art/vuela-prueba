@@ -4,13 +4,13 @@
  * Carga Google Analytics solo si el usuario acepta.
  *
  * Uso en cada HTML, antes de </head>:
- *   <script>window.EV_GA = 'G-YN4CVRVX4C';</script>
+ *   <script>window.EV_GA = 'G-K1H2LQDH5';</script>
  *   <script src="cookie-banner.js"></script>
  */
 
 (function () {
   const STORAGE_KEY = 'ev_cookies_consent'; // 'accepted' | 'rejected'
-  const GA_ID       = window.EV_GA || 'G-YN4CVRVX4C';
+  const GA_ID       = window.EV_GA || 'G-K1H2LQDH5';
   const consent     = localStorage.getItem(STORAGE_KEY);
 
   /* ── Si ya aceptó: carga GA inmediatamente ── */
