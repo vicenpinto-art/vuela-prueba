@@ -319,10 +319,11 @@
       return;
     }
 
-    mostrar('¡Cuenta creada! Ya puedes iniciar sesión.', 'success');
+    mostrar('¡Cuenta creada! Redirigiendo...', 'success');
     btn.textContent = 'Ir a iniciar sesión →';
     btn.disabled = false;
     btn.onclick = () => window.location.href = 'login.html';
+    setTimeout(() => window.location.href = 'login.html', 2000);
   });
 </script>
 
