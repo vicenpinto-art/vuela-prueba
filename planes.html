@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planes — Espacio Vuela</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --coral: #ff4e68;
+      --magenta: #ff008d;
+      --cyan: #00c8d4;
+      --purple: #8b6aff;
+      --yellow: #fecb29;
+      --dark: #111111;
+      --gray: #555;
+      --light: #f5f5f7;
+      --border: rgba(0,0,0,0.08);
+    }
+    body { font-family: 'Outfit', sans-serif; background: #f7f7f9; color: var(--dark); min-height: 100vh; }
+
+    /* NAV */
+    nav {
+      background: #fff;
+      padding: 16px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-family: 'Dancing Script', cursive; font-size: 26px; color: var(--coral); text-decoration: none; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-link { font-size: 14px; color: var(--gray); text-decoration: none; }
+    .nav-link:hover { color: var(--coral); }
+    .btn-nav {
+      font-size: 13px; padding: 8px 16px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      color: #fff; border: none; cursor: pointer; font-family: 'Outfit', sans-serif;
+      font-weight: 600; text-decoration: none;
+    }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 52px 24px 36px;
+    }
+    .hero-eyebrow {
+      font-size: 11px; font-weight: 600; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--coral); margin-bottom: 12px;
+    }
+    .hero h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(32px, 5vw, 52px);
+      line-height: 1.1; margin-bottom: 12px;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p { font-size: 16px; color: var(--gray); max-width: 480px; margin: 0 auto; }
+
+    /* TABS */
+    .tabs-wrap { display: flex; justify-content: center; padding: 0 24px 32px; }
+    .tabs {
+      display: flex; gap: 4px;
+      background: #fff; border-radius: 16px; padding: 6px;
+      border: 1px solid var(--border);
+      flex-wrap: wrap; justify-content: center;
+    }
+    .tab {
+      padding: 10px 22px; border-radius: 12px; border: none;
+      font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500;
+      cursor: pointer; color: var(--gray); background: transparent;
+      transition: all .2s;
+    }
+    .tab.active {
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      color: #fff; font-weight: 600;
+    }
+
+    /* GRID DE PLANES */
+    main { max-width: 1100px; margin: 0 auto; padding: 0 24px 60px; }
+    .planes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* CARD DE PLAN */
+    .plan-card {
+      background: #fff; border-radius: 20px; padding: 28px 22px;
+      border: 1.5px solid var(--border);
+      display: flex; flex-direction: column; gap: 16px;
+      position: relative; transition: transform .2s, box-shadow .2s;
+    }
+    .plan-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,.08); }
+    .plan-card.popular {
+      border-color: var(--coral);
+      box-shadow: 0 0 0 3px rgba(255,78,104,.08);
+    }
+    .badge-popular {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      color: #fff; font-size: 11px; font-weight: 700;
+      padding: 4px 14px; border-radius: 20px; white-space: nowrap;
+    }
+    .plan-tipo-tag {
+      font-size: 11px; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gray);
+    }
+    .plan-nombre { font-size: 17px; font-weight: 700; }
+    .plan-precio {
+      font-size: 30px; font-weight: 800;
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+    .plan-precio span { font-size: 14px; font-weight: 500; color: var(--gray); }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .plan-features li { font-size: 13px; color: #444; display: flex; align-items: flex-start; gap: 8px; }
+    .plan-features li::before { content: '✓'; color: var(--cyan); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .plan-features li.nota::before { content: 'ℹ'; color: var(--yellow); }
+    .btn-comprar {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      color: white; border: none; border-radius: 12px;
+      font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: transform .15s, box-shadow .15s;
+    }
+    .btn-comprar:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,78,104,.3); }
+    .btn-comprar:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* SECCIÓN TRANSFERENCIA VISIBLE */
+    .transferencia-banner {
+      margin-top: 32px; padding: 20px 28px;
+      background: #fff; border-radius: 16px; border: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .transferencia-banner p { font-size: 14px; color: var(--gray); flex: 1; min-width: 200px; }
+    .transferencia-banner p strong { color: var(--dark); }
+    .transferencia-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-contacto {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: 10px;
+      font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600;
+      text-decoration: none; border: none; cursor: pointer; transition: opacity .2s;
+    }
+    .btn-contacto:hover { opacity: .85; }
+    .btn-wa { background: #25D366; color: #fff; }
+    .btn-ig { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; }
+
+    /* MODAL OVERLAY */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 200;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 24px; padding: 36px;
+      max-width: 460px; width: 100%; position: relative;
+      animation: modalIn .25s ease;
+    }
+    @keyframes modalIn { from { opacity:0; transform: scale(.95) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: var(--light); border: none; border-radius: 50%;
+      width: 32px; height: 32px; cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .modal .modal-sub { font-size: 14px; color: var(--gray); margin-bottom: 24px; line-height: 1.5; }
+
+    /* MODAL MATRÍCULA */
+    .opciones-matricula { display: flex; flex-direction: column; gap: 12px; }
+    .opcion-btn {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 18px; border-radius: 14px; border: 1.5px solid var(--border);
+      background: #fff; cursor: pointer; text-align: left;
+      font-family: 'Outfit', sans-serif; transition: border-color .2s, background .2s;
+    }
+    .opcion-btn:hover { border-color: var(--coral); background: rgba(255,78,104,.03); }
+    .opcion-icon { font-size: 24px; flex-shrink: 0; }
+    .opcion-texto strong { display: block; font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+    .opcion-texto span { font-size: 12px; color: var(--gray); }
+
+    /* MODAL RESUMEN */
+    .resumen-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .resumen-item {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 14px;
+    }
+    .resumen-item .item-nombre { color: #444; }
+    .resumen-item .item-precio { font-weight: 600; }
+    .resumen-divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .resumen-total {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 16px; font-weight: 700; margin-bottom: 4px;
+    }
+    .resumen-total .total-precio {
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      font-size: 22px;
+    }
+
+    /* ADDON CHECKBOX */
+    .addon-toggle {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; border-radius: 12px; background: var(--light);
+      cursor: pointer; margin-bottom: 20px; border: 1.5px solid transparent;
+      transition: border-color .2s;
+    }
+    .addon-toggle.checked { border-color: var(--purple); background: rgba(139,106,255,.05); }
+    .addon-toggle input { width: 18px; height: 18px; accent-color: var(--purple); cursor: pointer; }
+    .addon-toggle-texto strong { display: block; font-size: 13px; font-weight: 600; }
+    .addon-toggle-texto span { font-size: 12px; color: var(--gray); }
+
+    /* BOTONES DE PAGO */
+    .pago-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    .btn-mp {
+      width: 100%; padding: 14px;
+      background: #00b1ea; color: #fff; border: none; border-radius: 12px;
+      font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: opacity .2s;
+    }
+    .btn-mp:hover { opacity: .9; }
+    .btn-mp:disabled { opacity: .5; cursor: not-allowed; }
+    .pago-divider {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12px; color: #ccc;
+    }
+    .pago-divider::before, .pago-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .pago-transferencia {
+      display: flex; gap: 8px;
+    }
+    .btn-pago-contacto {
+      flex: 1; padding: 11px; border-radius: 10px; border: none;
+      font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+      text-decoration: none; transition: opacity .2s;
+    }
+    .btn-pago-contacto:hover { opacity: .85; }
+
+    /* MENSAJE DE ERROR */
+    .modal-error {
+      font-size: 13px; color: var(--coral); background: rgba(255,78,104,.06);
+      border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: none;
+    }
+    .modal-error.visible { display: block; }
+
+    /* SKELETON */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+      background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .loading-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;
+    }
+    .loading-card {
+      background: #fff; border-radius: 20px; padding: 28px 22px; height: 280px;
+      display: flex; flex-direction: column; gap: 14px; border: 1.5px solid var(--border);
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .hero { padding: 36px 20px 24px; }
+      main { padding: 0 16px 48px; }
+      .planes-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .modal { padding: 28px 22px; }
+    }
+    @media (max-width: 480px) {
+      .planes-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Espacio Vuela</a>
+  <div class="nav-right">
+    <a href="mi-cuenta.html" class="nav-link" id="nav-cuenta" style="display:none;">Mi cuenta</a>
+    <a href="login-nuevo.html" class="btn-nav" id="nav-login">Iniciar sesión</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">Elige tu plan</div>
+  <h1>Encuentra el plan <span>perfecto para ti</span></h1>
+  <p>Todos los planes duran 31 días desde su activación. Las clases no usadas se pierden al vencer.</p>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" data-tab="vuela">Vuela</button>
+    <button class="tab" data-tab="muevete">Muévete</button>
+    <button class="tab" data-tab="gym">Gym</button>
+    <button class="tab" data-tab="clases_sueltas">Clases sueltas</button>
+  </div>
+</div>
+
+<main>
+  <!-- Contenido de tabs -->
+  <div id="tab-vuela" class="tab-content active">
+    <div class="planes-grid" id="grid-vuela">
+      <div class="loading-grid" style="grid-column:1/-1; display:grid; grid-template-columns:repeat(5,1fr); gap:16px;">
+        <div class="loading-card"><div class="skeleton" style="height:14px;width:60%"></div><div class="skeleton" style="height:22px;width:80%"></div><div class="skeleton" style="height:36px;width:50%"></div><div class="skeleton" style="height:100px"></div><div class="skeleton" style="height:44px;margin-top:auto"></div></div>
+        <div class="loading-card"><div class="skeleton" style="height:14px;width:60%"></div><div class="skeleton" style="height:22px;width:80%"></div><div class="skeleton" style="height:36px;width:50%"></div><div class="skeleton" style="height:100px"></div><div class="skeleton" style="height:44px;margin-top:auto"></div></div>
+        <div class="loading-card"><div class="skeleton" style="height:14px;width:60%"></div><div class="skeleton" style="height:22px;width:80%"></div><div class="skeleton" style="height:36px;width:50%"></div><div class="skeleton" style="height:100px"></div><div class="skeleton" style="height:44px;margin-top:auto"></div></div>
+      </div>
+    </div>
+  </div>
+  <div id="tab-muevete" class="tab-content">
+    <div class="planes-grid" id="grid-muevete"></div>
+  </div>
+  <div id="tab-gym" class="tab-content">
+    <div class="planes-grid" id="grid-gym"></div>
+  </div>
+  <div id="tab-clases_sueltas" class="tab-content">
+    <div class="planes-grid" id="grid-clases_sueltas"></div>
+  </div>
+
+  <!-- Banner pago por transferencia -->
+  <div class="transferencia-banner">
+    <p>💳 <strong>¿Prefieres pagar por transferencia?</strong> Escríbenos y te enviamos los datos de cuenta. Activamos tu plan en menos de 24 horas.</p>
+    <div class="transferencia-btns">
+      <a href="https://wa.me/56973841513?text=Hola%2C%20quiero%20pagar%20un%20plan%20por%20transferencia" target="_blank" class="btn-contacto btn-wa">
+        <span>📱</span> WhatsApp
+      </a>
+      <a href="https://instagram.com/espacio_vuela" target="_blank" class="btn-contacto btn-ig">
+        <span>📷</span> Instagram
+      </a>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL: MATRÍCULA -->
+<div class="modal-overlay" id="modal-matricula">
+  <div class="modal">
+    <button class="modal-close" onclick="cerrarModal('modal-matricula')">✕</button>
+    <h2>Una cosa antes de continuar</h2>
+    <div class="modal-sub">Como es tu primera vez en Espacio Vuela, necesitas elegir una de estas opciones para comenzar:</div>
+    <div class="opciones-matricula">
+      <button class="opcion-btn" onclick="elegirMatricula()">
+        <span class="opcion-icon">📋</span>
+        <div class="opcion-texto">
+          <strong>Pagar matrícula — $12.000</strong>
+          <span>Se agrega a tu compra de hoy. Pago único, para siempre.</span>
+        </div>
+      </button>
+      <button class="opcion-btn" onclick="irAClasePrueba()">
+        <span class="opcion-icon">✨</span>
+        <div class="opcion-texto">
+          <strong>Tomar una clase de prueba primero</strong>
+          <span>Prueba el estudio desde $5.000. Exime la matrícula para siempre.</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: RESUMEN Y PAGO -->
+<div class="modal-overlay" id="modal-resumen">
+  <div class="modal">
+    <button class="modal-close" onclick="cerrarModal('modal-resumen')">✕</button>
+    <h2>Resumen de tu compra</h2>
+
+    <div class="resumen-items" id="resumen-items"></div>
+
+    <div id="addon-wrap" style="display:none;">
+      <label class="addon-toggle" id="addon-toggle" onclick="toggleAddon()">
+        <input type="checkbox" id="addon-check" onclick="event.stopPropagation()">
+        <div class="addon-toggle-texto">
+          <strong>🏋️ Agregar acceso al Gym — $13.000</strong>
+          <span>Complementa tu plan con acceso libre al gimnasio funcional</span>
+        </div>
+      </label>
+    </div>
+
+    <div class="resumen-divider"></div>
+    <div class="resumen-total">
+      <span>Total</span>
+      <span class="total-precio" id="resumen-total">$0</span>
+    </div>
+    <div style="font-size:12px; color:var(--gray); margin-bottom:20px;">Pago único · Plan activo por 31 días desde la compra</div>
+
+    <div class="pago-btns">
+      <button class="btn-mp" id="btn-mp" onclick="pagarConMP()">
+        <span>💳</span> Pagar con MercadoPago
+      </button>
+      <div class="pago-divider">o</div>
+      <div class="pago-transferencia">
+        <a href="https://wa.me/56973841513?text=Hola%2C%20quiero%20pagar%20por%20transferencia" target="_blank" class="btn-pago-contacto btn-wa">
+          <span>📱</span> WhatsApp
+        </a>
+        <a href="https://instagram.com/espacio_vuela" target="_blank" class="btn-pago-contacto btn-ig">
+          <span>📷</span> Instagram
+        </a>
+      </div>
+    </div>
+    <div class="modal-error" id="modal-error"></div>
+  </div>
+</div>
+
+<script>
+  // ── CONFIG ────────────────────────────────────────────────────
+  const SUPABASE_URL  = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
+  const SUPABASE_KEY  = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+  // ⚠️ Reemplaza esta URL después de crear el servicio en Render:
+  const SERVIDOR_URL  = 'https://TU-SERVICIO.onrender.com';
+
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ── ESTADO GLOBAL ─────────────────────────────────────────────
+  let todosLosPlanes  = [];
+  let planSeleccionado = null;
+  let incluyeMatricula = false;
+  let incluyeAddon    = false;
+  let usuarioDatos    = null;
+  let sesionActiva    = null;
+
+  // ── UTILS ─────────────────────────────────────────────────────
+  function formatPrecio(n) {
+    return '$' + Number(n).toLocaleString('es-CL');
+  }
+
+  // ── TABS ──────────────────────────────────────────────────────
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ── CARGAR PLANES ─────────────────────────────────────────────
+  async function cargarPlanes() {
+    const { data: planes, error } = await sb
+      .from('planes')
+      .select('*')
+      .not('tipo', 'in', '("matricula","addon_gym")')
+      .order('precio', { ascending: true });
+
+    if (error || !planes) {
+      console.error('Error cargando planes:', error);
+      return;
+    }
+
+    todosLosPlanes = planes;
+    renderizarTab('vuela',        planes.filter(p => p.tipo === 'vuela'));
+    renderizarTab('muevete',      planes.filter(p => p.tipo === 'muevete'));
+    renderizarTab('gym',          planes.filter(p => p.tipo === 'gym'));
+    renderizarTab('clases_sueltas', planes.filter(p => p.tipo === 'clase_suelta' || p.tipo === 'clase_prueba'));
+  }
+
+  function renderizarTab(tabId, planes) {
+    const grid = document.getElementById('grid-' + tabId);
+    if (!planes || planes.length === 0) {
+      grid.innerHTML = '<p style="color:var(--gray); font-size:14px; padding:20px 0;">No hay planes disponibles en este momento.</p>';
+      return;
+    }
+
+    grid.innerHTML = planes.map((plan, i) => {
+      const esPopular = (plan.tipo === 'vuela' || plan.tipo === 'muevete') && plan.clases === 8;
+      const esPrueba  = plan.tipo === 'clase_prueba';
+      const esIlimitado = plan.nombre?.toLowerCase().includes('ilimitado');
+
+      const features = obtenerFeatures(plan);
+
+      return `
+        <div class="plan-card ${esPopular ? 'popular' : ''}">
+          ${esPopular ? '<div class="badge-popular">⭐ Más popular</div>' : ''}
+          <div class="plan-tipo-tag">${labelTipo(plan.tipo)}</div>
+          <div class="plan-nombre">${plan.nombre}</div>
+          <div class="plan-precio">
+            ${formatPrecio(plan.precio)}<span> / plan</span>
+          </div>
+          <ul class="plan-features">
+            ${features.map(f => `<li class="${f.nota ? 'nota' : ''}">${f.texto}</li>`).join('')}
+          </ul>
+          <button class="btn-comprar" onclick="onComprar('${plan.id}')">
+            Comprar →
+          </button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function labelTipo(tipo) {
+    const map = { vuela: 'Pole · Aéreos · Heels', muevete: 'Baile · Funky · Afro', gym: 'Gimnasio funcional', clase_suelta: 'Sin compromiso', clase_prueba: 'Primera vez' };
+    return map[tipo] || tipo;
+  }
+
+  function obtenerFeatures(plan) {
+    const esIlimitado = plan.nombre?.toLowerCase().includes('ilimitado');
+    const tipo = plan.tipo;
+    const features = [];
+
+    if (tipo === 'vuela' || tipo === 'muevete') {
+      if (esIlimitado) {
+        features.push({ texto: 'Clases ilimitadas por 31 días' });
+      } else {
+        features.push({ texto: `${plan.clases} clases para usar en 31 días` });
+      }
+      features.push({ texto: 'Agenda online cuando quieras' });
+      features.push({ texto: 'Acceso a la rutina del día' });
+      if (tipo === 'vuela') features.push({ texto: 'Pole · Lira · Telas · Heels avanzado' });
+      if (tipo === 'muevete') features.push({ texto: 'Baile · Heels · Funky · Afro' });
+    }
+
+    if (tipo === 'gym') {
+      features.push({ texto: 'Acceso libre al gimnasio funcional' });
+      features.push({ texto: 'Sin reserva previa' });
+      if (plan.nombre?.toLowerCase().includes('pase')) {
+        features.push({ texto: 'Válido para un solo día' });
+      } else {
+        features.push({ texto: 'Válido según duración del plan' });
+      }
+    }
+
+    if (tipo === 'clase_suelta') {
+      features.push({ texto: '1 clase a elección' });
+      features.push({ texto: 'Agenda online' });
+      features.push({ texto: 'Requiere matrícula o clase de prueba previa' });
+    }
+
+    if (tipo === 'clase_prueba') {
+      features.push({ texto: '1 clase de prueba en el estudio' });
+      features.push({ texto: 'Exime la matrícula para siempre ✨', nota: true });
+      features.push({ texto: 'Ideal para conocer Espacio Vuela' });
+    }
+
+    return features;
+  }
+
+  // ── FLUJO DE COMPRA ───────────────────────────────────────────
+  async function onComprar(planId) {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      window.location.href = 'login-nuevo.html';
+      return;
+    }
+
+    sesionActiva    = session;
+    planSeleccionado = todosLosPlanes.find(p => String(p.id) === String(planId));
+    incluyeMatricula = false;
+    incluyeAddon    = false;
+
+    if (!planSeleccionado) return;
+
+    // Cargar datos del usuario
+    const { data: u } = await sb
+      .from('usuarios')
+      .select('nombre, apellido, matricula_pagada, clase_prueba_tomada')
+      .eq('id', session.user.id)
+      .single();
+
+    usuarioDatos = { ...u, email: session.user.email, id: session.user.id };
+
+    const esPrueba  = planSeleccionado.tipo === 'clase_prueba';
+    const tieneAcceso = u?.matricula_pagada || u?.clase_prueba_tomada;
+
+    if (!esPrueba && !tieneAcceso) {
+      abrirModal('modal-matricula');
+    } else {
+      abrirModalResumen();
+    }
+  }
+
+  function elegirMatricula() {
+    incluyeMatricula = true;
+    cerrarModal('modal-matricula');
+    abrirModalResumen();
+  }
+
+  function irAClasePrueba() {
+    cerrarModal('modal-matricula');
+    document.querySelector('.tab[data-tab="clases_sueltas"]').click();
+  }
+
+  function abrirModalResumen() {
+    const plan = planSeleccionado;
+    const puedeAddon = (plan.tipo === 'vuela' || plan.tipo === 'muevete') && !plan.nombre?.toLowerCase().includes('suelta') && plan.tipo !== 'clase_prueba';
+
+    // Addon
+    const addonWrap = document.getElementById('addon-wrap');
+    addonWrap.style.display = puedeAddon ? 'block' : 'none';
+    document.getElementById('addon-check').checked = false;
+    document.getElementById('addon-toggle').classList.remove('checked');
+    incluyeAddon = false;
+
+    actualizarResumen();
+    abrirModal('modal-resumen');
+  }
+
+  function toggleAddon() {
+    incluyeAddon = !incluyeAddon;
+    document.getElementById('addon-check').checked = incluyeAddon;
+    document.getElementById('addon-toggle').classList.toggle('checked', incluyeAddon);
+    actualizarResumen();
+  }
+
+  function actualizarResumen() {
+    const plan = planSeleccionado;
+    let items = [];
+    let total = 0;
+
+    items.push({ nombre: plan.nombre, precio: plan.precio });
+    total += plan.precio;
+
+    if (incluyeMatricula) {
+      items.push({ nombre: 'Matrícula Espacio Vuela', precio: 12000 });
+      total += 12000;
+    }
+
+    if (incluyeAddon) {
+      items.push({ nombre: 'Addon Gym', precio: 13000 });
+      total += 13000;
+    }
+
+    document.getElementById('resumen-items').innerHTML = items.map(item => `
+      <div class="resumen-item">
+        <span class="item-nombre">${item.nombre}</span>
+        <span class="item-precio">${formatPrecio(item.precio)}</span>
+      </div>
+    `).join('');
+
+    document.getElementById('resumen-total').textContent = formatPrecio(total);
+    document.getElementById('modal-error').classList.remove('visible');
+  }
+
+  async function pagarConMP() {
+    const btn = document.getElementById('btn-mp');
+    const errorEl = document.getElementById('modal-error');
+    btn.disabled = true;
+    btn.textContent = 'Preparando pago...';
+    errorEl.classList.remove('visible');
+
+    try {
+      const res = await fetch(`${SERVIDOR_URL}/crear-preferencia`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan_id: planSeleccionado.id,
+          usuario_id: usuarioDatos.id,
+          usuario_email: usuarioDatos.email,
+          usuario_nombre: `${usuarioDatos.nombre || ''} ${usuarioDatos.apellido || ''}`.trim(),
+          incluye_matricula: incluyeMatricula,
+          incluye_addon: incluyeAddon
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.checkout_url) {
+        throw new Error(data.error || 'Error al conectar con el servidor de pagos');
+      }
+
+      window.location.href = data.checkout_url;
+
+    } catch (err) {
+      errorEl.textContent = 'Error: ' + err.message;
+      errorEl.classList.add('visible');
+      btn.disabled = false;
+      btn.innerHTML = '<span>💳</span> Pagar con MercadoPago';
+    }
+  }
+
+  // ── MODALES ───────────────────────────────────────────────────
+  function abrirModal(id) {
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function cerrarModal(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) cerrarModal(overlay.id);
+    });
+  });
+
+  // ── SESIÓN ────────────────────────────────────────────────────
+  async function verificarSesion() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      document.getElementById('nav-login').style.display = 'none';
+      document.getElementById('nav-cuenta').style.display = 'block';
+    }
+  }
+
+  // ── INIT ──────────────────────────────────────────────────────
+  verificarSesion();
+  cargarPlanes();
+</script>
+
+</body>
+</html>

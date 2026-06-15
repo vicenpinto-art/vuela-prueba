@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¡Pago exitoso! — Espacio Vuela</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --coral: #ff4e68; --magenta: #ff008d; --cyan: #00c8d4; --border: rgba(0,0,0,0.08); }
+    body {
+      font-family: 'Outfit', sans-serif; background: #f7f7f9;
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+    nav {
+      background: #fff; padding: 16px 40px;
+      display: flex; align-items: center; border-bottom: 1px solid var(--border);
+    }
+    .logo { font-family: 'Dancing Script', cursive; font-size: 26px; color: var(--coral); text-decoration: none; }
+    .page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
+    .card {
+      background: #fff; border-radius: 24px; padding: 52px 40px;
+      max-width: 480px; width: 100%; text-align: center;
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 48px rgba(0,0,0,.06);
+    }
+    .icono { font-size: 64px; margin-bottom: 20px; }
+    h1 { font-family: 'Dancing Script', cursive; font-size: 38px; margin-bottom: 12px; }
+    h1 span { background: linear-gradient(135deg, var(--coral), var(--magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    p { font-size: 16px; color: #555; line-height: 1.7; margin-bottom: 8px; }
+    .info-box {
+      background: rgba(0,200,212,.06); border: 1px solid rgba(0,200,212,.2);
+      border-radius: 12px; padding: 16px 20px; margin: 24px 0; text-align: left;
+    }
+    .info-box div { font-size: 13px; color: #444; margin-bottom: 6px; }
+    .info-box div:last-child { margin-bottom: 0; }
+    .info-box strong { color: #111; }
+    .btns { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
+    .btn-primary {
+      padding: 14px; background: linear-gradient(135deg, var(--coral), var(--magenta));
+      color: #fff; border: none; border-radius: 12px;
+      font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600;
+      cursor: pointer; text-decoration: none; display: block;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,78,104,.3); }
+    .btn-secondary {
+      padding: 13px; background: #f5f5f7; color: #111; border: none;
+      border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 15px;
+      font-weight: 600; cursor: pointer; text-decoration: none; display: block;
+    }
+    .btn-secondary:hover { background: #ebebee; }
+  </style>
+</head>
+<body>
+<nav><a href="index.html" class="logo">Espacio Vuela</a></nav>
+<div class="page">
+  <div class="card">
+    <div class="icono">🎉</div>
+    <h1>¡Todo listo, <span>ya puedes volar!</span></h1>
+    <p>Tu pago fue procesado correctamente. Tu plan ya está activo.</p>
+    <div class="info-box">
+      <div>✅ <strong>Pago aprobado</strong> por MercadoPago</div>
+      <div>📅 <strong>Tu plan está activo</strong> por 31 días desde hoy</div>
+      <div>📧 Recibirás una confirmación en tu correo</div>
+    </div>
+    <p style="font-size:14px; color:#888;">¿Tardas en ver tu plan? Espera unos segundos y recarga tu cuenta.</p>
+    <div class="btns">
+      <a href="mi-cuenta.html" class="btn-primary">Ir a mi cuenta →</a>
+      <a href="agendar.html" class="btn-secondary">Agendar mi primera clase</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
