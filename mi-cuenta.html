@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi cuenta — Espacio Vuela</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --coral: #ff4e68;
+      --magenta: #ff008d;
+      --cyan: #00c8d4;
+      --purple: #8b6aff;
+      --yellow: #fecb29;
+      --dark: #111111;
+      --gray: #555;
+      --light: #f5f5f7;
+      --border: rgba(0,0,0,0.08);
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f7f7f9;
+      color: var(--dark);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      background: #fff;
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo {
+      font-family: 'Dancing Script', cursive;
+      font-size: 26px;
+      color: var(--coral);
+      text-decoration: none;
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .nav-nombre {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    .nav-nombre span {
+      font-weight: 600;
+      color: var(--dark);
+    }
+    .btn-salir {
+      font-size: 13px;
+      color: var(--gray);
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      transition: color .2s, border-color .2s;
+    }
+    .btn-salir:hover { color: var(--coral); border-color: var(--coral); }
+
+    /* ALERTA */
+    .alerta {
+      display: none;
+      padding: 14px 40px;
+      font-size: 14px;
+      font-weight: 500;
+      align-items: center;
+      gap: 10px;
+    }
+    .alerta.sin-plan {
+      background: rgba(255,78,104,.08);
+      color: #c0002a;
+      border-bottom: 1px solid rgba(255,78,104,.15);
+      display: flex;
+    }
+    .alerta.pocas-clases {
+      background: rgba(254,203,41,.12);
+      color: #7a5800;
+      border-bottom: 1px solid rgba(254,203,41,.3);
+      display: flex;
+    }
+    .alerta a {
+      color: inherit;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* MAIN */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 36px 24px 60px;
+    }
+
+    .bienvenida {
+      margin-bottom: 28px;
+    }
+    .bienvenida h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 38px;
+      color: var(--dark);
+      line-height: 1.1;
+    }
+    .bienvenida h1 span {
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .bienvenida p {
+      font-size: 15px;
+      color: var(--gray);
+      margin-top: 6px;
+    }
+
+    /* GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .col-left { display: flex; flex-direction: column; gap: 20px; }
+    .col-right { display: flex; flex-direction: column; gap: 20px; }
+
+    /* CARD */
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 28px;
+      border: 1px solid var(--border);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .card-titulo {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+    .card-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .badge-activo { background: rgba(0,200,212,.1); color: #007a82; }
+    .badge-vencido { background: rgba(255,78,104,.1); color: var(--coral); }
+    .badge-congelado { background: rgba(139,106,255,.1); color: var(--purple); }
+    .badge-sin-plan { background: var(--light); color: var(--gray); }
+
+    /* PLAN */
+    .plan-nombre {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+    .plan-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat {
+      background: var(--light);
+      border-radius: 14px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stat-valor {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-valor.coral { color: var(--coral); }
+    .stat-valor.cyan { color: var(--cyan); }
+    .stat-valor.gray { color: var(--gray); }
+    .stat-valor.ilimitado { font-size: 20px; }
+    .stat-label { font-size: 11px; color: var(--gray); font-weight: 500; }
+
+    .plan-vencimiento {
+      font-size: 13px;
+      color: var(--gray);
+      background: var(--light);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .plan-vencimiento.urgente { background: rgba(255,78,104,.06); color: #c0002a; }
+
+    .plan-addon {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--purple);
+      background: rgba(139,106,255,.08);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-weight: 500;
+    }
+
+    .sin-plan-box {
+      text-align: center;
+      padding: 20px 0;
+    }
+    .sin-plan-box .icon { font-size: 40px; margin-bottom: 12px; }
+    .sin-plan-box p {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    /* BOTONES */
+    .btn-primary {
+      display: inline-block;
+      padding: 13px 22px;
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+      text-align: center;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255,78,104,.35);
+    }
+    .btn-secondary {
+      display: inline-block;
+      padding: 12px 22px;
+      background: var(--light);
+      color: var(--dark);
+      border: none;
+      border-radius: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s;
+      text-align: center;
+    }
+    .btn-secondary:hover { background: #ebebee; }
+    .btn-full { width: 100%; display: block; }
+
+    /* CLASES */
+    .clase-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .clase-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .clase-fecha-box {
+      min-width: 46px;
+      text-align: center;
+      background: var(--light);
+      border-radius: 12px;
+      padding: 8px 6px;
+    }
+    .clase-dia { font-size: 20px; font-weight: 700; line-height: 1; color: var(--coral); }
+    .clase-mes { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--gray); letter-spacing: 1px; }
+    .clase-info { flex: 1; min-width: 0; }
+    .clase-nombre { font-size: 14px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .clase-detalle { font-size: 12px; color: var(--gray); }
+
+    .sin-clases {
+      text-align: center;
+      padding: 20px 0;
+      color: var(--gray);
+      font-size: 14px;
+    }
+    .sin-clases .icon { font-size: 32px; display: block; margin-bottom: 8px; }
+
+    /* RUTINA DEL DÍA */
+    .rutina-fecha {
+      font-size: 12px;
+      color: var(--gray);
+      margin-bottom: 14px;
+    }
+    .rutina-titulo {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--dark);
+    }
+    .rutina-contenido {
+      font-size: 14px;
+      color: #444;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    .sin-rutina {
+      text-align: center;
+      padding: 16px 0;
+      color: var(--gray);
+      font-size: 14px;
+    }
+    .sin-rutina .icon { font-size: 32px; display: block; margin-bottom: 8px; }
+
+    /* ACCIONES RÁPIDAS */
+    .acciones-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .accion-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 18px 12px;
+      background: var(--light);
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .accion-btn:hover { background: #ebebee; transform: translateY(-2px); }
+    .accion-icon { font-size: 24px; }
+    .accion-label { font-size: 12px; font-weight: 600; color: var(--dark); text-align: center; }
+
+    /* SKELETON LOADER */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-nombre { display: none; }
+      .alerta { padding: 12px 20px; font-size: 13px; }
+      main { padding: 24px 16px 48px; }
+      .bienvenida h1 { font-size: 30px; }
+      .grid { grid-template-columns: 1fr; }
+      .plan-stats { grid-template-columns: repeat(3, 1fr); }
+      .acciones-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Espacio Vuela</a>
+  <div class="nav-right">
+    <div class="nav-nombre">Hola, <span id="nav-nombre">...</span></div>
+    <button class="btn-salir" id="btn-salir">Cerrar sesión</button>
+  </div>
+</nav>
+
+<div class="alerta" id="alerta-sin-plan">
+  ⚠️ No tienes un plan activo. <a href="planes.html">Ver planes disponibles →</a>
+</div>
+<div class="alerta pocas-clases" id="alerta-pocas" style="display:none;">
+  💛 Te quedan pocas clases. <a href="planes.html">Renueva tu plan →</a>
+</div>
+
+<main>
+  <div class="bienvenida">
+    <h1>¡Hola, <span id="bienvenida-nombre">...</span>!</h1>
+    <p id="bienvenida-sub">Cargando tu información...</p>
+  </div>
+
+  <div class="grid">
+    <div class="col-left">
+
+      <!-- CARD: PLAN ACTIVO -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-titulo">Tu plan activo</div>
+          <div class="card-badge badge-sin-plan" id="plan-badge">—</div>
+        </div>
+        <div id="plan-contenido">
+          <!-- Se rellena con JS -->
+          <div class="skeleton" style="height:28px; width:60%; margin-bottom:18px;"></div>
+          <div class="plan-stats">
+            <div class="stat"><div class="skeleton" style="height:34px; margin-bottom:6px;"></div><div class="skeleton" style="height:12px;"></div></div>
+            <div class="stat"><div class="skeleton" style="height:34px; margin-bottom:6px;"></div><div class="skeleton" style="height:12px;"></div></div>
+            <div class="stat"><div class="skeleton" style="height:34px; margin-bottom:6px;"></div><div class="skeleton" style="height:12px;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD: PRÓXIMAS CLASES -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-titulo">Próximas clases</div>
+          <a href="agendar.html" class="btn-secondary" style="font-size:12px; padding:8px 14px;">+ Agendar</a>
+        </div>
+        <div id="clases-contenido">
+          <div class="skeleton" style="height:60px; margin-bottom:10px; border-radius:12px;"></div>
+          <div class="skeleton" style="height:60px; border-radius:12px;"></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-right">
+
+      <!-- CARD: RUTINA DEL DÍA -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-titulo">Rutina del día</div>
+          <div style="font-size:20px;">🏃‍♀️</div>
+        </div>
+        <div id="rutina-contenido">
+          <div class="skeleton" style="height:16px; width:40%; margin-bottom:14px;"></div>
+          <div class="skeleton" style="height:20px; width:70%; margin-bottom:10px;"></div>
+          <div class="skeleton" style="height:80px;"></div>
+        </div>
+      </div>
+
+      <!-- CARD: ACCIONES RÁPIDAS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-titulo">Acciones rápidas</div>
+        </div>
+        <div class="acciones-grid">
+          <a href="agendar.html" class="accion-btn">
+            <span class="accion-icon">📅</span>
+            <span class="accion-label">Agendar clase</span>
+          </a>
+          <a href="planes.html" class="accion-btn">
+            <span class="accion-icon">💳</span>
+            <span class="accion-label">Ver planes</span>
+          </a>
+          <a href="mis-clases.html" class="accion-btn">
+            <span class="accion-icon">📋</span>
+            <span class="accion-label">Mis clases</span>
+          </a>
+          <a href="https://wa.me/56973841513" target="_blank" class="accion-btn">
+            <span class="accion-icon">💬</span>
+            <span class="accion-label">WhatsApp</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ── UTILIDADES ────────────────────────────────────────────────
+  function formatFecha(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+  function diasRestantes(fechaActivacion) {
+    const activacion = new Date(fechaActivacion);
+    const vencimiento = new Date(activacion);
+    vencimiento.setDate(vencimiento.getDate() + 31);
+    const hoy = new Date();
+    const diff = Math.ceil((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+    return { dias: diff, fecha: vencimiento };
+  }
+  function nombreMes(date) {
+    return new Date(date).toLocaleDateString('es-CL', { month: 'short' }).toUpperCase();
+  }
+  function dia(date) {
+    return new Date(date).getDate();
+  }
+  function horaMinutos(date) {
+    return new Date(date).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // ── INIT ──────────────────────────────────────────────────────
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      window.location.href = 'login-nuevo.html';
+      return;
+    }
+
+    const userId = session.user.id;
+    await Promise.all([
+      cargarUsuario(userId),
+      cargarPlan(userId),
+      cargarClases(userId),
+      cargarRutina()
+    ]);
+  }
+
+  // ── USUARIO ───────────────────────────────────────────────────
+  async function cargarUsuario(userId) {
+    const { data: u } = await sb.from('usuarios').select('nombre, apellido').eq('id', userId).single();
+    if (!u) return;
+
+    const nombre = u.nombre || 'alumna';
+    document.getElementById('nav-nombre').textContent = nombre;
+    document.getElementById('bienvenida-nombre').textContent = nombre;
+
+    const hora = new Date().getHours();
+    let saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
+    document.getElementById('bienvenida-sub').textContent = saludo + ' — ' + new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
+  // ── PLAN ──────────────────────────────────────────────────────
+  async function cargarPlan(userId) {
+    const { data: compras } = await sb
+      .from('compras')
+      .select('*, planes(nombre, tipo)')
+      .eq('usuario_id', userId)
+      .order('created_at', { ascending: false });
+
+    const contenedor = document.getElementById('plan-contenido');
+    const badge = document.getElementById('plan-badge');
+
+    if (!compras || compras.length === 0) {
+      mostrarSinPlan(contenedor, badge);
+      return;
+    }
+
+    // Buscar plan vigente: no vencido y con clases disponibles (o ilimitado)
+    const hoy = new Date();
+    let planActivo = null;
+
+    for (const c of compras) {
+      if (!c.fecha_activacion) continue;
+      const { dias } = diasRestantes(c.fecha_activacion);
+      const esIlimitado = c.clases_disponibles === null || c.clases_disponibles < 0;
+      const tieneClases = esIlimitado || c.clases_disponibles > 0;
+      if (dias > 0 && tieneClases) {
+        planActivo = { ...c, diasRestantes: dias, esIlimitado };
+        break;
+      }
+    }
+
+    if (!planActivo) {
+      mostrarSinPlan(contenedor, badge);
+      return;
+    }
+
+    // Alertas
+    if (!planActivo.esIlimitado && planActivo.clases_disponibles <= 2) {
+      document.getElementById('alerta-pocas').style.display = 'flex';
+    }
+
+    // Badge
+    if (planActivo.congelado) {
+      badge.textContent = 'Congelado';
+      badge.className = 'card-badge badge-congelado';
+    } else {
+      badge.textContent = 'Activo';
+      badge.className = 'card-badge badge-activo';
+    }
+
+    // Nombre del plan
+    const nombrePlan = planActivo.planes?.nombre || 'Plan activo';
+
+    // Calcular vencimiento
+    const { dias, fecha } = diasRestantes(planActivo.fecha_activacion);
+    const urgente = dias <= 5;
+
+    // Render
+    contenedor.innerHTML = `
+      <div class="plan-nombre">${nombrePlan}</div>
+      <div class="plan-stats">
+        <div class="stat">
+          <div class="stat-valor coral ${planActivo.esIlimitado ? 'ilimitado' : ''}">
+            ${planActivo.esIlimitado ? '∞' : planActivo.clases_disponibles ?? '—'}
+          </div>
+          <div class="stat-label">Disponibles</div>
+        </div>
+        <div class="stat">
+          <div class="stat-valor cyan">${planActivo.clases_usadas ?? 0}</div>
+          <div class="stat-label">Usadas</div>
+        </div>
+        <div class="stat">
+          <div class="stat-valor gray">${dias}</div>
+          <div class="stat-label">Días restantes</div>
+        </div>
+      </div>
+      <div class="plan-vencimiento ${urgente ? 'urgente' : ''}">
+        ${urgente ? '⚠️' : '📅'} Vence el ${formatFecha(fecha)}
+        ${planActivo.congelado ? ' · <strong>Plan congelado</strong> — contacta al admin para reactivar' : ''}
+      </div>
+      ${planActivo.addon_gym ? '<div class="plan-addon">🏋️ Addon Gym incluido en tu plan</div>' : ''}
+    `;
+  }
+
+  function mostrarSinPlan(contenedor, badge) {
+    document.getElementById('alerta-sin-plan').className = 'alerta sin-plan';
+    badge.textContent = 'Sin plan';
+    badge.className = 'card-badge badge-sin-plan';
+    contenedor.innerHTML = `
+      <div class="sin-plan-box">
+        <div class="icon">🌟</div>
+        <p>Aún no tienes un plan activo.<br>Elige el que más se ajuste a ti.</p>
+        <a href="planes.html" class="btn-primary btn-full">Ver planes disponibles →</a>
+      </div>
+    `;
+  }
+
+  // ── CLASES ────────────────────────────────────────────────────
+  async function cargarClases(userId) {
+    const ahora = new Date().toISOString();
+    const { data: inscripciones } = await sb
+      .from('inscripciones')
+      .select('*, clases!inner(nombre, fecha_hora, profesora, tipo)')
+      .eq('usuario_id', userId)
+      .gte('clases.fecha_hora', ahora)
+      .order('clases.fecha_hora', { ascending: true })
+      .limit(5);
+
+    const contenedor = document.getElementById('clases-contenido');
+
+    if (!inscripciones || inscripciones.length === 0) {
+      contenedor.innerHTML = `
+        <div class="sin-clases">
+          <span class="icon">📭</span>
+          No tienes clases agendadas próximamente.
+        </div>
+        <a href="agendar.html" class="btn-primary btn-full" style="margin-top:16px;">Agendar mi primera clase →</a>
+      `;
+      return;
+    }
+
+    contenedor.innerHTML = inscripciones.map(ins => {
+      const c = ins.clases;
+      return `
+        <div class="clase-item">
+          <div class="clase-fecha-box">
+            <div class="clase-dia">${dia(c.fecha_hora)}</div>
+            <div class="clase-mes">${nombreMes(c.fecha_hora)}</div>
+          </div>
+          <div class="clase-info">
+            <div class="clase-nombre">${c.nombre || c.tipo || 'Clase'}</div>
+            <div class="clase-detalle">${horaMinutos(c.fecha_hora)} · ${c.profesora || 'Profesora por confirmar'}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ── RUTINA DEL DÍA ────────────────────────────────────────────
+  async function cargarRutina() {
+    const hoy = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const { data: rutina } = await sb
+      .from('wod')
+      .select('*')
+      .eq('fecha', hoy)
+      .single();
+
+    const contenedor = document.getElementById('rutina-contenido');
+
+    if (!rutina) {
+      contenedor.innerHTML = `
+        <div class="sin-rutina">
+          <span class="icon">🌸</span>
+          Aún no hay rutina publicada para hoy.<br>Vuelve más tarde o consulta a tu profesora.
+        </div>
+      `;
+      return;
+    }
+
+    const fechaLegible = new Date(hoy + 'T12:00:00').toLocaleDateString('es-CL', {
+      weekday: 'long', day: 'numeric', month: 'long'
+    });
+
+    contenedor.innerHTML = `
+      <div class="rutina-fecha">📅 ${fechaLegible.charAt(0).toUpperCase() + fechaLegible.slice(1)}</div>
+      ${rutina.titulo ? `<div class="rutina-titulo">${rutina.titulo}</div>` : ''}
+      <div class="rutina-contenido">${rutina.descripcion || rutina.contenido || 'Sin descripción.'}</div>
+    `;
+  }
+
+  // ── CERRAR SESIÓN ─────────────────────────────────────────────
+  document.getElementById('btn-salir').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    window.location.href = 'login-nuevo.html';
+  });
+
+  // ── ARRANCAR ──────────────────────────────────────────────────
+  init();
+</script>
+
+</body>
+</html>
