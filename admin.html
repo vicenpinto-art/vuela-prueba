@@ -377,15 +377,7 @@
     <input type="hidden" id="h-id">
     <div class="form-grid">
       <div class="form-group full"><label>Nombre de la clase</label><input type="text" id="h-nombre" placeholder="Ej: Pole básico"></div>
-      <div class="form-group">
-        <label>Tipo</label>
-        <select id="h-tipo">
-          <option value="vuela">Vuela</option>
-          <option value="muevete">Muévete</option>
-          <option value="gym">Gym</option>
-        </select>
-      </div>
-      <div class="form-group">
+      <div class="form-group full">
         <label>Plan requerido</label>
         <select id="h-restriccion">
           <option value="vuela">Plan Vuela</option>
@@ -664,7 +656,6 @@ function editarHorario(id){
   document.getElementById('modal-horario-titulo').textContent='Editar horario';
   document.getElementById('h-id').value=h.id;
   document.getElementById('h-nombre').value=h.nombre;
-  document.getElementById('h-tipo').value=h.tipo;
   document.getElementById('h-restriccion').value=h.restriccion_plan||'muevete';
   document.getElementById('h-profesora').value=h.profesora;
   document.getElementById('h-dia').value=h.dia_semana;
@@ -679,7 +670,7 @@ async function guardarHorario(){
   const id = document.getElementById('h-id').value;
   const datos = {
     nombre:         document.getElementById('h-nombre').value.trim(),
-    tipo:           document.getElementById('h-tipo').value,
+    tipo:           document.getElementById('h-restriccion').value,
     restriccion_plan: document.getElementById('h-restriccion').value,
     profesora:      document.getElementById('h-profesora').value.trim(),
     dia_semana:     parseInt(document.getElementById('h-dia').value),
