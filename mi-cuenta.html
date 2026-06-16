@@ -316,7 +316,7 @@
     const { data: inscripciones } = await sb
       .from('inscripciones')
       .select('*, clases!inner(nombre, fecha_hora, profesora, tipo)')
-      .eq('usuario_id', userId)
+      .eq('alumna_id', userId)
       .gte('clases.fecha_hora', ahora)
       .order('clases.fecha_hora', { ascending: true })
       .limit(5);

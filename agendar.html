@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendar clases — Espacio Vuela</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --coral: #ff4e68; --magenta: #ff008d; --cyan: #00c8d4;
+      --purple: #8b6aff; --yellow: #fecb29; --dark: #111111;
+      --gray: #555; --light: #f5f5f7; --border: rgba(0,0,0,0.08);
+    }
+    body { font-family: 'Outfit', sans-serif; background: #f7f7f9; color: var(--dark); min-height: 100vh; }
+
+    /* NAV */
+    nav {
+      background: #fff; padding: 16px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-family: 'Dancing Script', cursive; font-size: 26px; color: var(--coral); text-decoration: none; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-back { font-size: 14px; color: var(--gray); text-decoration: none; transition: color .2s; }
+    .nav-back:hover { color: var(--coral); }
+
+    /* ALERTA SIN PLAN */
+    .alerta-plan {
+      display: none; padding: 14px 40px; font-size: 14px; font-weight: 500;
+      align-items: center; gap: 10px;
+      background: rgba(255,78,104,.08); color: #c0002a;
+      border-bottom: 1px solid rgba(255,78,104,.15);
+    }
+    .alerta-plan.visible { display: flex; }
+    .alerta-plan a { color: inherit; font-weight: 700; text-decoration: underline; }
+
+    /* HEADER */
+    .header { padding: 36px 40px 0; max-width: 1100px; margin: 0 auto; }
+    .header h1 { font-family: 'Dancing Script', cursive; font-size: 38px; line-height: 1.1; margin-bottom: 6px; }
+    .header h1 span { background: linear-gradient(135deg, var(--coral), var(--magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .header p { font-size: 15px; color: var(--gray); }
+
+    /* FILTROS */
+    .filtros-wrap { padding: 24px 40px 0; max-width: 1100px; margin: 0 auto; }
+    .filtros {
+      display: flex; gap: 4px;
+      background: #fff; border-radius: 16px; padding: 6px;
+      border: 1px solid var(--border); width: fit-content;
+    }
+    .filtro {
+      padding: 9px 20px; border-radius: 11px; border: none;
+      font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500;
+      cursor: pointer; color: var(--gray); background: transparent; transition: all .2s;
+    }
+    .filtro.active {
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      color: #fff; font-weight: 600;
+    }
+
+    /* MAIN */
+    main { max-width: 1100px; margin: 0 auto; padding: 24px 40px 60px; }
+
+    /* GRUPO DÍA */
+    .grupo-dia { margin-bottom: 32px; }
+    .dia-label {
+      font-size: 13px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--gray);
+      margin-bottom: 12px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dia-label span { color: var(--coral); margin-left: 8px; font-weight: 500; font-size: 12px; text-transform: none; letter-spacing: 0; }
+
+    /* CLASE CARD */
+    .clase-card {
+      background: #fff; border-radius: 16px; border: 1.5px solid var(--border);
+      padding: 18px 22px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 16px;
+      transition: box-shadow .2s, border-color .2s;
+    }
+    .clase-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.06); }
+    .clase-card.inscrita { border-color: rgba(0,200,212,.3); background: rgba(0,200,212,.02); }
+    .clase-card.sin-cupo { opacity: .6; }
+
+    .clase-hora-box {
+      min-width: 60px; text-align: center;
+      background: var(--light); border-radius: 12px; padding: 10px 8px; flex-shrink: 0;
+    }
+    .clase-hora { font-size: 18px; font-weight: 700; line-height: 1; color: var(--coral); }
+    .clase-duracion { font-size: 10px; color: var(--gray); margin-top: 3px; }
+
+    .clase-info { flex: 1; min-width: 0; }
+    .clase-nombre-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+    .clase-nombre { font-size: 15px; font-weight: 700; }
+    .tipo-badge {
+      font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0;
+    }
+    .tipo-vuela    { background: rgba(255,78,104,.1); color: var(--coral); }
+    .tipo-muevete  { background: rgba(139,106,255,.1); color: var(--purple); }
+    .tipo-gym      { background: rgba(0,200,212,.1); color: #007a82; }
+    .tipo-default  { background: var(--light); color: var(--gray); }
+
+    .clase-meta { font-size: 13px; color: var(--gray); display: flex; gap: 12px; flex-wrap: wrap; }
+    .clase-meta span { display: flex; align-items: center; gap: 4px; }
+
+    .cupo-bar-wrap { margin-top: 8px; }
+    .cupo-text { font-size: 11px; color: var(--gray); margin-bottom: 4px; }
+    .cupo-text.urgente { color: var(--coral); font-weight: 600; }
+    .cupo-bar { height: 4px; background: var(--light); border-radius: 4px; overflow: hidden; }
+    .cupo-fill { height: 100%; border-radius: 4px; background: var(--cyan); transition: width .3s; }
+    .cupo-fill.urgente { background: var(--coral); }
+    .cupo-fill.lleno   { background: #ddd; }
+
+    .clase-accion { flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+
+    .btn-agendar {
+      padding: 10px 20px; border-radius: 10px; border: none;
+      font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: transform .15s, box-shadow .15s;
+      background: linear-gradient(135deg, var(--coral), var(--magenta)); color: #fff;
+      white-space: nowrap;
+    }
+    .btn-agendar:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(255,78,104,.3); }
+    .btn-agendar:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn-cancelar {
+      padding: 8px 16px; border-radius: 10px;
+      background: var(--light); color: var(--gray); border: none;
+      font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: background .2s, color .2s;
+    }
+    .btn-cancelar:hover { background: rgba(255,78,104,.08); color: var(--coral); }
+
+    .inscrita-badge {
+      font-size: 12px; font-weight: 700; color: #007a82;
+      background: rgba(0,200,212,.1); padding: 6px 12px; border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    .btn-sin-cupo {
+      padding: 10px 16px; border-radius: 10px;
+      background: var(--light); color: var(--gray); border: none;
+      font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500;
+      cursor: not-allowed;
+    }
+
+    /* ESTADO VACÍO */
+    .sin-clases {
+      text-align: center; padding: 60px 24px; color: var(--gray);
+    }
+    .sin-clases .icon { font-size: 48px; display: block; margin-bottom: 16px; }
+    .sin-clases p { font-size: 15px; }
+
+    /* SKELETON */
+    .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .skeleton-card { background: #fff; border-radius: 16px; padding: 18px 22px; margin-bottom: 10px; display: flex; gap: 16px; align-items: center; border: 1.5px solid var(--border); }
+
+    /* MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #fff; border-radius: 24px; padding: 36px; max-width: 440px; width: 100%; position: relative; animation: modalIn .25s ease; }
+    @keyframes modalIn { from { opacity:0; transform: scale(.95) translateY(8px); } to { opacity:1; transform: none; } }
+    .modal-close { position: absolute; top: 16px; right: 16px; background: var(--light); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+    .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+
+    .modal-clase-detalle {
+      background: var(--light); border-radius: 14px; padding: 16px 18px; margin-bottom: 20px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .modal-clase-detalle .nombre { font-size: 17px; font-weight: 700; }
+    .modal-clase-detalle .meta { font-size: 13px; color: var(--gray); display: flex; flex-direction: column; gap: 4px; }
+
+    .modal-btns { display: flex; flex-direction: column; gap: 10px; }
+    .btn-confirmar {
+      width: 100%; padding: 14px; border-radius: 12px; border: none;
+      background: linear-gradient(135deg, var(--coral), var(--magenta)); color: #fff;
+      font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: opacity .2s;
+    }
+    .btn-confirmar:hover { opacity: .9; }
+    .btn-confirmar:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-modal-sec {
+      width: 100%; padding: 13px; border-radius: 12px; border: none;
+      background: var(--light); color: var(--dark);
+      font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+    .btn-modal-sec:hover { background: #ebebee; }
+
+    .modal-msg { font-size: 13px; padding: 10px 14px; border-radius: 8px; margin-top: 8px; display: none; }
+    .modal-msg.error   { background: rgba(255,78,104,.08); color: var(--coral); display: block; }
+    .modal-msg.success { background: rgba(0,200,212,.08); color: #007a82; display: block; }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .header { padding: 28px 20px 0; }
+      .header h1 { font-size: 30px; }
+      .filtros-wrap { padding: 20px 20px 0; }
+      main { padding: 20px 16px 48px; }
+      .clase-card { flex-wrap: wrap; }
+      .clase-accion { width: 100%; flex-direction: row; justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Espacio Vuela</a>
+  <div class="nav-right">
+    <a href="mi-cuenta.html" class="nav-back">← Mi cuenta</a>
+  </div>
+</nav>
+
+<div class="alerta-plan" id="alerta-plan">
+  ⚠️ No tienes un plan activo. <a href="planes.html">Comprar plan →</a>
+</div>
+
+<div class="header">
+  <h1>Elige tu <span>próxima clase</span></h1>
+  <p>Clases disponibles para los próximos 14 días</p>
+</div>
+
+<div class="filtros-wrap">
+  <div class="filtros">
+    <button class="filtro active" data-tipo="todas">Todas</button>
+    <button class="filtro" data-tipo="vuela">Vuela</button>
+    <button class="filtro" data-tipo="muevete">Muévete</button>
+    <button class="filtro" data-tipo="gym">Gym</button>
+  </div>
+</div>
+
+<main id="main-content">
+  <!-- Skeletons de carga -->
+  <div id="skeleton-wrap">
+    <div style="height:13px; width:140px;" class="skeleton" style="margin-bottom:12px;"></div>
+    <div class="skeleton-card"><div class="skeleton" style="width:60px;height:52px;border-radius:12px;flex-shrink:0;"></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;"><div class="skeleton" style="height:16px;width:50%;"></div><div class="skeleton" style="height:13px;width:70%;"></div></div><div class="skeleton" style="width:90px;height:38px;border-radius:10px;"></div></div>
+    <div class="skeleton-card"><div class="skeleton" style="width:60px;height:52px;border-radius:12px;flex-shrink:0;"></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;"><div class="skeleton" style="height:16px;width:40%;"></div><div class="skeleton" style="height:13px;width:60%;"></div></div><div class="skeleton" style="width:90px;height:38px;border-radius:10px;"></div></div>
+    <div class="skeleton-card"><div class="skeleton" style="width:60px;height:52px;border-radius:12px;flex-shrink:0;"></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;"><div class="skeleton" style="height:16px;width:55%;"></div><div class="skeleton" style="height:13px;width:65%;"></div></div><div class="skeleton" style="width:90px;height:38px;border-radius:10px;"></div></div>
+  </div>
+  <div id="clases-wrap" style="display:none;"></div>
+</main>
+
+<!-- MODAL CONFIRMAR AGENDAMIENTO -->
+<div class="modal-overlay" id="modal-agendar">
+  <div class="modal">
+    <button class="modal-close" onclick="cerrarModal('modal-agendar')">✕</button>
+    <h2>Confirmar agendamiento</h2>
+    <div class="modal-clase-detalle" id="modal-detalle"></div>
+    <div class="modal-btns">
+      <button class="btn-confirmar" id="btn-confirmar-agendar" onclick="confirmarAgendar()">Confirmar →</button>
+      <button class="btn-modal-sec" onclick="cerrarModal('modal-agendar')">Cancelar</button>
+    </div>
+    <div class="modal-msg" id="modal-agendar-msg"></div>
+  </div>
+</div>
+
+<!-- MODAL CANCELAR INSCRIPCIÓN -->
+<div class="modal-overlay" id="modal-cancelar">
+  <div class="modal">
+    <button class="modal-close" onclick="cerrarModal('modal-cancelar')">✕</button>
+    <h2>¿Cancelar inscripción?</h2>
+    <div class="modal-clase-detalle" id="modal-cancelar-detalle"></div>
+    <div class="modal-btns">
+      <button class="btn-confirmar" id="btn-confirmar-cancelar" onclick="confirmarCancelar()" style="background: linear-gradient(135deg,#ff4e68,#ff008d);">Sí, cancelar inscripción</button>
+      <button class="btn-modal-sec" onclick="cerrarModal('modal-cancelar')">Volver</button>
+    </div>
+    <div class="modal-msg" id="modal-cancelar-msg"></div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ── ESTADO ────────────────────────────────────────────────────
+  let userId       = null;
+  let todasLasClases    = [];
+  let misInscripciones  = new Set(); // clase_id de inscripciones confirmadas
+  let tieneplanActivo   = false;
+  let claseSeleccionada = null;
+  let filtroActivo      = 'todas';
+
+  // ── UTILS ─────────────────────────────────────────────────────
+  function horaStr(fechaHora) {
+    return new Date(fechaHora).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+  }
+  function fechaLegible(fechaHora) {
+    return new Date(fechaHora).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+  function diaKey(fechaHora) {
+    return new Date(fechaHora).toISOString().split('T')[0];
+  }
+  function diaLabel(isoDate) {
+    const d = new Date(isoDate + 'T12:00:00');
+    const hoy  = new Date(); hoy.setHours(0,0,0,0);
+    const manana = new Date(hoy); manana.setDate(manana.getDate() + 1);
+    if (d.toDateString() === hoy.toDateString())    return 'Hoy';
+    if (d.toDateString() === manana.toDateString()) return 'Mañana';
+    return d.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+  function tipoBadge(tipo) {
+    const t = (tipo || '').toLowerCase();
+    if (t.includes('vuela') || t.includes('pole') || t.includes('lira') || t.includes('aerea') || t.includes('aerial')) return { clase: 'tipo-vuela', label: 'Vuela' };
+    if (t.includes('muevete') || t.includes('baile') || t.includes('heels') || t.includes('dance') || t.includes('funky') || t.includes('afro')) return { clase: 'tipo-muevete', label: 'Muévete' };
+    if (t.includes('gym') || t.includes('fuerza')) return { clase: 'tipo-gym', label: 'Gym' };
+    return { clase: 'tipo-default', label: tipo || 'Clase' };
+  }
+  function matchFiltro(clase) {
+    if (filtroActivo === 'todas') return true;
+    const t = (clase.tipo || '').toLowerCase();
+    if (filtroActivo === 'vuela')   return t.includes('vuela') || t.includes('pole') || t.includes('lira') || t.includes('aerea');
+    if (filtroActivo === 'muevete') return t.includes('muevete') || t.includes('baile') || t.includes('heels') || t.includes('funky') || t.includes('afro');
+    if (filtroActivo === 'gym')     return t.includes('gym') || t.includes('fuerza');
+    return true;
+  }
+
+  // ── INIT ──────────────────────────────────────────────────────
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'login-nuevo.html'; return; }
+    userId = session.user.id;
+    await Promise.all([verificarPlan(), cargarClases()]);
+  }
+
+  async function verificarPlan() {
+    const hoy = new Date().toISOString().split('T')[0];
+    const { data } = await sb
+      .from('compras')
+      .select('id')
+      .eq('alumna_id', userId)
+      .eq('estado', 'activo')
+      .gte('fecha_fin', hoy)
+      .limit(1);
+    tieneplanActivo = !!(data && data.length > 0);
+    if (!tieneplanActivo) document.getElementById('alerta-plan').classList.add('visible');
+  }
+
+  async function cargarClases() {
+    const ahora = new Date().toISOString();
+    const en14dias = new Date();
+    en14dias.setDate(en14dias.getDate() + 14);
+
+    const [{ data: clases }, { data: inscripciones }] = await Promise.all([
+      sb.from('clases')
+        .select('*')
+        .gte('fecha_hora', ahora)
+        .lte('fecha_hora', en14dias.toISOString())
+        .order('fecha_hora', { ascending: true }),
+      sb.from('inscripciones')
+        .select('clase_id')
+        .eq('alumna_id', userId)
+        .eq('estado', 'confirmada')
+    ]);
+
+    todasLasClases = clases || [];
+    misInscripciones = new Set((inscripciones || []).map(i => i.clase_id));
+
+    document.getElementById('skeleton-wrap').style.display = 'none';
+    document.getElementById('clases-wrap').style.display = 'block';
+    renderClases();
+  }
+
+  // ── RENDER ────────────────────────────────────────────────────
+  function renderClases() {
+    const wrap = document.getElementById('clases-wrap');
+    const filtradas = todasLasClases.filter(matchFiltro);
+
+    if (filtradas.length === 0) {
+      wrap.innerHTML = `<div class="sin-clases"><span class="icon">📭</span><p>No hay clases disponibles para este filtro.</p></div>`;
+      return;
+    }
+
+    // Agrupar por día
+    const porDia = new Map();
+    filtradas.forEach(c => {
+      const k = diaKey(c.fecha_hora);
+      if (!porDia.has(k)) porDia.set(k, []);
+      porDia.get(k).push(c);
+    });
+
+    let html = '';
+    porDia.forEach((clasesDia, fechaKey) => {
+      const inscritasCnt = clasesDia.filter(c => misInscripciones.has(c.id)).length;
+      html += `<div class="grupo-dia">
+        <div class="dia-label">${diaLabel(fechaKey)} ${inscritasCnt > 0 ? `<span>· ${inscritasCnt} inscrita${inscritasCnt > 1 ? 's' : ''}</span>` : ''}</div>
+        ${clasesDia.map(c => renderCard(c)).join('')}
+      </div>`;
+    });
+
+    wrap.innerHTML = html;
+  }
+
+  function renderCard(c) {
+    const estaInscrita  = misInscripciones.has(c.id);
+    const sinCupo       = c.cupo_disponible <= 0 && !estaInscrita;
+    const ocupados      = (c.cupo_maximo || 15) - (c.cupo_disponible ?? 15);
+    const pct           = Math.round((ocupados / (c.cupo_maximo || 15)) * 100);
+    const urgente       = !estaInscrita && c.cupo_disponible <= 3 && c.cupo_disponible > 0;
+    const badge         = tipoBadge(c.tipo);
+
+    let accionHtml = '';
+    if (estaInscrita) {
+      accionHtml = `
+        <div class="inscrita-badge">✓ Inscrita</div>
+        <button class="btn-cancelar" onclick="abrirCancelar('${c.id}')">Cancelar</button>`;
+    } else if (sinCupo) {
+      accionHtml = `<button class="btn-sin-cupo" disabled>Sin cupo</button>`;
+    } else {
+      accionHtml = `<button class="btn-agendar" onclick="abrirAgendar('${c.id}')">Agendar →</button>`;
+    }
+
+    return `
+      <div class="clase-card ${estaInscrita ? 'inscrita' : ''} ${sinCupo ? 'sin-cupo' : ''}" id="card-${c.id}">
+        <div class="clase-hora-box">
+          <div class="clase-hora">${horaStr(c.fecha_hora)}</div>
+          <div class="clase-duracion">${c.duracion_minutos || 60} min</div>
+        </div>
+        <div class="clase-info">
+          <div class="clase-nombre-row">
+            <div class="clase-nombre">${c.nombre}</div>
+            <div class="tipo-badge ${badge.clase}">${badge.label}</div>
+          </div>
+          <div class="clase-meta">
+            <span>👩‍🏫 ${c.profesora}</span>
+          </div>
+          <div class="cupo-bar-wrap">
+            <div class="cupo-text ${urgente ? 'urgente' : ''} ${sinCupo ? 'urgente' : ''}">
+              ${sinCupo ? 'Clase llena' : urgente ? `¡Solo ${c.cupo_disponible} lugar${c.cupo_disponible > 1 ? 'es' : ''} disponible!` : `${c.cupo_disponible} de ${c.cupo_maximo || 15} lugares disponibles`}
+            </div>
+            <div class="cupo-bar">
+              <div class="cupo-fill ${urgente || sinCupo ? (sinCupo ? 'lleno' : 'urgente') : ''}" style="width:${pct}%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="clase-accion">${accionHtml}</div>
+      </div>`;
+  }
+
+  // ── FILTROS ───────────────────────────────────────────────────
+  document.querySelectorAll('.filtro').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filtro').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filtroActivo = btn.dataset.tipo;
+      renderClases();
+    });
+  });
+
+  // ── MODAL AGENDAR ─────────────────────────────────────────────
+  function abrirAgendar(claseId) {
+    if (!tieneplanActivo) {
+      window.location.href = 'planes.html';
+      return;
+    }
+    claseSeleccionada = todasLasClases.find(c => c.id === claseId);
+    if (!claseSeleccionada) return;
+
+    document.getElementById('modal-detalle').innerHTML = `
+      <div class="nombre">${claseSeleccionada.nombre}</div>
+      <div class="meta">
+        <span>📅 ${fechaLegible(claseSeleccionada.fecha_hora)}</span>
+        <span>🕐 ${horaStr(claseSeleccionada.fecha_hora)} · ${claseSeleccionada.duracion_minutos || 60} min</span>
+        <span>👩‍🏫 ${claseSeleccionada.profesora}</span>
+        <span>👥 ${claseSeleccionada.cupo_disponible} lugar${claseSeleccionada.cupo_disponible !== 1 ? 'es' : ''} disponible${claseSeleccionada.cupo_disponible !== 1 ? 's' : ''}</span>
+      </div>`;
+
+    document.getElementById('modal-agendar-msg').className = 'modal-msg';
+    document.getElementById('btn-confirmar-agendar').disabled = false;
+    document.getElementById('btn-confirmar-agendar').textContent = 'Confirmar →';
+    abrirModal('modal-agendar');
+  }
+
+  async function confirmarAgendar() {
+    const btn = document.getElementById('btn-confirmar-agendar');
+    const msg = document.getElementById('modal-agendar-msg');
+    btn.disabled = true;
+    btn.textContent = 'Agendando...';
+
+    const { data, error } = await sb.rpc('agendar_clase', {
+      p_clase_id: claseSeleccionada.id,
+      p_alumna_id: userId
+    });
+
+    if (error || !data?.ok) {
+      const errores = {
+        ya_inscrita:        'Ya estás inscrita en esta clase.',
+        sin_cupo:           'Ya no hay cupo disponible.',
+        clase_no_encontrada:'No se encontró la clase.',
+      };
+      msg.textContent = errores[data?.error] || 'Error al agendar. Intenta de nuevo.';
+      msg.className = 'modal-msg error';
+      btn.disabled = false;
+      btn.textContent = 'Confirmar →';
+      return;
+    }
+
+    // Actualizar estado local
+    misInscripciones.add(claseSeleccionada.id);
+    const clase = todasLasClases.find(c => c.id === claseSeleccionada.id);
+    if (clase) clase.cupo_disponible = Math.max(0, (clase.cupo_disponible || 1) - 1);
+
+    msg.textContent = '¡Listo! Quedaste inscrita en la clase. 🎉';
+    msg.className = 'modal-msg success';
+    btn.textContent = '✓ Inscrita';
+
+    setTimeout(() => {
+      cerrarModal('modal-agendar');
+      renderClases();
+    }, 1500);
+  }
+
+  // ── MODAL CANCELAR ────────────────────────────────────────────
+  function abrirCancelar(claseId) {
+    claseSeleccionada = todasLasClases.find(c => c.id === claseId);
+    if (!claseSeleccionada) return;
+
+    document.getElementById('modal-cancelar-detalle').innerHTML = `
+      <div class="nombre">${claseSeleccionada.nombre}</div>
+      <div class="meta">
+        <span>📅 ${fechaLegible(claseSeleccionada.fecha_hora)}</span>
+        <span>🕐 ${horaStr(claseSeleccionada.fecha_hora)}</span>
+        <span>👩‍🏫 ${claseSeleccionada.profesora}</span>
+      </div>`;
+
+    document.getElementById('modal-cancelar-msg').className = 'modal-msg';
+    document.getElementById('btn-confirmar-cancelar').disabled = false;
+    document.getElementById('btn-confirmar-cancelar').textContent = 'Sí, cancelar inscripción';
+    abrirModal('modal-cancelar');
+  }
+
+  async function confirmarCancelar() {
+    const btn = document.getElementById('btn-confirmar-cancelar');
+    const msg = document.getElementById('modal-cancelar-msg');
+    btn.disabled = true;
+    btn.textContent = 'Cancelando...';
+
+    const { data, error } = await sb.rpc('cancelar_inscripcion', {
+      p_clase_id: claseSeleccionada.id,
+      p_alumna_id: userId
+    });
+
+    if (error || !data?.ok) {
+      msg.textContent = 'No se pudo cancelar. Intenta de nuevo.';
+      msg.className = 'modal-msg error';
+      btn.disabled = false;
+      btn.textContent = 'Sí, cancelar inscripción';
+      return;
+    }
+
+    // Actualizar estado local
+    misInscripciones.delete(claseSeleccionada.id);
+    const clase = todasLasClases.find(c => c.id === claseId);
+    if (clase) clase.cupo_disponible = (clase.cupo_disponible || 0) + 1;
+
+    msg.textContent = 'Inscripción cancelada correctamente.';
+    msg.className = 'modal-msg success';
+    btn.textContent = '✓ Cancelada';
+
+    setTimeout(() => {
+      cerrarModal('modal-cancelar');
+      renderClases();
+    }, 1400);
+  }
+
+  // ── MODALES ───────────────────────────────────────────────────
+  function abrirModal(id)  { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function cerrarModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
+  document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target === o) cerrarModal(o.id); });
+  });
+
+  init();
+</script>
+</body>
+</html>

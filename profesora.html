@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Profesora — Espacio Vuela</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --coral: #ff4e68; --magenta: #ff008d; --cyan: #00c8d4;
+      --purple: #8b6aff; --yellow: #fecb29; --dark: #111111;
+      --gray: #555; --light: #f5f5f7; --border: rgba(0,0,0,0.08);
+    }
+    body { font-family: 'Outfit', sans-serif; background: #f7f7f9; color: var(--dark); min-height: 100vh; }
+
+    /* NAV */
+    nav {
+      background: #fff; padding: 16px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-family: 'Dancing Script', cursive; font-size: 26px; color: var(--coral); text-decoration: none; }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .rol-badge {
+      font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+      background: rgba(139,106,255,.1); color: var(--purple); letter-spacing: 1px; text-transform: uppercase;
+    }
+    .nav-nombre { font-size: 14px; color: var(--gray); }
+    .btn-salir {
+      font-size: 13px; color: var(--gray); background: none;
+      border: 1.5px solid var(--border); border-radius: 8px; padding: 7px 14px;
+      cursor: pointer; font-family: 'Outfit', sans-serif; transition: color .2s, border-color .2s;
+    }
+    .btn-salir:hover { color: var(--coral); border-color: var(--coral); }
+
+    /* LAYOUT */
+    .layout {
+      display: grid; grid-template-columns: 340px 1fr;
+      max-width: 1200px; margin: 0 auto;
+      padding: 28px 24px 60px; gap: 20px;
+    }
+
+    /* PANEL IZQUIERDO */
+    .panel-clases {}
+    .panel-header { margin-bottom: 16px; }
+    .panel-header h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .panel-header p { font-size: 13px; color: var(--gray); }
+
+    .tabs { display: flex; gap: 4px; background: #fff; border-radius: 12px; padding: 5px; border: 1px solid var(--border); margin-bottom: 16px; }
+    .tab { flex: 1; padding: 8px; border-radius: 9px; border: none; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--gray); background: transparent; transition: all .2s; text-align: center; }
+    .tab.active { background: linear-gradient(135deg, var(--coral), var(--magenta)); color: #fff; font-weight: 600; }
+
+    /* CLASE ITEM */
+    .clase-item {
+      background: #fff; border-radius: 14px; padding: 16px 18px;
+      border: 1.5px solid var(--border); margin-bottom: 10px; cursor: pointer;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .clase-item:hover { border-color: rgba(255,78,104,.3); box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+    .clase-item.activa { border-color: var(--coral); background: rgba(255,78,104,.02); }
+    .clase-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .clase-hora-badge {
+      font-size: 13px; font-weight: 700; color: var(--coral);
+      background: rgba(255,78,104,.08); padding: 4px 10px; border-radius: 8px;
+    }
+    .clase-estado-badge {
+      font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px;
+    }
+    .estado-en-curso  { background: rgba(0,200,212,.1); color: #007a82; }
+    .estado-proxima   { background: rgba(254,203,41,.15); color: #7a5800; }
+    .estado-pasada    { background: var(--light); color: var(--gray); }
+    .clase-nombre-txt { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .clase-meta-txt   { font-size: 12px; color: var(--gray); display: flex; gap: 10px; }
+
+    .sin-clases-msg { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 14px; }
+    .sin-clases-msg .icon { font-size: 36px; display: block; margin-bottom: 10px; }
+
+    /* PANEL DERECHO */
+    .panel-lista { }
+    .panel-vacio {
+      background: #fff; border-radius: 20px; border: 1px solid var(--border);
+      padding: 60px 40px; text-align: center; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .panel-vacio .icon { font-size: 48px; margin-bottom: 16px; }
+    .panel-vacio p { font-size: 15px; color: var(--gray); }
+
+    .lista-header {
+      background: #fff; border-radius: 20px 20px 0 0; padding: 24px 28px 20px;
+      border: 1px solid var(--border); border-bottom: none;
+    }
+    .lista-header-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+    .lista-clase-nombre { font-size: 20px; font-weight: 700; }
+    .lista-clase-meta { font-size: 13px; color: var(--gray); display: flex; gap: 14px; margin-top: 4px; flex-wrap: wrap; }
+
+    .lista-stats { display: flex; gap: 10px; }
+    .stat-mini {
+      background: var(--light); border-radius: 10px; padding: 8px 14px; text-align: center;
+    }
+    .stat-mini-val { font-size: 20px; font-weight: 700; color: var(--coral); line-height: 1; }
+    .stat-mini-lbl { font-size: 10px; color: var(--gray); font-weight: 500; }
+
+    /* TABLA ASISTENCIA */
+    .tabla-wrap {
+      background: #fff; border-radius: 0 0 20px 20px;
+      border: 1px solid var(--border); border-top: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .alumna-row {
+      display: grid; grid-template-columns: 1fr auto auto;
+      align-items: center; gap: 12px;
+      padding: 14px 28px; border-bottom: 1px solid var(--border);
+      transition: background .15s;
+    }
+    .alumna-row:last-child { border-bottom: none; }
+    .alumna-row:hover { background: rgba(0,0,0,.01); }
+
+    .alumna-info .nombre { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .alumna-plan {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px;
+    }
+    .plan-ok       { background: rgba(0,200,212,.1); color: #007a82; }
+    .plan-low      { background: rgba(254,203,41,.15); color: #7a5800; }
+    .plan-sin      { background: rgba(255,78,104,.1); color: var(--coral); }
+    .plan-ilimitado{ background: rgba(139,106,255,.1); color: var(--purple); }
+
+    .alumna-clases { font-size: 11px; color: var(--gray); margin-top: 2px; }
+
+    /* TOGGLE ASISTENCIA */
+    .toggle-asistencia {
+      display: flex; border-radius: 10px; overflow: hidden;
+      border: 1.5px solid var(--border); flex-shrink: 0;
+    }
+    .toggle-btn {
+      padding: 7px 14px; border: none; font-family: 'Outfit', sans-serif;
+      font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s;
+      background: #fff; color: var(--gray);
+    }
+    .toggle-btn:first-child { border-right: 1px solid var(--border); }
+    .toggle-btn.presente-on  { background: rgba(0,200,212,.1); color: #007a82; }
+    .toggle-btn.ausente-on   { background: rgba(255,78,104,.1); color: var(--coral); }
+    .toggle-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* SKELETON */
+    .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--dark); color: #fff; padding: 12px 22px; border-radius: 12px;
+      font-size: 14px; font-weight: 500; z-index: 300; opacity: 0;
+      transition: opacity .3s; pointer-events: none; white-space: nowrap;
+    }
+    .toast.ok      { background: #007a82; }
+    .toast.error   { background: var(--coral); }
+    .toast.visible { opacity: 1; }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; padding: 20px 16px 48px; }
+      .panel-vacio { display: none; }
+      nav { padding: 14px 20px; }
+      .nav-nombre { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Espacio Vuela</a>
+  <div class="nav-right">
+    <span class="rol-badge" id="nav-rol">Profesora</span>
+    <span class="nav-nombre" id="nav-nombre">...</span>
+    <button class="btn-salir" id="btn-salir">Cerrar sesión</button>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- PANEL IZQUIERDO: lista de clases -->
+  <div class="panel-clases">
+    <div class="panel-header">
+      <h2 id="panel-titulo">Mis clases</h2>
+      <p id="panel-fecha">Cargando...</p>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="hoy">Hoy</button>
+      <button class="tab" data-tab="semana">Esta semana</button>
+    </div>
+    <div id="lista-clases">
+      <div class="skeleton" style="height:80px; border-radius:14px; margin-bottom:10px;"></div>
+      <div class="skeleton" style="height:80px; border-radius:14px; margin-bottom:10px;"></div>
+    </div>
+  </div>
+
+  <!-- PANEL DERECHO: lista de asistencia -->
+  <div class="panel-lista">
+    <div class="panel-vacio" id="panel-vacio">
+      <div class="icon">👈</div>
+      <p>Selecciona una clase para ver<br>la lista de asistencia</p>
+    </div>
+    <div id="panel-asistencia" style="display:none;">
+      <div class="lista-header">
+        <div class="lista-header-top">
+          <div>
+            <div class="lista-clase-nombre" id="lista-nombre">—</div>
+            <div class="lista-clase-meta" id="lista-meta"></div>
+          </div>
+          <div class="lista-stats">
+            <div class="stat-mini">
+              <div class="stat-mini-val" id="stat-presentes">0</div>
+              <div class="stat-mini-lbl">Presentes</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini-val" id="stat-total">0</div>
+              <div class="stat-mini-lbl">Inscritas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tabla-wrap" id="tabla-asistencia"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ── ESTADO ────────────────────────────────────────────────────
+  let userId       = null;
+  let usuarioNombre = '';
+  let usuarioRol   = '';
+  let todasLasClases = [];
+  let claseActivaId  = null;
+  let tabActiva      = 'hoy';
+
+  // ── UTILS ─────────────────────────────────────────────────────
+  function horaStr(ts)  { return new Date(ts).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }); }
+  function fechaCorta(ts) { return new Date(ts).toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' }); }
+  function estadoClase(fechaHora, durMin) {
+    const inicio = new Date(fechaHora);
+    const fin    = new Date(inicio.getTime() + (durMin || 60) * 60000);
+    const ahora  = new Date();
+    if (ahora >= inicio && ahora <= fin) return { label: 'En curso', clase: 'estado-en-curso' };
+    if (ahora < inicio)                  return { label: 'Próxima',  clase: 'estado-proxima' };
+    return { label: 'Pasada', clase: 'estado-pasada' };
+  }
+
+  function mostrarToast(msg, tipo = 'ok') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${tipo} visible`;
+    setTimeout(() => t.classList.remove('visible'), 2500);
+  }
+
+  // ── INIT ──────────────────────────────────────────────────────
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'login-nuevo.html'; return; }
+    userId = session.user.id;
+
+    const { data: u } = await sb.from('usuarios').select('nombre, apellido, rol').eq('id', userId).single();
+    if (!u || !['profesora', 'admin'].includes(u.rol)) {
+      window.location.href = 'mi-cuenta.html'; return;
+    }
+
+    usuarioNombre = `${u.nombre || ''} ${u.apellido || ''}`.trim();
+    usuarioRol    = u.rol;
+
+    document.getElementById('nav-nombre').textContent = usuarioNombre;
+    document.getElementById('nav-rol').textContent    = u.rol === 'admin' ? 'Admin' : 'Profesora';
+    document.getElementById('panel-fecha').textContent =
+      new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    await cargarClases();
+  }
+
+  // ── CARGAR CLASES ─────────────────────────────────────────────
+  async function cargarClases() {
+    const hoyInicio = new Date(); hoyInicio.setHours(0,0,0,0);
+    const hoyFin    = new Date(); hoyFin.setHours(23,59,59,999);
+    const semanaFin = new Date(); semanaFin.setDate(semanaFin.getDate() + 7);
+
+    // Admin ve todas las clases; profesora solo las suyas
+    let query = sb.from('clases').select('*').order('fecha_hora', { ascending: true });
+    if (usuarioRol !== 'admin') {
+      query = query.ilike('profesora', `%${(usuarioNombre.split(' ')[0])}%`);
+    }
+
+    const { data: clases } = await query
+      .gte('fecha_hora', hoyInicio.toISOString())
+      .lte('fecha_hora', semanaFin.toISOString());
+
+    todasLasClases = clases || [];
+    renderClases();
+  }
+
+  function renderClases() {
+    const hoyInicio = new Date(); hoyInicio.setHours(0,0,0,0);
+    const hoyFin    = new Date(); hoyFin.setHours(23,59,59,999);
+
+    const filtradas = todasLasClases.filter(c => {
+      const f = new Date(c.fecha_hora);
+      if (tabActiva === 'hoy') return f >= hoyInicio && f <= hoyFin;
+      return true;
+    });
+
+    const contenedor = document.getElementById('lista-clases');
+    if (filtradas.length === 0) {
+      contenedor.innerHTML = `<div class="sin-clases-msg"><span class="icon">📭</span>${tabActiva === 'hoy' ? 'No tienes clases hoy.' : 'No hay clases esta semana.'}</div>`;
+      return;
+    }
+
+    contenedor.innerHTML = filtradas.map(c => {
+      const est  = estadoClase(c.fecha_hora, c.duracion_minutos);
+      const cupo = c.cupo_disponible ?? 0;
+      const max  = c.cupo_maximo ?? 15;
+      const inscritas = max - cupo;
+      return `
+        <div class="clase-item ${claseActivaId === c.id ? 'activa' : ''}" onclick="seleccionarClase('${c.id}')">
+          <div class="clase-item-top">
+            <span class="clase-hora-badge">${horaStr(c.fecha_hora)}</span>
+            <span class="clase-estado-badge ${est.clase}">${est.label}</span>
+          </div>
+          <div class="clase-nombre-txt">${c.nombre}</div>
+          <div class="clase-meta-txt">
+            <span>👩‍🏫 ${c.profesora}</span>
+            <span>👥 ${inscritas}/${max} inscritas</span>
+            ${tabActiva === 'semana' ? `<span>📅 ${fechaCorta(c.fecha_hora)}</span>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── TABS ──────────────────────────────────────────────────────
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      tabActiva = btn.dataset.tab;
+      renderClases();
+    });
+  });
+
+  // ── SELECCIONAR CLASE ─────────────────────────────────────────
+  async function seleccionarClase(claseId) {
+    claseActivaId = claseId;
+    renderClases(); // Actualiza el highlight
+
+    const clase = todasLasClases.find(c => c.id === claseId);
+    if (!clase) return;
+
+    document.getElementById('panel-vacio').style.display = 'none';
+    document.getElementById('panel-asistencia').style.display = 'block';
+    document.getElementById('lista-nombre').textContent = clase.nombre;
+    document.getElementById('lista-meta').innerHTML = `
+      <span>📅 ${fechaCorta(clase.fecha_hora)}</span>
+      <span>🕐 ${horaStr(clase.fecha_hora)} · ${clase.duracion_minutos || 60} min</span>
+      <span>👩‍🏫 ${clase.profesora}</span>`;
+
+    document.getElementById('tabla-asistencia').innerHTML =
+      `<div style="padding:20px 28px;"><div class="skeleton" style="height:50px;margin-bottom:10px;"></div><div class="skeleton" style="height:50px;margin-bottom:10px;"></div></div>`;
+    document.getElementById('stat-presentes').textContent = '—';
+    document.getElementById('stat-total').textContent = '—';
+
+    await cargarAsistencia(claseId);
+  }
+
+  // ── CARGAR ASISTENCIA ─────────────────────────────────────────
+  async function cargarAsistencia(claseId) {
+    // Inscripciones confirmadas con datos de usuaria
+    const { data: inscripciones } = await sb
+      .from('inscripciones')
+      .select('alumna_id, usuarios(nombre, apellido)')
+      .eq('clase_id', claseId)
+      .eq('estado', 'confirmada');
+
+    // Asistencias ya registradas
+    const { data: asistencias } = await sb
+      .from('asistencias')
+      .select('alumna_id, presente')
+      .eq('clase_id', claseId);
+
+    const asistenciaMap = new Map((asistencias || []).map(a => [a.alumna_id, a.presente]));
+
+    if (!inscripciones || inscripciones.length === 0) {
+      document.getElementById('tabla-asistencia').innerHTML =
+        `<div style="padding:28px; text-align:center; color:var(--gray); font-size:14px;">No hay alumnas inscritas en esta clase.</div>`;
+      document.getElementById('stat-total').textContent = '0';
+      document.getElementById('stat-presentes').textContent = '0';
+      return;
+    }
+
+    // Cargar planes activos de cada alumna
+    const alumnaIds = inscripciones.map(i => i.alumna_id);
+    const hoy = new Date().toISOString().split('T')[0];
+    const { data: compras } = await sb
+      .from('compras')
+      .select('alumna_id, clases_disponibles, ilimitado, addon_gym, planes(nombre, tipo)')
+      .in('alumna_id', alumnaIds)
+      .eq('estado', 'activo')
+      .gte('fecha_fin', hoy);
+
+    // Mapear compra activa por alumna (la más reciente)
+    const compraMap = new Map();
+    (compras || []).forEach(c => {
+      if (!compraMap.has(c.alumna_id)) compraMap.set(c.alumna_id, c);
+    });
+
+    const clase = todasLasClases.find(c => c.id === claseId);
+    const restriccion = clase?.restriccion_plan || 'libre';
+
+    // Calcular presentes
+    let presentes = 0;
+    asistencias?.forEach(a => { if (a.presente) presentes++; });
+    document.getElementById('stat-total').textContent = inscripciones.length;
+    document.getElementById('stat-presentes').textContent = presentes;
+
+    // Render tabla
+    document.getElementById('tabla-asistencia').innerHTML = inscripciones.map(ins => {
+      const u      = ins.usuarios;
+      const nombre = u ? `${u.nombre || ''} ${u.apellido || ''}`.trim() : 'Alumna';
+      const compra = compraMap.get(ins.alumna_id);
+      const estadoAsistencia = asistenciaMap.get(ins.alumna_id); // true/false/undefined
+
+      // Determinar estado del plan
+      let planHtml = '';
+      let puedeAsistir = true;
+      if (!compra) {
+        planHtml = `<span class="alumna-plan plan-sin">⚠️ Sin plan activo</span>`;
+        puedeAsistir = false;
+      } else {
+        const planTipo = compra.planes?.tipo || '';
+        const planNombre = compra.planes?.nombre || 'Plan';
+        const clasesDis = compra.clases_disponibles;
+        const esIlimitado = compra.ilimitado;
+
+        // Verificar restricción
+        if (restriccion !== 'libre' && planTipo !== restriccion && !(restriccion === 'gym' && compra.addon_gym)) {
+          planHtml = `<span class="alumna-plan plan-sin">❌ Plan no corresponde</span>`;
+          puedeAsistir = false;
+        } else if (esIlimitado) {
+          planHtml = `<span class="alumna-plan plan-ilimitado">∞ ${planNombre}</span>`;
+        } else if (clasesDis <= 0) {
+          planHtml = `<span class="alumna-plan plan-sin">0 clases — ${planNombre}</span>`;
+          puedeAsistir = false;
+        } else if (clasesDis <= 2) {
+          planHtml = `<span class="alumna-plan plan-low">⚠️ ${clasesDis} clase${clasesDis > 1 ? 's' : ''} — ${planNombre}</span>`;
+        } else {
+          planHtml = `<span class="alumna-plan plan-ok">✓ ${clasesDis} clases — ${planNombre}</span>`;
+        }
+      }
+
+      const presenteOn = estadoAsistencia === true  ? 'presente-on' : '';
+      const ausenteOn  = estadoAsistencia === false ? 'ausente-on'  : '';
+
+      return `
+        <div class="alumna-row" id="row-${ins.alumna_id}">
+          <div class="alumna-info">
+            <div class="nombre">${nombre}</div>
+            ${planHtml}
+          </div>
+          <div class="toggle-asistencia">
+            <button class="toggle-btn ${presenteOn}"
+              onclick="marcarAsistencia('${ins.alumna_id}', '${claseId}', true)"
+              id="btn-p-${ins.alumna_id}">✓ Presente</button>
+            <button class="toggle-btn ${ausenteOn}"
+              onclick="marcarAsistencia('${ins.alumna_id}', '${claseId}', false)"
+              id="btn-a-${ins.alumna_id}">✗ Ausente</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── MARCAR ASISTENCIA ─────────────────────────────────────────
+  async function marcarAsistencia(alumnaId, claseId, presente) {
+    const btnP = document.getElementById(`btn-p-${alumnaId}`);
+    const btnA = document.getElementById(`btn-a-${alumnaId}`);
+    btnP.disabled = true; btnA.disabled = true;
+
+    const { data, error } = await sb.rpc('registrar_asistencia', {
+      p_alumna_id:    alumnaId,
+      p_clase_id:     claseId,
+      p_presente:     presente,
+      p_registrado_por: userId
+    });
+
+    if (error || !data?.ok) {
+      mostrarToast('Error al registrar. Intenta de nuevo.', 'error');
+      btnP.disabled = false; btnA.disabled = false;
+      return;
+    }
+
+    // Actualizar UI
+    btnP.className = `toggle-btn ${presente ? 'presente-on' : ''}`;
+    btnA.className = `toggle-btn ${!presente ? 'ausente-on' : ''}`;
+    btnP.disabled = false; btnA.disabled = false;
+
+    mostrarToast(presente ? '✓ Asistencia registrada' : 'Marcada como ausente');
+
+    // Actualizar contador de presentes
+    const asistencias = document.querySelectorAll('.toggle-btn.presente-on');
+    const cnt = Math.floor(asistencias.length / 2); // cada alumna tiene 2 botones
+    // Recontar correctamente
+    let presentes = 0;
+    document.querySelectorAll('[id^="btn-p-"]').forEach(b => {
+      if (b.classList.contains('presente-on')) presentes++;
+    });
+    document.getElementById('stat-presentes').textContent = presentes;
+  }
+
+  // ── CERRAR SESIÓN ─────────────────────────────────────────────
+  document.getElementById('btn-salir').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    window.location.href = 'login-nuevo.html';
+  });
+
+  init();
+</script>
+</body>
+</html>
