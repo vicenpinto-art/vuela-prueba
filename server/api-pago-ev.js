@@ -83,6 +83,18 @@ app.post('/crear-preferencia', async (req, res) => {
   }
 });
 
+// ── DESCONTAR CLASES PRÓXIMAS (cron cada hora) ───────────────
+app.get('/descontar-proximas', async (req, res) => {
+  try {
+    const { data: count } = await sb.rpc('descontar_clases_proximas');
+    console.log(`✅ Descontadas ${count} clases`);
+    res.json({ ok: true, clases_descontadas: count });
+  } catch(err) {
+    console.error('Error descontando:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── AUTO-GENERACIÓN DE CLASES (para cron-job.org) ────────────
 app.get('/generar-automatico', async (req, res) => {
   const token = req.headers['x-cron-token'] || req.query.token;

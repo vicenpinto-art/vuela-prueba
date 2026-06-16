@@ -400,13 +400,21 @@
     const ocupados      = (c.cupo_maximo || 15) - (c.cupo_disponible ?? 15);
     const pct           = Math.round((ocupados / (c.cupo_maximo || 15)) * 100);
     const urgente       = !estaInscrita && c.cupo_disponible <= 3 && c.cupo_disponible > 0;
+    const horasHasta    = (new Date(c.fecha_hora) - new Date()) / (1000 * 60 * 60);
+    const cancelBloqueada = estaInscrita && horasHasta < 2;
     const badge         = tipoBadge(c.tipo);
 
     let accionHtml = '';
     if (estaInscrita) {
-      accionHtml = `
-        <div class="inscrita-badge">✓ Inscrita</div>
-        <button class="btn-cancelar" onclick="abrirCancelar('${c.id}')">Cancelar</button>`;
+      if (cancelBloqueada) {
+        accionHtml = `
+          <div class="inscrita-badge">✓ Inscrita</div>
+          <div style="font-size:11px;color:var(--coral);margin-top:4px;text-align:right">⏰ Sin cancelación</div>`;
+      } else {
+        accionHtml = `
+          <div class="inscrita-badge">✓ Inscrita</div>
+          <button class="btn-cancelar" onclick="abrirCancelar('${c.id}')">Cancelar</button>`;
+      }
     } else if (sinCupo) {
       accionHtml = `<button class="btn-sin-cupo" disabled>Sin cupo</button>`;
     } else {
@@ -491,6 +499,7 @@
         sin_cupo:           'Ya no hay cupo disponible.',
         clase_no_encontrada:'No se encontró la clase.',
         plan_no_permite:    'Tu plan actual no incluye este tipo de clase.',
+        fuera_de_plazo:     'Ya no puedes cancelar — faltan menos de 2 horas. Se descontará 1 clase de tu plan.',
       };
       msg.textContent = errores[data?.error] || 'Error al agendar. Intenta de nuevo.';
       msg.className = 'modal-msg error';

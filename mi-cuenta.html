@@ -233,7 +233,7 @@
   }
 
   async function cargarUsuario(userId) {
-    const { data: u } = await sb.from('usuarios').select('nombre, apellido').eq('id', userId).single();
+    const { data: u } = await sb.from('usuarios').select('nombre, apellido, rol').eq('id', userId).single();
     if (!u) return;
     const nombre = u.nombre || 'alumna';
     document.getElementById('nav-nombre').textContent = nombre;
@@ -241,6 +241,12 @@
     const hora = new Date().getHours();
     const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
     document.getElementById('bienvenida-sub').textContent = saludo + ' — ' + new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+    // Admin y profesora no tienen plan — ocultar alertas
+    if (u.rol === 'admin' || u.rol === 'profesora') {
+      document.getElementById('alerta-sin-plan').style.display = 'none !important';
+      document.getElementById('alerta-sin-plan').className = '';
+      document.getElementById('alerta-pocas').style.display = 'none';
+    }
   }
 
   async function cargarPlan(userId) {
