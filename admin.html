@@ -988,7 +988,7 @@ async function confirmarAsignarPlan(){
     }
   }
   const inicio = new Date(fechaInicio+'T12:00:00');
-  const fin    = new Date(inicio); fin.setDate(fin.getDate()+31);
+  const fin    = new Date(inicio); fin.setDate(fin.getDate()+30);
   const fechaFin = fin.toISOString().split('T')[0];
 
   // Determinar clases según nombre del plan
