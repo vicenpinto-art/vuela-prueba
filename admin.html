@@ -55,6 +55,8 @@
     /* BADGES */
     .badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;display:inline-flex;align-items:center}
     .badge-activo{background:rgba(0,200,212,.1);color:#007a82}
+    .badge-vuela{background:rgba(161,131,255,.15);color:#6b3fd4}
+    .badge-muevete{background:rgba(254,203,41,.2);color:#8a6800}
     .badge-congelado{background:rgba(139,106,255,.1);color:var(--purple)}
     .badge-vencido{background:rgba(255,78,104,.1);color:var(--coral)}
     .badge-sin{background:var(--light);color:var(--gray)}
@@ -154,6 +156,7 @@
     <div class="sidebar-item" data-sec="alumnas"><span class="sidebar-icon">👩‍🦰</span> Alumnas</div>
     <div class="sidebar-item" data-sec="rutina"><span class="sidebar-icon">📝</span> Rutina del día</div>
     <div class="sidebar-item" data-sec="roles"><span class="sidebar-icon">👥</span> Roles</div>
+    <div class="sidebar-item" data-sec="disciplinas"><span class="sidebar-icon">🏷️</span> Disciplinas</div>
     <div class="sidebar-item" data-sec="ingresos"><span class="sidebar-icon">💰</span> Ingresos</div>
     <a href="calendario.html" style="text-decoration:none"><div class="sidebar-item"><span class="sidebar-icon">📆</span> Calendario</div></a>
   </aside>
@@ -261,6 +264,50 @@
       </div>
     </div>
 
+    <!-- DISCIPLINAS -->
+    <div class="section" id="sec-disciplinas">
+      <div class="section-title">Disciplinas por plan</div>
+      <div class="section-sub">Administra qué disciplinas aparecen en cada plan. Los cambios se reflejan en tiempo real en la página de planes.</div>
+
+      <!-- Agregar nueva disciplina -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><div class="card-title">Agregar disciplina</div></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <div class="form-group" style="flex:1;min-width:160px">
+            <label>Nombre</label>
+            <input type="text" id="disc-nombre" placeholder="Ej: Aerial Silks">
+          </div>
+          <div class="form-group" style="min-width:160px">
+            <label>Plan</label>
+            <select id="disc-plan">
+              <option value="vuela">Plan Vuela</option>
+              <option value="muevete">Plan Muévete</option>
+              <option value="gym">Gym</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="agregarDisciplina()">+ Agregar</button>
+        </div>
+      </div>
+
+      <!-- Columnas por plan -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" id="disc-grid">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" style="color:#6b3fd4">🟣 Plan Vuela</div>
+            <span style="font-size:12px;color:var(--gray)" id="disc-count-vuela">0 disciplinas</span>
+          </div>
+          <div id="disc-lista-vuela"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" style="color:#8a6800">🟡 Plan Muévete</div>
+            <span style="font-size:12px;color:var(--gray)" id="disc-count-muevete">0 disciplinas</span>
+          </div>
+          <div id="disc-lista-muevete"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- INGRESOS -->
     <div class="section" id="sec-ingresos">
       <div class="section-title">Ingresos</div>
@@ -330,10 +377,8 @@
       <div class="form-group">
         <label>Plan requerido</label>
         <select id="h-restriccion">
-          <option value="libre">Libre (cualquier plan)</option>
-          <option value="muevete">Vuela y Muévete (ambos planes)</option>
-          <option value="vuela">Solo Vuela (clases avanzadas)</option>
-          <option value="gym">Solo Gym</option>
+          <option value="vuela">Plan Vuela</option>
+          <option value="muevete">Plan Muévete</option>
         </select>
       </div>
       <div class="form-group full"><label>Profesora</label><input type="text" id="h-profesora" placeholder="Nombre completo"></div>
@@ -519,6 +564,7 @@ document.querySelectorAll('.sidebar-item').forEach(item=>{
     if(sec==='asistencia') cargarClasesAsistencia();
     if(sec==='alumnas' && todasLasAlumnas.length===0) cargarAlumnas();
     if(sec==='rutina') cargarRutinas();
+    if(sec==='disciplinas') cargarDisciplinas();
     if(sec==='ingresos'){iniciarIngresos();}
     if(sec==='roles' && todosLosUsuarios.length===0) cargarRoles();
   });
@@ -575,7 +621,7 @@ function renderHorarios(){
         <td>${h.nombre}</td>
         <td style="color:var(--gray)">${h.profesora}</td>
         <td>${h.cupo_maximo}</td>
-        <td><span class="badge badge-${h.restriccion_plan==='libre'?'sin':h.restriccion_plan==='vuela'?'activo':h.restriccion_plan==='muevete'?'prof':'alumna'}">${h.restriccion_plan||'libre'}</span></td>
+        <td><span class="badge badge-${h.restriccion_plan==='vuela'?'vuela':h.restriccion_plan==='muevete'?'muevete':'sin'}">${h.restriccion_plan==='vuela'?'Vuela':h.restriccion_plan==='muevete'?'Muévete':'Libre'}</span></td>
         <td>
           <button class="toggle-activo ${h.activo?'on':'off'}" onclick="toggleHorario('${h.id}',${h.activo})"></button>
         </td>
@@ -608,7 +654,7 @@ function editarHorario(id){
   document.getElementById('h-id').value=h.id;
   document.getElementById('h-nombre').value=h.nombre;
   document.getElementById('h-tipo').value=h.tipo;
-  document.getElementById('h-restriccion').value=h.restriccion_plan||'libre';
+  document.getElementById('h-restriccion').value=h.restriccion_plan||'muevete';
   document.getElementById('h-profesora').value=h.profesora;
   document.getElementById('h-dia').value=h.dia_semana;
   document.getElementById('h-hora').value=h.hora?.slice(0,5)||'';
@@ -1128,6 +1174,65 @@ async function cambiarRol(usuarioId,nuevoRol){
   if(error||!data?.ok){toast('Error al cambiar rol','error');return;}
   toast(`Rol actualizado a ${nuevoRol} ✓`);
   cargarRoles();
+}
+
+// ── DISCIPLINAS ───────────────────────────────────────────────
+let todasLasDisciplinas = [];
+
+async function cargarDisciplinas(){
+  const {data} = await sb.from('disciplinas').select('*').eq('activo',true).order('plan').order('orden');
+  todasLasDisciplinas = data||[];
+  renderDisciplinas();
+}
+
+function renderDisciplinas(){
+  const vuela   = todasLasDisciplinas.filter(d=>d.plan==='vuela');
+  const muevete = todasLasDisciplinas.filter(d=>d.plan==='muevete');
+
+  document.getElementById('disc-count-vuela').textContent   = `${vuela.length} disciplinas`;
+  document.getElementById('disc-count-muevete').textContent = `${muevete.length} disciplinas`;
+
+  document.getElementById('disc-lista-vuela').innerHTML   = renderListaDisc(vuela,'vuela');
+  document.getElementById('disc-lista-muevete').innerHTML = renderListaDisc(muevete,'muevete');
+}
+
+function renderListaDisc(lista, planActual){
+  if(!lista.length) return '<p style="font-size:13px;color:var(--gray);padding:8px 0">Sin disciplinas.</p>';
+  const otroPlan = planActual==='vuela'?'muevete':'vuela';
+  const otraLabel = planActual==='vuela'?'Muévete':'Vuela';
+  return lista.map(d=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span style="flex:1;font-size:13px;font-weight:500">${d.nombre}</span>
+      <button class="btn btn-secondary btn-sm" onclick="moverDisciplina('${d.id}','${otroPlan}')" title="Mover a ${otraLabel}">→ ${otraLabel}</button>
+      <button class="btn btn-danger btn-sm" onclick="eliminarDisciplina('${d.id}')">✕</button>
+    </div>`).join('');
+}
+
+async function agregarDisciplina(){
+  const nombre = document.getElementById('disc-nombre').value.trim();
+  const plan   = document.getElementById('disc-plan').value;
+  if(!nombre){toast('Escribe el nombre de la disciplina','error');return;}
+  const maxOrden = todasLasDisciplinas.filter(d=>d.plan===plan).length + 1;
+  const {error} = await sb.from('disciplinas').insert({nombre,plan,orden:maxOrden,activo:true});
+  if(error){toast('Error al agregar','error');return;}
+  document.getElementById('disc-nombre').value='';
+  toast('Disciplina agregada ✓');
+  cargarDisciplinas();
+}
+
+async function moverDisciplina(id, nuevoPlan){
+  const {error} = await sb.from('disciplinas').update({plan:nuevoPlan}).eq('id',id);
+  if(error){toast('Error al mover','error');return;}
+  toast('Disciplina movida ✓');
+  cargarDisciplinas();
+}
+
+async function eliminarDisciplina(id){
+  if(!confirm('¿Eliminar esta disciplina?')) return;
+  const {error} = await sb.from('disciplinas').update({activo:false}).eq('id',id);
+  if(error){toast('Error al eliminar','error');return;}
+  toast('Disciplina eliminada ✓');
+  cargarDisciplinas();
 }
 
 // ── INGRESOS ──────────────────────────────────────────────────

@@ -336,6 +336,117 @@
       </a>
     </div>
   </div>
+
+  <!-- WIDGET ¿QUÉ INCLUYE CADA PLAN? -->
+  <div style="margin-top:40px">
+    <h2 style="font-family:'Dancing Script',cursive;font-size:32px;text-align:center;margin-bottom:24px;color:var(--dark)">¿Qué incluye cada plan?</h2>
+
+    <style>
+    .pv{font-family:'Outfit',sans-serif;}
+    .outer-box{border:3px solid #00f9ff;border-radius:24px;padding:1.5rem;background:#fff;max-width:860px;margin:0 auto;}
+    .pv-title{font-family:'Dancing Script',cursive;font-size:36px;font-weight:700;text-align:center;color:#111;margin:0 0 16px;}
+    .info-bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
+    .info-chip{border-radius:16px;padding:8px 16px;font-size:13px;font-weight:700;text-align:center;border:none;background:#00ffcc;color:#000;}
+    .info-chip em{font-style:normal;font-weight:800;display:block;font-size:14px;}
+    .pill-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
+    .pv-pill{padding:10px 26px;border-radius:100px;font-size:15px;font-weight:800;cursor:pointer;border:none;transition:all .2s;opacity:0.55;letter-spacing:0.5px;}
+    .pv-pill-vuela{background:#a183ff;color:#fff;}
+    .pv-pill-muevete{background:#fecb29;color:#5a4000;}
+    .pv-pill-ilimitado{background:#00f9ff;color:#005544;}
+    .pv-pill-gym{background:#ff4e68;color:#fff;}
+    .pv-pill.active{opacity:1;transform:scale(1.08);box-shadow:0 6px 18px rgba(0,0,0,0.15);border:2px solid #000 !important;}
+    .pv-panel2{display:none;}
+    .pv-panel2.visible{display:block;}
+    .pv-clases-box{border-radius:18px;padding:1rem 1.25rem;border:3px solid;}
+    .pv-box-v{background:#f0eaff;border-color:#a183ff;}
+    .pv-box-m{background:#fffbec;border-color:#fecb29;}
+    .pv-box-all{background:#e0fff8;border-color:#00ffcc;}
+    .pv-box-g{background:#fff0f2;border-color:#ff4e68;}
+    .pv-clases-box h4{font-size:13px;font-weight:800;margin:0 0 10px;text-transform:uppercase;letter-spacing:1.5px;}
+    .pv-box-v h4{color:#7b55cc;}
+    .pv-box-m h4{color:#8a6400;}
+    .pv-box-all h4{color:#007a66;}
+    .pv-box-g h4{color:#cc3344;}
+    .pv-tags{display:flex;flex-wrap:wrap;gap:6px;}
+    .pv-tag{font-size:12px;padding:5px 13px;border-radius:100px;font-weight:700;}
+    .pv-tag-v{background:#a183ff;color:#fff;}
+    .pv-tag-m{background:#fecb29;color:#5a4000;}
+    .pv-tag-g{background:#ff4e68;color:#fff;}
+    .pv-note-info{font-size:13px;color:#666;text-align:center;margin:10px 0;font-style:italic;}
+    </style>
+
+    <div class="pv">
+    <div class="outer-box">
+      <div class="info-bar">
+        <div class="info-chip"><em>Matrícula (una vez)</em>$12.000</div>
+        <div class="info-chip"><em>Clase de prueba</em>Vuela $7.000 · Muévete $5.000</div>
+        <div class="info-chip"><em>Clase suelta</em>Vuela $12.000 · Muévete $9.000</div>
+      </div>
+      <div class="pill-row">
+        <button class="pv-pill pv-pill-vuela active" id="pp2-vuela" onclick="pvShow2('vuela')">Vuela</button>
+        <button class="pv-pill pv-pill-muevete" id="pp2-muevete" onclick="pvShow2('muevete')">Muévete</button>
+        <button class="pv-pill pv-pill-ilimitado" id="pp2-ilimitado" onclick="pvShow2('ilimitado')">Ilimitados</button>
+        <button class="pv-pill pv-pill-gym" id="pp2-gym" onclick="pvShow2('gym')">Gym</button>
+      </div>
+
+      <div id="pvpanel2-vuela" class="pv-panel2 visible">
+        <p class="pv-note-info">+ $13.000 agrega acceso al gym durante el mes</p>
+        <div class="pv-clases-box pv-box-v">
+          <h4>Clases incluidas en Plan Vuela</h4>
+          <div class="pv-tags" id="tags-vuela"></div>
+        </div>
+      </div>
+
+      <div id="pvpanel2-muevete" class="pv-panel2">
+        <p class="pv-note-info">+ $13.000 agrega acceso al gym durante el mes</p>
+        <div class="pv-clases-box pv-box-m">
+          <h4>Clases incluidas en Plan Muévete</h4>
+          <div class="pv-tags" id="tags-muevete"></div>
+        </div>
+      </div>
+
+      <div id="pvpanel2-ilimitado" class="pv-panel2">
+        <div class="pv-clases-box pv-box-all">
+          <h4 style="text-align:center;">Vuela Ilimitado $99.990 · Muévete Ilimitado $82.990</h4>
+          <p style="font-size:13px;color:#007a66;text-align:center;margin-top:6px">Todas las clases del plan elegido, sin límite · +$13.000 agrega gym</p>
+        </div>
+      </div>
+
+      <div id="pvpanel2-gym" class="pv-panel2">
+        <div class="pv-clases-box pv-box-g">
+          <h4>Planes Gym</h4>
+          <div class="pv-tags">
+            <span class="pv-tag pv-tag-g">Mensual $22.500</span>
+            <span class="pv-tag pv-tag-g">Trimestral $57.000</span>
+            <span class="pv-tag pv-tag-g">Semestral $100.990</span>
+            <span class="pv-tag pv-tag-g">Anual $175.990</span>
+            <span class="pv-tag pv-tag-g">Pase diario $5.000</span>
+          </div>
+          <p style="font-size:12px;color:#cc3344;margin-top:10px;font-style:italic">Lun–Vie 7:00–21:00 · Sábado 9:00–15:00</p>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <script>
+    function pvShow2(plan){
+      document.querySelectorAll('.pv-panel2').forEach(p=>p.classList.remove('visible'));
+      document.getElementById('pvpanel2-'+plan).classList.add('visible');
+      document.querySelectorAll('.pv-pill').forEach(p=>p.classList.remove('active'));
+      document.getElementById('pp2-'+plan).classList.add('active');
+    }
+
+    async function cargarWidgetDisciplinas(){
+      const {data} = await sb.from('disciplinas').select('nombre,plan').eq('activo',true).order('plan').order('orden');
+      const vuela   = (data||[]).filter(d=>d.plan==='vuela');
+      const muevete = (data||[]).filter(d=>d.plan==='muevete');
+      const mkTags = (lista,cls) => lista.map(d=>`<span class="pv-tag ${cls}">${d.nombre}</span>`).join('');
+      document.getElementById('tags-vuela').innerHTML   = mkTags(vuela,'pv-tag-v');
+      document.getElementById('tags-muevete').innerHTML = mkTags(muevete,'pv-tag-m');
+    }
+    cargarWidgetDisciplinas();
+    </script>
+  </div>
 </main>
 
 <!-- MODAL: MATRÍCULA -->
