@@ -312,14 +312,17 @@
   }
 
   async function cargarClases(userId) {
-    const ahora = new Date().toISOString();
-    const { data: inscripciones } = await sb
+    const { data: todas } = await sb
       .from('inscripciones')
-      .select('*, clases!inner(nombre, fecha_hora, profesora, tipo)')
+      .select('*, clases(nombre, fecha_hora, profesora, tipo)')
       .eq('alumna_id', userId)
-      .gte('clases.fecha_hora', ahora)
-      .order('clases.fecha_hora', { ascending: true })
-      .limit(5);
+      .eq('estado', 'confirmada');
+
+    const ahora = new Date();
+    const inscripciones = (todas || [])
+      .filter(i => i.clases && new Date(i.clases.fecha_hora) >= ahora)
+      .sort((a, b) => new Date(a.clases.fecha_hora) - new Date(b.clases.fecha_hora))
+      .slice(0, 5);
 
     const contenedor = document.getElementById('clases-contenido');
     if (!inscripciones || inscripciones.length === 0) {
