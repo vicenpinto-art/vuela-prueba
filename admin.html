@@ -179,7 +179,10 @@
     <div class="section" id="sec-horarios">
       <div class="section-title">Horarios</div>
       <div class="section-sub">Define los horarios recurrentes. Desde aquí se generan las clases automáticamente.</div>
-      <div style="margin-bottom:16px"><button class="btn btn-primary" onclick="abrirModalHorario()">+ Nuevo horario</button></div>
+      <div style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="abrirModalHorario()">+ Nuevo horario</button>
+        <button class="btn btn-cyan" onclick="regenerarTodos()">↻ Actualizar todas las clases</button>
+      </div>
       <div class="card">
         <div id="tabla-horarios"><div class="sk" style="height:60px;margin-bottom:8px"></div><div class="sk" style="height:60px"></div></div>
       </div>
@@ -591,6 +594,18 @@ async function guardarHorario(){
   if(document.getElementById('h-generar').checked && horarioId){
     await generarClases(horarioId, false);
   }
+}
+
+async function regenerarTodos(){
+  const activos = todosLosHorarios.filter(h=>h.activo);
+  if(activos.length===0){toast('No hay horarios activos','error');return;}
+  toast(`Actualizando ${activos.length} horarios...`);
+  let total=0;
+  for(const h of activos){
+    const {data}=await sb.rpc('generar_clases',{p_horario_id:h.id,p_semanas:4});
+    total+=data||0;
+  }
+  toast(`✓ Listo — ${total} clase${total!==1?'s':''} nueva${total!==1?'s':''} generadas`);
 }
 
 async function toggleHorario(id, actual){
