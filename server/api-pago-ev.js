@@ -4,7 +4,7 @@ const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
-app.use(cors({ origin: process.env.CLIENT_URL || 'https://espaciovuela.netlify.app' }));
+app.use(cors({ origin: process.env.CLIENT_URL || 'https://vuela-prueba.vicenpinto.workers.dev' }));
 app.use(express.json());
 
 // ── CONFIG ────────────────────────────────────────────────────
