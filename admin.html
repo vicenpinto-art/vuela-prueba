@@ -306,6 +306,17 @@
           <div id="disc-lista-muevete"></div>
         </div>
       </div>
+
+      <!-- Eliminadas -->
+      <div style="margin-top:16px">
+        <button class="btn btn-secondary" onclick="toggleEliminadas()" id="btn-ver-eliminadas">Ver eliminadas</button>
+        <div id="disc-eliminadas-wrap" style="display:none;margin-top:12px">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Disciplinas eliminadas</div></div>
+            <div id="disc-lista-eliminadas"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- INGRESOS -->
@@ -1183,6 +1194,38 @@ async function cargarDisciplinas(){
   const {data} = await sb.from('disciplinas').select('*').eq('activo',true).order('plan').order('orden');
   todasLasDisciplinas = data||[];
   renderDisciplinas();
+}
+
+async function toggleEliminadas(){
+  const wrap = document.getElementById('disc-eliminadas-wrap');
+  const btn  = document.getElementById('btn-ver-eliminadas');
+  if(wrap.style.display==='none'){
+    wrap.style.display='block';
+    btn.textContent='Ocultar eliminadas';
+    const {data} = await sb.from('disciplinas').select('*').eq('activo',false).order('plan').order('nombre');
+    const el = document.getElementById('disc-lista-eliminadas');
+    if(!data||data.length===0){
+      el.innerHTML='<p style="font-size:13px;color:var(--gray);padding:8px 0">No hay disciplinas eliminadas.</p>';
+      return;
+    }
+    el.innerHTML = data.map(d=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="flex:1;font-size:13px;color:var(--gray)">${d.nombre} <span style="font-size:11px">(${d.plan==='vuela'?'Vuela':'Muévete'})</span></span>
+        <button class="btn btn-cyan btn-sm" onclick="restaurarDisciplina('${d.id}')">Restaurar</button>
+      </div>`).join('');
+  } else {
+    wrap.style.display='none';
+    btn.textContent='Ver eliminadas';
+  }
+}
+
+async function restaurarDisciplina(id){
+  const {error} = await sb.from('disciplinas').update({activo:true}).eq('id',id);
+  if(error){toast('Error al restaurar','error');return;}
+  toast('Disciplina restaurada ✓');
+  cargarDisciplinas();
+  toggleEliminadas(); // refrescar lista
+  toggleEliminadas();
 }
 
 function renderDisciplinas(){
