@@ -426,7 +426,7 @@ let compraExtenderActiva = null;
 
 // ── UTILS ─────────────────────────────────────────────────────
 const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-function horaStr(ts){ return new Date(ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'}); }
+function horaStr(ts){ return new Date(ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',hour12:false}); }
 function fechaStr(ts){ return new Date(ts).toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short'}); }
 function hoy(){ return new Date().toISOString().split('T')[0]; }
 function toast(msg,tipo='ok'){
