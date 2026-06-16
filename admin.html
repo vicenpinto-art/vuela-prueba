@@ -648,7 +648,7 @@ function renderClases(){
         <td>${(c.cupo_maximo||15)-(c.cupo_disponible||0)}/${c.cupo_maximo||15}</td>
         <td>${c.sobrecupo||0}</td>
         <td><span class="badge ${c.cancelada?'badge-vencido':'badge-activo'}">${c.cancelada?'Cancelada':'Activa'}</span></td>
-        <td>${!c.cancelada?`<button class="btn btn-secondary btn-sm" onclick="abrirEditarClase('${c.id}')">Editar</button>`:''}</td>
+        <td>${!c.cancelada?`<button class="btn btn-secondary btn-sm" onclick="abrirEditarClase('${c.id}')">Editar</button>`:''} <button class="btn btn-danger btn-sm" onclick="eliminarClase('${c.id}')">Eliminar</button></td>
       </tr>`).join('')}
     </tbody></table>`;
 }
@@ -670,6 +670,16 @@ async function guardarClase(){
   if(error){toast('Error al guardar','error');return;}
   toast('Clase actualizada ✓');
   cerrarModal('modal-clase');
+  cargarClases();
+}
+
+async function eliminarClase(id){
+  if(!confirm('¿Eliminar esta clase permanentemente? Las inscripciones asociadas también se eliminarán.')) return;
+  await sb.from('inscripciones').delete().eq('clase_id',id);
+  await sb.from('asistencias').delete().eq('clase_id',id);
+  const {error} = await sb.from('clases').delete().eq('id',id);
+  if(error){toast('Error al eliminar','error');return;}
+  toast('Clase eliminada ✓');
   cargarClases();
 }
 
