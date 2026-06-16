@@ -372,8 +372,8 @@
     <div class="resumen-items" id="resumen-items"></div>
 
     <div id="addon-wrap" style="display:none;">
-      <label class="addon-toggle" id="addon-toggle" onclick="toggleAddon()">
-        <input type="checkbox" id="addon-check" onclick="event.stopPropagation()">
+      <label class="addon-toggle" id="addon-toggle">
+        <input type="checkbox" id="addon-check" onchange="toggleAddon()">
         <div class="addon-toggle-texto">
           <strong>🏋️ Agregar acceso al Gym — $13.000</strong>
           <span>Complementa tu plan con acceso libre al gimnasio funcional</span>
@@ -387,6 +387,13 @@
       <span class="total-precio" id="resumen-total">$0</span>
     </div>
     <div style="font-size:12px; color:var(--gray); margin-bottom:20px;">Pago único · Plan activo por 31 días desde la compra</div>
+
+    <div style="margin-bottom:14px">
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--gray);line-height:1.4">
+        <input type="checkbox" id="check-terminos" onchange="validarTerminos()" style="width:16px;height:16px;accent-color:var(--coral);flex-shrink:0;margin-top:2px">
+        <span>He leído y acepto los <a href="terminos.html" target="_blank" style="color:var(--coral);font-weight:600">Términos y condiciones</a> y la <a href="privacidad.html" target="_blank" style="color:var(--coral);font-weight:600">Política de privacidad</a></span>
+      </label>
+    </div>
 
     <div class="pago-btns">
       <button class="btn-mp" id="btn-mp" onclick="pagarConMP()">
@@ -411,7 +418,7 @@
   const SUPABASE_URL  = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
   const SUPABASE_KEY  = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
   // ⚠️ Reemplaza esta URL después de crear el servicio en Render:
-  const SERVIDOR_URL = 'https://espacio-vuela-pagos.onrender.com';
+  const SERVIDOR_URL  = 'https://TU-SERVICIO.onrender.com';
 
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -596,14 +603,21 @@
     incluyeAddon = false;
 
     actualizarResumen();
+    // Resetear términos
+    document.getElementById('check-terminos').checked = false;
+    document.getElementById('btn-mp').disabled = true;
     abrirModal('modal-resumen');
   }
 
   function toggleAddon() {
-    incluyeAddon = !incluyeAddon;
-    document.getElementById('addon-check').checked = incluyeAddon;
+    incluyeAddon = document.getElementById('addon-check').checked;
     document.getElementById('addon-toggle').classList.toggle('checked', incluyeAddon);
     actualizarResumen();
+  }
+
+  function validarTerminos() {
+    const aceptado = document.getElementById('check-terminos').checked;
+    document.getElementById('btn-mp').disabled = !aceptado;
   }
 
   function actualizarResumen() {
