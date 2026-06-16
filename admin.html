@@ -394,9 +394,18 @@
 <div class="modal-overlay" id="modal-asignar-plan">
   <div class="modal">
     <button class="modal-close" onclick="cerrarModal('modal-asignar-plan')">✕</button>
-    <h2>Asignar plan</h2>
-    <p style="font-size:13px;color:var(--gray);margin-bottom:20px" id="asignar-alumna-nombre">—</p>
+    <h2>Gestionar plan</h2>
+    <p style="font-size:14px;font-weight:600;margin-bottom:16px" id="asignar-alumna-nombre">—</p>
     <input type="hidden" id="asignar-alumna-id">
+
+    <!-- Plan actual -->
+    <div id="asignar-plan-actual" style="display:none;margin-bottom:20px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:8px">Plan activo</div>
+      <div id="asignar-plan-actual-contenido"></div>
+    </div>
+
+    <!-- Formulario nuevo plan -->
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:12px" id="asignar-form-titulo">Asignar plan</div>
     <div class="form-grid">
       <div class="form-group full">
         <label>Plan</label>
@@ -417,6 +426,15 @@
       <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px">
         <input type="checkbox" id="asignar-addon" style="width:16px;height:16px;accent-color:var(--coral)">
         <label for="asignar-addon" style="font-weight:400;font-size:13px;color:var(--gray)">Incluye addon gym ($13.000)</label>
+      </div>
+      <div class="form-group full" style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">
+        <label>Monto personalizado (opcional)</label>
+        <input type="number" id="asignar-monto-custom" min="0" placeholder="Dejar vacío para usar el precio del plan">
+        <span style="font-size:11px;color:var(--gray);margin-top:4px">Solo si vendiste el plan a un precio distinto al oficial</span>
+      </div>
+      <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px">
+        <input type="checkbox" id="asignar-no-ingresos" style="width:16px;height:16px;accent-color:var(--purple)">
+        <label for="asignar-no-ingresos" style="font-weight:400;font-size:13px;color:var(--gray)">No sumar a ingresos (plan de regalo)</label>
       </div>
     </div>
     <div class="modal-btns">
@@ -845,6 +863,8 @@ function renderAlumnas(lista){
     </tbody></table>`;
 }
 let planesCache = [];
+let comprasAlumnaActual = [];
+
 async function abrirAsignarPlan(alumnaId, nombre){
   document.getElementById('asignar-alumna-id').value = alumnaId;
   document.getElementById('asignar-alumna-nombre').textContent = nombre.trim();
@@ -852,7 +872,10 @@ async function abrirAsignarPlan(alumnaId, nombre){
   document.getElementById('asignar-monto').value = '';
   document.getElementById('asignar-matricula').checked = false;
   document.getElementById('asignar-addon').checked = false;
+  document.getElementById('asignar-monto-custom').value = '';
+  document.getElementById('asignar-no-ingresos').checked = false;
   document.getElementById('asignar-plan-msg').textContent = '';
+  document.getElementById('asignar-form-titulo').textContent = 'Asignar nuevo plan';
 
   // Cargar planes si no están en caché
   if(planesCache.length === 0){
@@ -867,15 +890,74 @@ async function abrirAsignarPlan(alumnaId, nombre){
     `<option value="${p.id}" data-precio="${p.precio}" data-tipo="${p.tipo}" data-nombre="${p.nombre}">
       ${p.nombre} — $${Number(p.precio).toLocaleString('es-CL')}
     </option>`).join('');
-
-  // Autocompletar monto al cambiar plan
   sel.onchange = () => {
     const opt = sel.options[sel.selectedIndex];
     document.getElementById('asignar-monto').value = opt.dataset.precio || '';
   };
   sel.dispatchEvent(new Event('change'));
 
+  // Cargar compras activas de la alumna
+  const hoyFecha = hoy();
+  const {data:compras} = await sb.from('compras')
+    .select('id,estado,fecha_fin,clases_disponibles,ilimitado,planes(nombre,tipo)')
+    .eq('alumna_id', alumnaId)
+    .in('estado',['activo','congelado'])
+    .gte('fecha_fin', hoyFecha)
+    .order('fecha_fin', {ascending:false});
+
+  comprasAlumnaActual = compras||[];
+  const planActualDiv = document.getElementById('asignar-plan-actual');
+  const planActualContenido = document.getElementById('asignar-plan-actual-contenido');
+
+  if(comprasAlumnaActual.length > 0){
+    planActualDiv.style.display = 'block';
+    planActualContenido.innerHTML = comprasAlumnaActual.map(c => {
+      const nombre = c.planes?.nombre||'Plan';
+      const vence  = new Date(c.fecha_fin+'T12:00:00').toLocaleDateString('es-CL',{day:'2-digit',month:'short',year:'numeric'});
+      const clases = c.ilimitado ? '∞' : (c.clases_disponibles??'—');
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--light);border-radius:12px;margin-bottom:8px">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">${nombre}</div>
+          <div style="font-size:11px;color:var(--gray)">Vence ${vence} · ${clases} clases disponibles</div>
+        </div>
+        <button class="btn btn-cyan btn-sm" onclick="usarFechaRenovacion('${c.fecha_fin}','${nombre}')">Renovar después</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarPlan('${c.id}')">Eliminar</button>
+      </div>`;
+    }).join('');
+  } else {
+    planActualDiv.style.display = 'none';
+  }
+
   abrirModal('modal-asignar-plan');
+}
+
+function usarFechaRenovacion(fechaFin, nombrePlan){
+  // Calcular día siguiente al vencimiento
+  const fin = new Date(fechaFin+'T12:00:00');
+  fin.setDate(fin.getDate()+1);
+  const nuevaFecha = fin.toISOString().split('T')[0];
+  document.getElementById('asignar-fecha-inicio').value = nuevaFecha;
+  document.getElementById('asignar-form-titulo').textContent = `Renovar — comienza el ${fin.toLocaleDateString('es-CL',{day:'2-digit',month:'short'})}`;
+  // Seleccionar el mismo plan si está disponible
+  const sel = document.getElementById('asignar-plan-id');
+  for(let i=0;i<sel.options.length;i++){
+    if(sel.options[i].dataset.nombre === nombrePlan){
+      sel.selectedIndex = i;
+      sel.dispatchEvent(new Event('change'));
+      break;
+    }
+  }
+  document.getElementById('asignar-plan-msg').textContent='';
+  toast('Fecha de inicio actualizada para renovación ✓');
+}
+
+async function eliminarPlan(compraId){
+  if(!confirm('¿Eliminar este plan? La alumna perderá acceso inmediatamente.')) return;
+  const {error} = await sb.from('compras').delete().eq('id', compraId);
+  if(error){toast('Error al eliminar plan','error');return;}
+  toast('Plan eliminado ✓');
+  cerrarModal('modal-asignar-plan');
+  cargarAlumnas();
 }
 
 async function confirmarAsignarPlan(){
@@ -889,11 +971,23 @@ async function confirmarAsignarPlan(){
   const monto      = parseInt(document.getElementById('asignar-monto').value)||0;
   const matricula  = document.getElementById('asignar-matricula').checked;
   const addon      = document.getElementById('asignar-addon').checked;
+  const noIngresos = document.getElementById('asignar-no-ingresos').checked;
+  const montoCustom= document.getElementById('asignar-monto-custom').value;
   const msgEl      = document.getElementById('asignar-plan-msg');
 
   if(!planId||!fechaInicio){msgEl.textContent='Selecciona plan y fecha';return;}
 
-  // Calcular fecha fin (+31 días) y clases disponibles
+  // Calcular monto: 0 si es regalo, personalizado si se ingresó, o automático
+  let monto = 0;
+  if(!noIngresos){
+    if(montoCustom !== ''){
+      monto = parseInt(montoCustom)||0;
+    } else {
+      monto = parseInt(document.getElementById('asignar-monto').value)||0;
+      if(matricula) monto += 12000;
+      if(addon) monto += 13000;
+    }
+  }
   const inicio = new Date(fechaInicio+'T12:00:00');
   const fin    = new Date(inicio); fin.setDate(fin.getDate()+31);
   const fechaFin = fin.toISOString().split('T')[0];
@@ -915,7 +1009,7 @@ async function confirmarAsignarPlan(){
     ilimitado:         esIlimitado,
     incluye_gym:       addon || planTipo==='gym',
     addon_gym:         addon,
-    monto_pagado:      monto + (matricula?12000:0) + (addon?13000:0),
+    monto_pagado:      monto,
     matricula_pagada:  matricula,
     clase_prueba:      planTipo==='clase_prueba'
   });
