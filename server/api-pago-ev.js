@@ -83,6 +83,29 @@ app.post('/crear-preferencia', async (req, res) => {
   }
 });
 
+// ── AUTO-GENERACIÓN DE CLASES (para cron-job.org) ────────────
+app.get('/generar-automatico', async (req, res) => {
+  const token = req.headers['x-cron-token'] || req.query.token;
+  if (process.env.CRON_SECRET && token !== process.env.CRON_SECRET) {
+    return res.status(401).json({ error: 'No autorizado' });
+  }
+  try {
+    const { data: horarios } = await sb.from('horarios').select('id, nombre').eq('activo', true);
+    let total = 0;
+    const detalle = [];
+    for (const h of (horarios || [])) {
+      const { data: count } = await sb.rpc('generar_clases', { p_horario_id: h.id, p_semanas: 6 });
+      total += count || 0;
+      detalle.push({ horario: h.nombre, clases_nuevas: count || 0 });
+    }
+    console.log(`✅ Auto-generación: ${total} clases nuevas`);
+    res.json({ ok: true, total_clases_generadas: total, detalle });
+  } catch (err) {
+    console.error('Error en auto-generación:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── WEBHOOK MERCADOPAGO ───────────────────────────────────────
 app.post('/webhook', async (req, res) => {
   res.sendStatus(200); // Responder inmediatamente para que MP no reintente

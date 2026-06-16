@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario — Espacio Vuela</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--coral:#ff4e68;--magenta:#ff008d;--cyan:#00c8d4;--purple:#8b6aff;--yellow:#fecb29;--dark:#111;--gray:#555;--light:#f5f5f7;--border:rgba(0,0,0,.08)}
+    body{font-family:'Outfit',sans-serif;background:#f7f7f9;color:var(--dark);min-height:100vh}
+
+    nav{background:#fff;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+    .logo{font-family:'Dancing Script',cursive;font-size:26px;color:var(--coral);text-decoration:none}
+    .nav-right{display:flex;align-items:center;gap:16px}
+    .nav-back{font-size:14px;color:var(--gray);text-decoration:none;transition:color .2s}
+    .nav-back:hover{color:var(--coral)}
+    .nav-lista{font-size:13px;color:var(--gray);text-decoration:none;background:var(--light);padding:7px 14px;border-radius:8px;transition:background .2s}
+    .nav-lista:hover{background:#ebebee}
+
+    main{max-width:1200px;margin:0 auto;padding:28px 24px 60px;display:grid;grid-template-columns:380px 1fr;gap:24px;align-items:start}
+
+    /* CALENDARIO */
+    .cal-wrap{background:#fff;border-radius:20px;border:1px solid var(--border);padding:24px;position:sticky;top:85px}
+    .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .cal-nav{background:none;border:none;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--gray);transition:background .2s}
+    .cal-nav:hover{background:var(--light)}
+    .cal-mes-anio{font-size:16px;font-weight:700}
+    .cal-dias-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:8px}
+    .cal-dia-lbl{text-align:center;font-size:11px;font-weight:700;color:var(--gray);padding:4px 0;text-transform:uppercase;letter-spacing:.5px}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+    .cal-cell{
+      aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;cursor:pointer;
+      padding:2px;position:relative;transition:background .15s;
+    }
+    .cal-cell:hover:not(.vacio):not(.otro-mes){background:var(--light)}
+    .cal-cell.vacio{cursor:default}
+    .cal-cell.otro-mes{opacity:.25;cursor:default}
+    .cal-cell.hoy .cal-num{
+      background:linear-gradient(135deg,var(--coral),var(--magenta));
+      color:#fff;border-radius:50%;width:26px;height:26px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .cal-cell.seleccionado{background:rgba(255,78,104,.08);border:1.5px solid var(--coral)}
+    .cal-cell.feriado{background:rgba(255,78,104,.04)}
+    .cal-num{font-size:13px;font-weight:600;line-height:1;margin-bottom:3px}
+    .cal-dots{display:flex;gap:2px;justify-content:center;flex-wrap:wrap;max-width:28px}
+    .dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+    .dot-vuela{background:var(--coral)}
+    .dot-muevete{background:var(--purple)}
+    .dot-gym{background:var(--cyan)}
+    .dot-otro{background:var(--gray)}
+    .cal-cell.feriado::after{
+      content:'';position:absolute;top:3px;right:3px;
+      width:5px;height:5px;border-radius:50%;background:rgba(255,78,104,.4);
+    }
+    .cal-legend{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--border)}
+    .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray)}
+
+    /* PANEL DÍA */
+    .day-panel{background:#fff;border-radius:20px;border:1px solid var(--border);overflow:hidden;min-height:400px}
+    .day-panel-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px;text-align:center;color:var(--gray);height:400px}
+    .day-panel-empty .icon{font-size:48px;margin-bottom:16px}
+    .day-panel-header{padding:24px 28px;border-bottom:1px solid var(--border)}
+    .day-fecha{font-family:'Dancing Script',cursive;font-size:26px;color:var(--dark);margin-bottom:4px}
+    .feriado-banner{background:rgba(255,78,104,.08);border:1px solid rgba(255,78,104,.2);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--coral);margin-top:10px;display:flex;align-items:center;gap:8px}
+    .day-clases-lista{padding:16px 0}
+    .clase-item-cal{
+      display:flex;align-items:center;gap:14px;
+      padding:14px 28px;border-bottom:1px solid var(--border);
+      transition:background .15s;
+    }
+    .clase-item-cal:last-child{border-bottom:none}
+    .clase-hora-badge{font-size:14px;font-weight:800;color:var(--coral);min-width:55px}
+    .clase-info-cal{flex:1;min-width:0}
+    .clase-nombre-cal{font-size:14px;font-weight:700;margin-bottom:2px}
+    .clase-meta-cal{font-size:12px;color:var(--gray)}
+    .clase-cupo-cal{font-size:11px;color:var(--gray);text-align:right;margin-top:3px}
+    .cupo-low{color:var(--coral);font-weight:600}
+
+    /* BOTONES ACCIÓN */
+    .btn-agendar-cal{padding:8px 16px;border-radius:9px;border:none;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+    .btn-agendar-cal.agendar{background:linear-gradient(135deg,var(--coral),var(--magenta));color:#fff}
+    .btn-agendar-cal.agendar:hover{opacity:.9;transform:translateY(-1px)}
+    .btn-agendar-cal.inscrita{background:rgba(0,200,212,.1);color:#007a82}
+    .btn-agendar-cal.cancelar{background:rgba(255,78,104,.1);color:var(--coral)}
+    .btn-agendar-cal.sin-cupo{background:var(--light);color:var(--gray);cursor:not-allowed}
+    .btn-agendar-cal.ver-lista{background:rgba(139,106,255,.1);color:var(--purple)}
+    .btn-agendar-cal.sin-plan{background:var(--light);color:var(--gray);cursor:not-allowed}
+
+    .sin-clases-dia{padding:32px 28px;text-align:center;color:var(--gray);font-size:14px}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+    .toast.ok{background:#007a82}
+    .toast.error{background:var(--coral)}
+    .toast.visible{opacity:1}
+
+    @media(max-width:900px){
+      main{grid-template-columns:1fr;padding:16px 16px 48px}
+      .cal-wrap{position:static}
+      nav{padding:14px 20px}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Espacio Vuela</a>
+  <div class="nav-right">
+    <a href="agendar.html" class="nav-lista">Vista lista</a>
+    <a href="mi-cuenta.html" class="nav-back" id="nav-back">← Mi cuenta</a>
+  </div>
+</nav>
+
+<main>
+  <!-- CALENDARIO -->
+  <div class="cal-wrap">
+    <div class="cal-header">
+      <button class="cal-nav" id="btn-prev">‹</button>
+      <div class="cal-mes-anio" id="cal-titulo">—</div>
+      <button class="cal-nav" id="btn-next">›</button>
+    </div>
+    <div class="cal-dias-header">
+      <div class="cal-dia-lbl">Lun</div>
+      <div class="cal-dia-lbl">Mar</div>
+      <div class="cal-dia-lbl">Mié</div>
+      <div class="cal-dia-lbl">Jue</div>
+      <div class="cal-dia-lbl">Vie</div>
+      <div class="cal-dia-lbl">Sáb</div>
+      <div class="cal-dia-lbl">Dom</div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-legend">
+      <div class="legend-item"><div class="dot dot-vuela"></div> Vuela</div>
+      <div class="legend-item"><div class="dot dot-muevete"></div> Muévete</div>
+      <div class="legend-item"><div class="dot dot-gym"></div> Gym</div>
+      <div class="legend-item"><span style="font-size:9px;color:rgba(255,78,104,.5)">●</span> Feriado</div>
+    </div>
+  </div>
+
+  <!-- PANEL DÍA -->
+  <div class="day-panel" id="day-panel">
+    <div class="day-panel-empty">
+      <div class="icon">📅</div>
+      <p>Selecciona un día para<br>ver las clases disponibles</p>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+const {createClient} = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── FERIADOS CHILE 2026-2027 ──────────────────────────────────
+const FERIADOS = {
+  '2026-01-01':'Año Nuevo',
+  '2026-04-03':'Viernes Santo',
+  '2026-04-04':'Sábado Santo',
+  '2026-05-01':'Día del Trabajo',
+  '2026-05-21':'Glorias Navales',
+  '2026-06-29':'San Pedro y San Pablo',
+  '2026-07-16':'Virgen del Carmen',
+  '2026-08-15':'Asunción de la Virgen',
+  '2026-09-18':'Independencia Nacional',
+  '2026-09-19':'Glorias del Ejército',
+  '2026-10-12':'Encuentro de Dos Mundos',
+  '2026-10-31':'Iglesias Evangélicas',
+  '2026-11-01':'Todos los Santos',
+  '2026-12-08':'Inmaculada Concepción',
+  '2026-12-25':'Navidad',
+  '2027-01-01':'Año Nuevo',
+  '2027-03-26':'Viernes Santo',
+  '2027-03-27':'Sábado Santo',
+  '2027-05-01':'Día del Trabajo',
+  '2027-05-21':'Glorias Navales',
+  '2027-06-28':'San Pedro y San Pablo',
+  '2027-07-16':'Virgen del Carmen',
+  '2027-08-15':'Asunción de la Virgen',
+  '2027-09-18':'Independencia Nacional',
+  '2027-09-19':'Glorias del Ejército',
+  '2027-10-11':'Encuentro de Dos Mundos',
+  '2027-10-31':'Iglesias Evangélicas',
+  '2027-11-01':'Todos los Santos',
+  '2027-12-08':'Inmaculada Concepción',
+  '2027-12-25':'Navidad',
+};
+
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+// ── ESTADO ────────────────────────────────────────────────────
+let userId      = null;
+let userRol     = 'alumna';
+let mesActual   = new Date().getMonth();
+let anioActual  = new Date().getFullYear();
+let clasesDelMes = [];  // todas las clases del mes cargado
+let misInscripciones = new Set();
+let tieneplanActivo  = false;
+let diaSeleccionado  = null;
+
+// ── UTILS ─────────────────────────────────────────────────────
+function isoFecha(date){ return date.toISOString().split('T')[0]; }
+function horaStr(ts){ return new Date(ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',hour12:false}); }
+function fechaLarga(isoDate){
+  const d = new Date(isoDate+'T12:00:00');
+  return d.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
+}
+function tipoDot(tipo){
+  const t=(tipo||'').toLowerCase();
+  if(t.includes('vuela')||t.includes('pole')||t.includes('lira')||t.includes('aere')) return 'dot-vuela';
+  if(t.includes('muevete')||t.includes('baile')||t.includes('heels')||t.includes('funky')) return 'dot-muevete';
+  if(t.includes('gym')||t.includes('fuerza')) return 'dot-gym';
+  return 'dot-otro';
+}
+function toast(msg,tipo='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=`toast ${tipo} visible`;
+  setTimeout(()=>t.classList.remove('visible'),2500);
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+async function init(){
+  const {data:{session}} = await sb.auth.getSession();
+  if(!session){window.location.href='login-nuevo.html';return;}
+  userId = session.user.id;
+
+  const {data:u} = await sb.from('usuarios').select('rol,nombre').eq('id',userId).single();
+  userRol = u?.rol || 'alumna';
+
+  // Actualizar nav según rol
+  const navBack = document.getElementById('nav-back');
+  if(userRol==='admin'){navBack.href='admin.html'; navBack.textContent='← Admin';}
+  else if(userRol==='profesora'){navBack.href='profesora.html'; navBack.textContent='← Panel profesora';}
+
+  // Verificar plan activo (solo alumnas)
+  if(userRol==='alumna'){
+    const {data:compras} = await sb.from('compras').select('id')
+      .eq('alumna_id',userId).eq('estado','activo').gte('fecha_fin',isoFecha(new Date())).limit(1);
+    tieneplanActivo = !!(compras && compras.length>0);
+  }
+
+  // Cargar inscripciones (alumnas)
+  if(userRol==='alumna'){
+    const {data:ins} = await sb.from('inscripciones').select('clase_id')
+      .eq('alumna_id',userId).eq('estado','confirmada');
+    misInscripciones = new Set((ins||[]).map(i=>i.clase_id));
+  }
+
+  await cargarMes(anioActual, mesActual);
+}
+
+// ── CARGAR MES ────────────────────────────────────────────────
+async function cargarMes(anio, mes){
+  const inicio = new Date(anio, mes, 1).toISOString();
+  const fin    = new Date(anio, mes+1, 0, 23, 59, 59).toISOString();
+
+  let query = sb.from('clases').select('*').gte('fecha_hora',inicio).lte('fecha_hora',fin).eq('cancelada',false).order('fecha_hora');
+  if(userRol==='profesora'){
+    // Solo sus clases - necesitamos su nombre
+    const {data:u} = await sb.from('usuarios').select('nombre').eq('id',userId).single();
+    if(u?.nombre) query = query.ilike('profesora',`%${u.nombre}%`);
+  }
+
+  const {data} = await query;
+  clasesDelMes = data||[];
+  renderCalendario(anio, mes);
+}
+
+// ── RENDER CALENDARIO ─────────────────────────────────────────
+function renderCalendario(anio, mes){
+  document.getElementById('cal-titulo').textContent = `${MESES[mes]} ${anio}`;
+
+  const primerDia  = new Date(anio, mes, 1);
+  const ultimoDia  = new Date(anio, mes+1, 0);
+  const startOffset = (primerDia.getDay()+6)%7; // lunes=0
+  const hoyStr     = isoFecha(new Date());
+
+  // Mapear clases por día
+  const clasesPorDia = {};
+  clasesDelMes.forEach(c => {
+    const fechaKey = isoFecha(new Date(c.fecha_hora));
+    if(!clasesPorDia[fechaKey]) clasesPorDia[fechaKey]=[];
+    clasesPorDia[fechaKey].push(c);
+  });
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML='';
+
+  // Celdas vacías del inicio
+  for(let i=0;i<startOffset;i++){
+    const cell=document.createElement('div');
+    cell.className='cal-cell vacio';
+    grid.appendChild(cell);
+  }
+
+  // Días del mes
+  for(let d=1;d<=ultimoDia.getDate();d++){
+    const fechaStr = `${anio}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const esFeriado = !!FERIADOS[fechaStr];
+    const esHoy     = fechaStr===hoyStr;
+    const esSel     = fechaStr===diaSeleccionado;
+    const clasesHoy = clasesPorDia[fechaStr]||[];
+
+    const cell=document.createElement('div');
+    cell.className='cal-cell'+(esFeriado?' feriado':'')+(esHoy?' hoy':'')+(esSel?' seleccionado':'');
+    cell.onclick=()=>seleccionarDia(fechaStr);
+
+    // Número del día
+    const num=document.createElement('div');
+    num.className='cal-num';
+    num.textContent=d;
+    cell.appendChild(num);
+
+    // Puntos de clases (máx 3)
+    if(clasesHoy.length>0){
+      const dotsWrap=document.createElement('div');
+      dotsWrap.className='cal-dots';
+      const max=Math.min(clasesHoy.length,3);
+      for(let i=0;i<max;i++){
+        const dot=document.createElement('div');
+        dot.className=`dot ${tipoDot(clasesHoy[i].tipo)}`;
+        dotsWrap.appendChild(dot);
+      }
+      if(clasesHoy.length>3){
+        const mas=document.createElement('div');
+        mas.style.cssText='font-size:8px;color:var(--gray);line-height:5px';
+        mas.textContent=`+${clasesHoy.length-3}`;
+        dotsWrap.appendChild(mas);
+      }
+      cell.appendChild(dotsWrap);
+    }
+
+    grid.appendChild(cell);
+  }
+}
+
+// ── SELECCIONAR DÍA ───────────────────────────────────────────
+function seleccionarDia(fechaStr){
+  diaSeleccionado = fechaStr;
+  renderCalendario(anioActual, mesActual); // actualiza highlight
+  mostrarDia(fechaStr);
+}
+
+function mostrarDia(fechaStr){
+  const feriado = FERIADOS[fechaStr];
+  const clases  = clasesDelMes.filter(c=>isoFecha(new Date(c.fecha_hora))===fechaStr);
+  const panel   = document.getElementById('day-panel');
+  const fechaLeg = fechaLarga(fechaStr);
+
+  let html = `<div class="day-panel-header">
+    <div class="day-fecha">${fechaLeg.charAt(0).toUpperCase()+fechaLeg.slice(1)}</div>
+    ${feriado?`<div class="feriado-banner">🎉 Feriado: ${feriado} — Las clases pueden tener menor asistencia</div>`:''}
+  </div>`;
+
+  if(clases.length===0){
+    html += `<div class="sin-clases-dia">No hay clases programadas para este día.</div>`;
+  } else {
+    html += `<div class="day-clases-lista">${clases.map(c=>renderClaseCard(c,feriado)).join('')}</div>`;
+  }
+
+  panel.innerHTML=html;
+}
+
+function renderClaseCard(c, esFeriado){
+  const cupoDisp  = c.cupo_disponible??0;
+  const cupoMax   = c.cupo_maximo??15;
+  const ocupados  = cupoMax-cupoDisp;
+  const cupoUrgente = !estaInscrita(c.id) && cupoDisp<=3 && cupoDisp>0;
+
+  let botonHtml = '';
+  if(userRol==='alumna'){
+    if(estaInscrita(c.id)){
+      botonHtml=`<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <button class="btn-agendar-cal inscrita">✓ Inscrita</button>
+        <button class="btn-agendar-cal cancelar" onclick="cancelarClase('${c.id}')">Cancelar</button>
+      </div>`;
+    } else if(cupoDisp<=0){
+      botonHtml=`<button class="btn-agendar-cal sin-cupo" disabled>Sin cupo</button>`;
+    } else if(!tieneplanActivo){
+      botonHtml=`<button class="btn-agendar-cal sin-plan" onclick="window.location.href='planes.html'">Ver planes</button>`;
+    } else {
+      botonHtml=`<button class="btn-agendar-cal agendar" onclick="agendarClase('${c.id}')">Agendar →</button>`;
+    }
+  } else {
+    botonHtml=`<button class="btn-agendar-cal ver-lista" onclick="window.location.href='${userRol==='admin'?'admin.html':'profesora.html'}'">Ver lista</button>`;
+  }
+
+  return `<div class="clase-item-cal" id="calcard-${c.id}">
+    <div class="clase-hora-badge">${horaStr(c.fecha_hora)}</div>
+    <div class="clase-info-cal">
+      <div class="clase-nombre-cal">${c.nombre}</div>
+      <div class="clase-meta-cal">👩‍🏫 ${c.profesora} · ${c.duracion_minutos||60} min</div>
+      <div class="clase-cupo-cal ${cupoUrgente?'cupo-low':''}">
+        ${cupoDisp<=0?'Clase llena':cupoUrgente?`¡Solo ${cupoDisp} lugar${cupoDisp>1?'es':''}!`:`${cupoDisp}/${cupoMax} lugares`}
+      </div>
+    </div>
+    ${botonHtml}
+  </div>`;
+}
+
+function estaInscrita(claseId){ return misInscripciones.has(claseId); }
+
+// ── AGENDAR DESDE CALENDARIO ──────────────────────────────────
+async function agendarClase(claseId){
+  const {data,error} = await sb.rpc('agendar_clase',{p_clase_id:claseId,p_alumna_id:userId});
+  const errores={
+    ya_inscrita:'Ya estás inscrita en esta clase.',
+    sin_cupo:'Ya no hay cupo disponible.',
+    plan_no_permite:'Tu plan no incluye este tipo de clase.',
+    clase_no_encontrada:'No se encontró la clase.'
+  };
+  if(error||!data?.ok){
+    toast(errores[data?.error]||'Error al agendar. Intenta de nuevo.','error'); return;
+  }
+  misInscripciones.add(claseId);
+  // Decrementar cupo local
+  const clase = clasesDelMes.find(c=>c.id===claseId);
+  if(clase) clase.cupo_disponible=Math.max(0,(clase.cupo_disponible||1)-1);
+  toast('✓ Clase agendada correctamente');
+  mostrarDia(diaSeleccionado);
+  renderCalendario(anioActual,mesActual);
+}
+
+async function cancelarClase(claseId){
+  const {data,error} = await sb.rpc('cancelar_inscripcion',{p_clase_id:claseId,p_alumna_id:userId});
+  if(error||!data?.ok){toast('Error al cancelar','error');return;}
+  misInscripciones.delete(claseId);
+  const clase = clasesDelMes.find(c=>c.id===claseId);
+  if(clase) clase.cupo_disponible=(clase.cupo_disponible||0)+1;
+  toast('Inscripción cancelada');
+  mostrarDia(diaSeleccionado);
+  renderCalendario(anioActual,mesActual);
+}
+
+// ── NAVEGACIÓN MES ────────────────────────────────────────────
+document.getElementById('btn-prev').addEventListener('click',()=>{
+  if(mesActual===0){mesActual=11;anioActual--;}else mesActual--;
+  diaSeleccionado=null;
+  document.getElementById('day-panel').innerHTML=`<div class="day-panel-empty"><div class="icon">📅</div><p>Selecciona un día</p></div>`;
+  cargarMes(anioActual,mesActual);
+});
+document.getElementById('btn-next').addEventListener('click',()=>{
+  if(mesActual===11){mesActual=0;anioActual++;}else mesActual++;
+  diaSeleccionado=null;
+  document.getElementById('day-panel').innerHTML=`<div class="day-panel-empty"><div class="icon">📅</div><p>Selecciona un día</p></div>`;
+  cargarMes(anioActual,mesActual);
+});
+
+init();
+</script>
+</body>
+</html>
