@@ -408,23 +408,34 @@ function estaInscrita(claseId){ return misInscripciones.has(claseId); }
 
 // ── AGENDAR DESDE CALENDARIO ──────────────────────────────────
 async function agendarClase(claseId){
-  const {data,error} = await sb.rpc('agendar_clase',{p_clase_id:claseId,p_alumna_id:userId});
-  const errores={
-    ya_inscrita:'Ya estás inscrita en esta clase.',
-    sin_cupo:'Ya no hay cupo disponible.',
-    plan_no_permite:'Tu plan no incluye este tipo de clase.',
-    clase_no_encontrada:'No se encontró la clase.'
-  };
-  if(error||!data?.ok){
-    toast(errores[data?.error]||'Error al agendar. Intenta de nuevo.','error'); return;
+  try {
+    const {data,error} = await sb.rpc('agendar_clase',{p_clase_id:claseId,p_alumna_id:userId});
+    const errores={
+      ya_inscrita:'Ya estás inscrita en esta clase.',
+      sin_cupo:'Ya no hay cupo disponible.',
+      plan_no_permite:'Tu plan no incluye este tipo de clase.',
+      clase_no_encontrada:'No se encontró la clase.'
+    };
+    if(error){
+      console.error('RPC error:', error);
+      toast('Error al agendar: ' + (error.message || 'Error desconocido'), 'error');
+      return;
+    }
+    if(!data?.ok){
+      toast(errores[data?.error]||'Error al agendar. Intenta de nuevo.','error');
+      console.log('Respuesta RPC:', data);
+      return;
+    }
+    misInscripciones.add(claseId);
+    const clase = clasesDelMes.find(c=>c.id===claseId);
+    if(clase) clase.cupo_disponible=Math.max(0,(clase.cupo_disponible||1)-1);
+    toast('✓ Clase agendada correctamente');
+    mostrarDia(diaSeleccionado);
+    renderCalendario(anioActual,mesActual);
+  } catch(err) {
+    console.error('Error agendarClase:', err);
+    toast('Error inesperado: ' + err.message, 'error');
   }
-  misInscripciones.add(claseId);
-  // Decrementar cupo local
-  const clase = clasesDelMes.find(c=>c.id===claseId);
-  if(clase) clase.cupo_disponible=Math.max(0,(clase.cupo_disponible||1)-1);
-  toast('✓ Clase agendada correctamente');
-  mostrarDia(diaSeleccionado);
-  renderCalendario(anioActual,mesActual);
 }
 
 async function cancelarClase(claseId){
