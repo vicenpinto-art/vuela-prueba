@@ -1373,8 +1373,8 @@ async function moverDisciplina(id, nuevoPlan){
 
   const label = nuevoPlan === 'muevete' ? 'Muévete' : 'Vuela';
   toast('✓ "' + nombreDisciplina + '" movida a ' + label + ' — horarios y clases actualizados');
-  cargarDisciplinas();
-  cargarHorarios();
+  await cargarDisciplinas();
+  await cargarHorarios();
 }
 
 async function eliminarDisciplina(id){
