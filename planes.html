@@ -438,7 +438,7 @@
 
     async function cargarWidgetDisciplinas(){
       const {data} = await sb.from('disciplinas').select('nombre,plan').eq('activo',true).order('plan').order('orden');
-      const vuela   = (data||[]).filter(d=>d.plan==='vuela');
+      const vuela   = data||[];  // Vuela incluye todas las disciplinas
       const muevete = (data||[]).filter(d=>d.plan==='muevete');
       const mkTags = (lista,cls) => lista.map(d=>`<span class="pv-tag ${cls}">${d.nombre}</span>`).join('');
       document.getElementById('tags-vuela').innerHTML   = mkTags(vuela,'pv-tag-v');
