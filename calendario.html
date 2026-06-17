@@ -375,20 +375,26 @@ function renderClaseCard(c, esFeriado){
 
   // Badge de color según el tipo
   let badgeHtml = '';
-  if (c.tipo === 'vuela') {
+  const t = (c.tipo||'').toLowerCase();
+  if (t.includes('vuela') || t.includes('pole') || t.includes('lira') || t.includes('aerea') || t.includes('aerial')) {
     badgeHtml = '<span style="background:#a183ff;color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;margin-left:6px">🟣 Vuela</span>';
-  } else if (c.tipo === 'muevete') {
+  } else if (t.includes('muevete') || t.includes('baile') || t.includes('heels') || t.includes('funky') || t.includes('afro')) {
     badgeHtml = '<span style="background:#fecb29;color:#5a4000;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;margin-left:6px">🟡 Muévete</span>';
-  } else if (c.tipo === 'gym') {
+  } else if (t.includes('gym') || t.includes('fuerza')) {
     badgeHtml = '<span style="background:#ff4e68;color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;margin-left:6px">🔴 Gym</span>';
   }
 
   let botonHtml = '';
   if(userRol==='alumna'){
     if(estaInscrita(c.id)){
+      const horasHasta = (new Date(c.fecha_hora) - new Date()) / (1000*60*60);
+      const cancelBloq = horasHasta < 2;
       botonHtml=`<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
         <button class="btn-agendar-cal inscrita">✓ Inscrita</button>
-        <button class="btn-agendar-cal cancelar" onclick="cancelarClase('${c.id}')">Cancelar</button>
+        ${cancelBloq
+          ? `<span style="font-size:11px;color:var(--coral);font-weight:600">⏰ Sin cancelación</span>`
+          : `<button class="btn-agendar-cal cancelar" onclick="cancelarClase('${c.id}')">Cancelar</button>`
+        }
       </div>`;
     } else if(cupoDisp<=0){
       botonHtml=`<button class="btn-agendar-cal sin-cupo" disabled>Sin cupo</button>`;

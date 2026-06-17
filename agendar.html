@@ -563,7 +563,7 @@
 
     // Actualizar estado local
     misInscripciones.delete(claseSeleccionada.id);
-    const clase = todasLasClases.find(c => c.id === claseId);
+    const clase = todasLasClases.find(c => c.id === claseSeleccionada.id);
     if (clase) clase.cupo_disponible = (clase.cupo_disponible || 0) + 1;
 
     msg.textContent = 'Inscripción cancelada correctamente.';
