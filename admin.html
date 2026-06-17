@@ -157,6 +157,7 @@
     <div class="sidebar-item" data-sec="rutina"><span class="sidebar-icon">📝</span> Rutina del día</div>
     <div class="sidebar-item" data-sec="roles"><span class="sidebar-icon">👥</span> Roles</div>
     <div class="sidebar-item" data-sec="disciplinas"><span class="sidebar-icon">🏷️</span> Disciplinas</div>
+    <div class="sidebar-item" data-sec="eliminar-usuario"><span class="sidebar-icon">🗑️</span> Eliminar usuario</div>
     <div class="sidebar-item" data-sec="ingresos"><span class="sidebar-icon">💰</span> Ingresos</div>
     <a href="calendario.html" style="text-decoration:none"><div class="sidebar-item"><span class="sidebar-icon">📆</span> Calendario</div></a>
   </aside>
@@ -316,6 +317,20 @@
             <div id="disc-lista-eliminadas"></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ELIMINAR USUARIO -->
+    <div class="section" id="sec-eliminar-usuario">
+      <div class="section-title">Eliminar usuario</div>
+      <div class="section-sub">Busca una alumna y elimina su cuenta de forma permanente. Esta acción no se puede deshacer.</div>
+
+      <div class="card">
+        <div class="form-group full">
+          <label>Email o nombre de la alumna</label>
+          <input type="text" id="buscar-usuario" placeholder="Escribe email o nombre" onkeyup="buscarUsuario()">
+        </div>
+        <div id="resultados-busqueda" style="max-height:300px;overflow-y:auto"></div>
       </div>
     </div>
 
@@ -567,6 +582,7 @@ document.querySelectorAll('.sidebar-item').forEach(item=>{
     if(sec==='asistencia') cargarClasesAsistencia();
     if(sec==='alumnas' && todasLasAlumnas.length===0) cargarAlumnas();
     if(sec==='rutina') cargarRutinas();
+    if(sec==='eliminar-usuario') cargarBuscarUsuario();
     if(sec==='disciplinas') cargarDisciplinas();
     if(sec==='ingresos'){iniciarIngresos();}
     if(sec==='roles' && todosLosUsuarios.length===0) cargarRoles();
@@ -1176,6 +1192,63 @@ async function cambiarRol(usuarioId,nuevoRol){
   if(error||!data?.ok){toast('Error al cambiar rol','error');return;}
   toast(`Rol actualizado a ${nuevoRol} ✓`);
   cargarRoles();
+}
+
+// ── ELIMINAR USUARIO ──────────────────────────────────────
+function cargarBuscarUsuario(){
+  document.getElementById('resultados-busqueda').innerHTML='';
+}
+
+async function buscarUsuario(){
+  const q = document.getElementById('buscar-usuario').value.trim().toLowerCase();
+  if(q.length<2){
+    document.getElementById('resultados-busqueda').innerHTML='';
+    return;
+  }
+  const {data} = await sb.from('usuarios').select('id,email,nombre,apellido,rol').ilike('email',`%${q}%`).limit(10);
+  const res = document.getElementById('resultados-busqueda');
+  if(!data||data.length===0){
+    res.innerHTML='<p style="font-size:13px;color:var(--gray);padding:8px 0">Sin resultados.</p>';
+    return;
+  }
+  res.innerHTML = data.map(u=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600">${u.nombre} ${u.apellido||''}</div>
+        <div style="font-size:12px;color:var(--gray)">${u.email} · ${u.rol}</div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="confirmarEliminar('${u.id}','${u.nombre} ${u.apellido||''}')">Eliminar</button>
+    </div>`).join('');
+}
+
+async function confirmarEliminar(userId, nombre){
+  const confirmado = confirm(`⚠️ ADVERTENCIA: Vas a eliminar a ${nombre} y TODOS sus datos (inscripciones, compras, historial).\n\nEsta acción NO se puede deshacer.\n\n¿Estás completamente seguro?`);
+  if(!confirmado) return;
+  
+  const dobleConfirmacion = confirm(`Escribiremos "ELIMINAR" para confirmar.\n\n¿Deseas continuar?`);
+  if(!dobleConfirmacion) return;
+
+  const respuesta = prompt('Escribe "ELIMINAR" para confirmar:');
+  if(respuesta!=='ELIMINAR'){
+    toast('Cancelado. Nada fue eliminado.','info');
+    return;
+  }
+
+  const btn = event.target;
+  btn.disabled=true;
+  btn.textContent='Eliminando...';
+
+  const {data,error} = await sb.rpc('eliminar_usuario',{p_usuario_id:userId});
+  if(error||!data?.ok){
+    toast('Error al eliminar: '+(error?.message||'Error desconocido'),'error');
+    btn.disabled=false;
+    btn.textContent='Eliminar';
+    return;
+  }
+
+  toast('✓ Usuario eliminado permanentemente','success');
+  document.getElementById('buscar-usuario').value='';
+  buscarUsuario();
 }
 
 // ── DISCIPLINAS ───────────────────────────────────────────────
