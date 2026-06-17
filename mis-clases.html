@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis clases — Espacio Vuela</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--coral:#ff4e68;--magenta:#ff008d;--cyan:#00c8d4;--purple:#8b6aff;--yellow:#fecb29;--dark:#111;--gray:#555;--light:#f5f5f7;--border:rgba(0,0,0,.08)}
+    body{font-family:'Outfit',sans-serif;background:#f7f7f9;color:var(--dark);min-height:100vh}
+
+    nav{background:#fff;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+    .logo{font-family:'Dancing Script',cursive;font-size:26px;color:var(--coral);text-decoration:none}
+    .nav-right{display:flex;align-items:center;gap:16px}
+    .nav-back{font-size:14px;color:var(--gray);text-decoration:none;transition:color .2s}
+    .nav-back:hover{color:var(--coral)}
+
+    main{max-width:900px;margin:0 auto;padding:28px 24px 60px}
+
+    .header{margin-bottom:32px}
+    .page-title{font-family:'Dancing Script',cursive;font-size:36px;color:var(--coral);margin-bottom:4px}
+    .page-subtitle{font-size:14px;color:var(--gray)}
+
+    .filtros{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+    .filtro-btn{padding:8px 16px;border:1.5px solid var(--border);background:#fff;border-radius:10px;font-size:13px;cursor:pointer;transition:all .2s;font-weight:600}
+    .filtro-btn.active{background:var(--coral);color:#fff;border-color:var(--coral)}
+    .filtro-btn:hover{border-color:var(--coral)}
+
+    .clases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+
+    .clase-card{
+      background:#fff;border-radius:16px;border:1px solid var(--border);padding:20px;
+      transition:all .2s;
+    }
+    .clase-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+
+    .clase-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+    .clase-fecha{font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px}
+    .clase-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;background:rgba(0,200,212,.1);color:#007a82}
+
+    .clase-nombre{font-size:16px;font-weight:700;margin-bottom:8px;color:var(--dark)}
+    .clase-meta{font-size:13px;color:var(--gray);display:flex;align-items:center;gap:6px;margin-bottom:4px}
+    
+    .estado-badge{font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;margin-top:12px;display:inline-block}
+    .estado-asistio{background:rgba(0,200,212,.1);color:#007a82}
+    .estado-no-asistio{background:rgba(255,78,104,.1);color:var(--coral)}
+    .estado-cancelada{background:rgba(100,100,100,.1);color:var(--gray)}
+
+    .empty-state{text-align:center;padding:60px 20px;color:var(--gray)}
+    .empty-icon{font-size:48px;margin-bottom:16px}
+
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+    .stat-card{background:#fff;border-radius:12px;padding:16px;border:1px solid var(--border);text-align:center}
+    .stat-number{font-size:24px;font-weight:700;color:var(--coral)}
+    .stat-label{font-size:12px;color:var(--gray);margin-top:4px}
+
+    @media(max-width:768px){
+      nav{padding:12px 20px}
+      main{padding:16px 16px 48px}
+      .clases-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Espacio Vuela</a>
+  <div class="nav-right">
+    <a href="mi-cuenta.html" class="nav-back">← Mi cuenta</a>
+  </div>
+</nav>
+
+<main>
+  <div class="header">
+    <h1 class="page-title">Mis clases</h1>
+    <p class="page-subtitle">Historial completo de clases a las que asististe</p>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-number" id="stat-total">—</div>
+      <div class="stat-label">Clases totales</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="stat-asistidas">—</div>
+      <div class="stat-label">Asistidas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="stat-canceladas">—</div>
+      <div class="stat-label">Canceladas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="stat-tasa">—</div>
+      <div class="stat-label">Tasa asistencia</div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros">
+    <button class="filtro-btn active" onclick="filtrar('todas')">Todas</button>
+    <button class="filtro-btn" onclick="filtrar('asistida')">Asistidas</button>
+    <button class="filtro-btn" onclick="filtrar('no-asistida')">No asistidas</button>
+    <button class="filtro-btn" onclick="filtrar('cancelada')">Canceladas</button>
+  </div>
+
+  <!-- Listado de clases -->
+  <div class="clases-grid" id="clases-container">
+    <div class="empty-state">
+      <div class="empty-icon">📚</div>
+      <p>Cargando tu historial de clases...</p>
+    </div>
+  </div>
+</main>
+
+<script>
+const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+const {createClient} = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let userId = null;
+let todasLasClases = [];
+let filtroActual = 'todas';
+
+async function init() {
+  const {data:{session}} = await sb.auth.getSession();
+  if (!session) {
+    window.location.href = 'login-nuevo.html';
+    return;
+  }
+  userId = session.user.id;
+  await cargarClases();
+}
+
+async function cargarClases() {
+  const {data: inscripciones} = await sb
+    .from('inscripciones')
+    .select('*, clases(nombre, fecha_hora, profesora, tipo)')
+    .eq('alumna_id', userId)
+    .order('clases.fecha_hora', {ascending: false});
+
+  const {data: asistencias} = await sb
+    .from('asistencias')
+    .select('clase_id, presente')
+    .eq('alumna_id', userId);
+
+  const asistenciaMap = {};
+  (asistencias || []).forEach(a => {
+    asistenciaMap[a.clase_id] = a.presente;
+  });
+
+  todasLasClases = (inscripciones || []).map(i => ({
+    ...i,
+    asistio: asistenciaMap[i.clase_id] !== undefined ? asistenciaMap[i.clase_id] : null
+  }));
+
+  actualizarStats();
+  renderizar();
+}
+
+function actualizarStats() {
+  const total = todasLasClases.length;
+  const asistidas = todasLasClases.filter(c => c.asistio === true).length;
+  const canceladas = todasLasClases.filter(c => c.estado === 'cancelada').length;
+  const tasa = total > 0 ? Math.round((asistidas / (total - canceladas)) * 100) : 0;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-asistidas').textContent = asistidas;
+  document.getElementById('stat-canceladas').textContent = canceladas;
+  document.getElementById('stat-tasa').textContent = tasa + '%';
+}
+
+function filtrar(tipo) {
+  filtroActual = tipo;
+  document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderizar();
+}
+
+function renderizar() {
+  const container = document.getElementById('clases-container');
+  
+  let clases = todasLasClases;
+  if (filtroActual === 'asistida') clases = todasLasClases.filter(c => c.asistio === true);
+  if (filtroActual === 'no-asistida') clases = todasLasClases.filter(c => c.asistio === false && c.estado !== 'cancelada');
+  if (filtroActual === 'cancelada') clases = todasLasClases.filter(c => c.estado === 'cancelada');
+
+  if (clases.length === 0) {
+    container.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><p>No hay clases para este filtro.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = clases.map(c => {
+    const fecha = new Date(c.clases.fecha_hora);
+    const fechaStr = fecha.toLocaleDateString('es-CL', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
+    const horaStr = fecha.toLocaleTimeString('es-CL', {hour:'2-digit', minute:'2-digit', hour12:false});
+    
+    let estadoBadge = '';
+    if (c.estado === 'cancelada') {
+      estadoBadge = '<span class="estado-badge estado-cancelada">Cancelada</span>';
+    } else if (c.asistio === true) {
+      estadoBadge = '<span class="estado-badge estado-asistio">✓ Asistió</span>';
+    } else if (c.asistio === false) {
+      estadoBadge = '<span class="estado-badge estado-no-asistio">✕ No asistió</span>';
+    }
+
+    return `
+      <div class="clase-card">
+        <div class="clase-header">
+          <span class="clase-fecha">${fechaStr}</span>
+          <span class="clase-badge">${c.clases.tipo || 'Vuela'}</span>
+        </div>
+        <div class="clase-nombre">${c.clases.nombre}</div>
+        <div class="clase-meta">👩‍🏫 ${c.clases.profesora || 'Por confirmar'}</div>
+        <div class="clase-meta">🕐 ${horaStr}</div>
+        ${estadoBadge}
+      </div>`;
+  }).join('');
+}
+
+init();
+</script>
+
+</body>
+</html>

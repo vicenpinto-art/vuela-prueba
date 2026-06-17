@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar contraseña — Espacio Vuela</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--coral:#ff4e68;--magenta:#ff008d;--cyan:#00c8d4;--purple:#8b6aff;--yellow:#fecb29;--dark:#111;--gray:#555;--light:#f5f5f7;--border:rgba(0,0,0,.08)}
+    body{font-family:'Outfit',sans-serif;background:linear-gradient(135deg,#fff 0%,#f0f0f5 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+
+    .login-container{
+      background:#fff;border-radius:24px;box-shadow:0 8px 32px rgba(0,0,0,.08);
+      width:100%;max-width:420px;padding:48px 32px;
+    }
+    .logo{font-family:'Dancing Script',cursive;font-size:28px;color:var(--coral);text-align:center;margin-bottom:32px}
+    .form-title{font-size:20px;font-weight:700;text-align:center;margin-bottom:8px;color:var(--dark)}
+    .form-subtitle{font-size:13px;color:var(--gray);text-align:center;margin-bottom:24px;line-height:1.5}
+    
+    .form-group{margin-bottom:18px}
+    .form-group label{font-size:12px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px}
+    .form-group input{
+      width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;
+      font-size:14px;font-family:'Outfit',sans-serif;transition:border .2s;
+    }
+    .form-group input:focus{outline:none;border-color:var(--coral)}
+    .form-group input::placeholder{color:#ccc}
+
+    .btn{
+      width:100%;padding:13px;border:none;border-radius:12px;font-family:'Outfit',sans-serif;
+      font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;
+      display:inline-block;text-align:center;
+    }
+    .btn-primary{background:linear-gradient(135deg,var(--coral),var(--magenta));color:#fff}
+    .btn-primary:hover{opacity:.9;transform:translateY(-2px)}
+    .btn-secondary{background:var(--light);color:var(--dark)}
+    .btn-secondary:hover{background:#e8e8e8}
+
+    .alert{
+      padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:16px;
+      display:none;
+    }
+    .alert.visible{display:block}
+    .alert.success{background:#e0fdf4;color:#065f46;border:1px solid #a7f3d0}
+    .alert.error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+    .alert.info{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+
+    .link-group{text-align:center;margin-top:20px;font-size:13px}
+    .link-group a{color:var(--coral);text-decoration:none;font-weight:600;transition:color .2s}
+    .link-group a:hover{color:var(--magenta)}
+
+    .loading{display:none}
+    .loading.visible{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <div class="logo">Espacio Vuela</div>
+  
+  <h2 class="form-title" id="titulo">Recuperar contraseña</h2>
+  <p class="form-subtitle" id="subtitulo">Ingresa tu email y te enviaremos un link para resetear tu contraseña.</p>
+
+  <div class="alert" id="alerta"></div>
+
+  <form id="form-recuperar" onsubmit="handleSubmit(event)">
+    <div class="form-group">
+      <label>Correo electrónico</label>
+      <input type="email" id="email" placeholder="tu@email.com" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      Enviar email de recuperación
+      <span class="loading" id="loading"></span>
+    </button>
+  </form>
+
+  <div class="link-group">
+    <a href="login-nuevo.html">← Volver al login</a>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+const {createClient} = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function handleSubmit(e) {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const btn = e.target.querySelector('button');
+  const loading = document.getElementById('loading');
+  const alerta = document.getElementById('alerta');
+
+  if (!email) {
+    mostrarAlerta('Por favor ingresa tu email', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  loading.classList.add('visible');
+
+  try {
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/login-nuevo.html`
+    });
+
+    if (error) {
+      mostrarAlerta('Error: ' + (error.message || 'No se pudo enviar el email'), 'error');
+      btn.disabled = false;
+      loading.classList.remove('visible');
+      return;
+    }
+
+    // Éxito
+    document.getElementById('form-recuperar').style.display = 'none';
+    document.getElementById('titulo').textContent = '✓ Email enviado';
+    document.getElementById('subtitulo').textContent = 'Revisa tu bandeja de entrada y haz clic en el link para resetear tu contraseña. Si no ves el email, revisa spam.';
+    mostrarAlerta('Email de recuperación enviado correctamente. Revivirá en 1 hora.', 'success');
+    
+  } catch (err) {
+    mostrarAlerta('Error inesperado: ' + err.message, 'error');
+    btn.disabled = false;
+    loading.classList.remove('visible');
+  }
+}
+
+function mostrarAlerta(msg, tipo) {
+  const alerta = document.getElementById('alerta');
+  alerta.textContent = msg;
+  alerta.className = `alert visible ${tipo}`;
+}
+
+// Si viene del link de reseteo, mostrar formulario para nueva contraseña
+window.addEventListener('load', () => {
+  const hash = window.location.hash;
+  if (hash.includes('type=recovery')) {
+    document.getElementById('titulo').textContent = 'Nueva contraseña';
+    document.getElementById('subtitulo').textContent = 'Ingresa tu nueva contraseña.';
+    document.getElementById('email').style.display = 'none';
+    document.getElementById('email').removeAttribute('required');
+    
+    const label = document.querySelector('label');
+    label.textContent = 'Nueva contraseña';
+    document.getElementById('email').id = 'password';
+    document.getElementById('email').type = 'password';
+    document.getElementById('email').placeholder = 'Nueva contraseña';
+    document.getElementById('email').style.display = 'block';
+    
+    document.querySelector('button').textContent = 'Cambiar contraseña';
+  }
+});
+</script>
+
+</body>
+</html>
