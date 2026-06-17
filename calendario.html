@@ -373,6 +373,16 @@ function renderClaseCard(c, esFeriado){
   const ocupados  = cupoMax-cupoDisp;
   const cupoUrgente = !estaInscrita(c.id) && cupoDisp<=3 && cupoDisp>0;
 
+  // Badge de color según el tipo
+  let badgeHtml = '';
+  if (c.tipo === 'vuela') {
+    badgeHtml = '<span style="background:#a183ff;color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;margin-left:6px">🟣 Vuela</span>';
+  } else if (c.tipo === 'muevete') {
+    badgeHtml = '<span style="background:#fecb29;color:#5a4000;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;margin-left:6px">🟡 Muévete</span>';
+  } else if (c.tipo === 'gym') {
+    badgeHtml = '<span style="background:#ff4e68;color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;margin-left:6px">🔴 Gym</span>';
+  }
+
   let botonHtml = '';
   if(userRol==='alumna'){
     if(estaInscrita(c.id)){
@@ -394,7 +404,7 @@ function renderClaseCard(c, esFeriado){
   return `<div class="clase-item-cal" id="calcard-${c.id}">
     <div class="clase-hora-badge">${horaStr(c.fecha_hora)}</div>
     <div class="clase-info-cal">
-      <div class="clase-nombre-cal">${c.nombre}</div>
+      <div class="clase-nombre-cal" style="display:flex;align-items:center">${c.nombre}${badgeHtml}</div>
       <div class="clase-meta-cal">👩‍🏫 ${c.profesora} · ${c.duracion_minutos||60} min</div>
       <div class="clase-cupo-cal ${cupoUrgente?'cupo-low':''}">
         ${cupoDisp<=0?'Clase llena':cupoUrgente?`¡Solo ${cupoDisp} lugar${cupoDisp>1?'es':''}!`:`${cupoDisp}/${cupoMax} lugares`}
