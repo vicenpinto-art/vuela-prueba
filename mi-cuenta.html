@@ -240,7 +240,15 @@
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'login-nuevo.html'; return; }
     const userId = session.user.id;
-    await Promise.all([cargarUsuario(userId), cargarPlan(userId), cargarClases(userId), cargarRutina()]);
+    // Cargar usuario primero para detectar rol
+    await cargarUsuario(userId);
+    // Solo cargar plan y clases si es alumna
+    const { data: rolCheck } = await sb.from('usuarios').select('rol').eq('id', userId).single();
+    if (rolCheck?.rol === 'alumna' || !rolCheck?.rol) {
+      await Promise.all([cargarPlan(userId), cargarClases(userId), cargarRutina()]);
+    } else if (rolCheck?.rol === 'profesora') {
+      await cargarRutina(); // profesora sí puede ver la rutina del día
+    }
   }
 
   async function cargarUsuario(userId) {
@@ -253,8 +261,7 @@
       return;
     }
     if (u.rol === 'profesora') {
-      window.location.href = 'profesora.html';
-      return;
+      adaptarVistaProfesora(u);
     }
     
     const nombre = u.nombre || 'alumna';
@@ -469,6 +476,42 @@
     renderRutina(claseActivaRutina);
   }
 
+
+  function adaptarVistaProfesora(u) {
+    // Ocultar alertas de plan
+    document.getElementById('alerta-sin-plan').style.display = 'none';
+    document.getElementById('alerta-pocas').style.display = 'none';
+
+    // Reemplazar card "Tu plan activo" por card de profesora
+    const cardPlan = document.querySelector('.col-left .card:first-child');
+    if (cardPlan) {
+      cardPlan.innerHTML = `
+        <div class="card-header">
+          <div class="card-titulo">Mi perfil docente</div>
+          <div class="card-badge" style="background:rgba(139,106,255,.1);color:var(--purple)">Profesora</div>
+        </div>
+        <div style="padding:8px 0">
+          <div style="font-size:22px;font-weight:700;color:var(--dark);margin-bottom:4px">${(u.nombre||'')} ${(u.apellido||'')}</div>
+          <div style="font-size:13px;color:var(--gray);margin-bottom:16px">Instructora Espacio Vuela</div>
+          <a href="profesora.html" style="display:inline-block;padding:10px 20px;background:linear-gradient(135deg,var(--coral),var(--magenta));color:#fff;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none">
+            Ir a mi panel de clases →
+          </a>
+        </div>`;
+    }
+
+    // Cambiar card "Próximas clases" — ocultar botón Agendar
+    const btnAgendar = document.querySelector('[href="agendar.html"]');
+    if (btnAgendar) btnAgendar.style.display = 'none';
+
+    // Reemplazar acciones rápidas
+    const acciones = document.querySelector('.acciones-grid');
+    if (acciones) {
+      acciones.innerHTML = `
+        <a href="profesora.html" class="accion-btn"><span class="accion-icon">🎓</span><span class="accion-label">Mis clases</span></a>
+        <a href="calendario.html" class="accion-btn"><span class="accion-icon">📅</span><span class="accion-label">Calendario</span></a>
+        <a href="https://wa.me/56973841513" target="_blank" class="accion-btn"><span class="accion-icon">💬</span><span class="accion-label">WhatsApp</span></a>`;
+    }
+  }
   document.getElementById('btn-salir').addEventListener('click', async () => {
     await sb.auth.signOut();
     window.location.href = 'login-nuevo.html';
