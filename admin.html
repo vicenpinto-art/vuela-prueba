@@ -1366,7 +1366,7 @@ async function moverDisciplina(id, nuevoPlan){
 
   // 3. Actualizar todos los horarios con ese nombre
   const ahora = new Date().toISOString();
-  await sb.from('horarios').update({tipo:nuevoPlan}).ilike('nombre', nombreDisciplina);
+  await sb.from('horarios').update({tipo:nuevoPlan, restriccion_plan:nuevoPlan}).ilike('nombre', nombreDisciplina);
 
   // 4. Actualizar todas las clases futuras con ese nombre
   await sb.from('clases').update({tipo:nuevoPlan}).ilike('nombre', nombreDisciplina).gte('fecha_hora', ahora);
