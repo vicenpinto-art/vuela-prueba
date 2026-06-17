@@ -293,7 +293,7 @@
     // Admin ve todas las clases; profesora solo las suyas
     let query = sb.from('clases').select('*').order('fecha_hora', { ascending: true });
     if (usuarioRol !== 'admin') {
-      query = query.ilike('profesora', `%${(usuarioNombre.split(' ')[0])}%`);
+      query = query.ilike('profesora', `%${usuarioNombre}%`);
     }
 
     const { data: clases } = await query
