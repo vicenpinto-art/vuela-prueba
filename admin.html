@@ -1355,10 +1355,26 @@ async function agregarDisciplina(){
 }
 
 async function moverDisciplina(id, nuevoPlan){
+  // 1. Obtener el nombre de la disciplina
+  const disciplina = todasLasDisciplinas.find(d => d.id === id);
+  if(!disciplina){toast('Error: disciplina no encontrada','error');return;}
+  const nombreDisciplina = disciplina.nombre;
+
+  // 2. Actualizar disciplinas
   const {error} = await sb.from('disciplinas').update({plan:nuevoPlan}).eq('id',id);
   if(error){toast('Error al mover','error');return;}
-  toast('Disciplina movida ✓');
+
+  // 3. Actualizar todos los horarios con ese nombre
+  const ahora = new Date().toISOString();
+  await sb.from('horarios').update({tipo:nuevoPlan}).ilike('nombre', nombreDisciplina);
+
+  // 4. Actualizar todas las clases futuras con ese nombre
+  await sb.from('clases').update({tipo:nuevoPlan}).ilike('nombre', nombreDisciplina).gte('fecha_hora', ahora);
+
+  const label = nuevoPlan === 'muevete' ? 'Muévete' : 'Vuela';
+  toast('✓ "' + nombreDisciplina + '" movida a ' + label + ' — horarios y clases actualizados');
   cargarDisciplinas();
+  cargarHorarios();
 }
 
 async function eliminarDisciplina(id){
