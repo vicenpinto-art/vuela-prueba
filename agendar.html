@@ -304,10 +304,11 @@
   }
   function tipoBadge(tipo) {
     const t = (tipo || '').toLowerCase();
-    if (t.includes('vuela') || t.includes('pole') || t.includes('lira') || t.includes('aerea') || t.includes('aerial')) return { clase: 'tipo-vuela', label: 'Vuela' };
-    if (t.includes('muevete') || t.includes('baile') || t.includes('heels') || t.includes('dance') || t.includes('funky') || t.includes('afro')) return { clase: 'tipo-muevete', label: 'Muévete' };
-    if (t.includes('gym') || t.includes('fuerza')) return { clase: 'tipo-gym', label: 'Gym' };
-    return { clase: 'tipo-default', label: tipo || 'Clase' };
+    if (t.includes('gym') || t.includes('fuerza')) return '<div class="tipo-badge tipo-gym">Gym</div>';
+    if (t.includes('muevete') || t.includes('baile') || t.includes('heels') || t.includes('dance') || t.includes('funky') || t.includes('afro'))
+      return '<div class="tipo-badge tipo-vuela">Vuela</div><div class="tipo-badge tipo-muevete">Muévete</div>';
+    if (t.includes('vuela') || t.includes('pole') || t.includes('lira') || t.includes('aerea') || t.includes('aerial')) return '<div class="tipo-badge tipo-vuela">Vuela</div>';
+    return '<div class="tipo-badge tipo-default">' + (tipo || 'Clase') + '</div>';
   }
   function matchFiltro(clase) {
     if (filtroActivo === 'todas') return true;
@@ -402,7 +403,7 @@
     const urgente       = !estaInscrita && c.cupo_disponible <= 3 && c.cupo_disponible > 0;
     const horasHasta    = (new Date(c.fecha_hora) - new Date()) / (1000 * 60 * 60);
     const cancelBloqueada = estaInscrita && horasHasta < 2;
-    const badge         = tipoBadge(c.tipo);
+    const badgeHtml     = tipoBadge(c.tipo);
 
     let accionHtml = '';
     if (estaInscrita) {
@@ -430,7 +431,7 @@
         <div class="clase-info">
           <div class="clase-nombre-row">
             <div class="clase-nombre">${c.nombre}</div>
-            <div class="tipo-badge ${badge.clase}">${badge.label}</div>
+            ${badgeHtml}
           </div>
           <div class="clase-meta">
             <span>👩‍🏫 ${c.profesora}</span>
