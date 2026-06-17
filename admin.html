@@ -726,12 +726,14 @@ async function regenerarTodos(){
     const {data}=await sb.rpc('generar_clases',{p_horario_id:h.id,p_semanas:4});
     total+=data||0;
     // Sincronizar tipo en clases futuras ya existentes
-    if(h.plan){
+    const tipoHorario = h.tipo || h.restriccion_plan;
+    if(tipoHorario){
       await sb.from('clases')
-        .update({tipo: h.plan})
+        .update({tipo: tipoHorario})
         .eq('horario_id', h.id)
         .gte('fecha_hora', ahora);
     }
+
   }
   toast(`✓ Listo — sincronizados ${activos.length} horarios, ${total} clase${total!==1?'s':''} nuevas`);
 }
