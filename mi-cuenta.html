@@ -102,6 +102,17 @@
     .rutina-contenido { font-size: 14px; color: #444; line-height: 1.7; white-space: pre-wrap; }
     .sin-rutina { text-align: center; padding: 16px 0; color: var(--gray); font-size: 14px; }
     .sin-rutina .icon { font-size: 32px; display: block; margin-bottom: 8px; }
+    .rutina-clase-titulo { font-size:15px; font-weight:700; color:var(--dark); margin-bottom:12px; }
+    .rutina-seccion { margin-bottom:14px; padding:10px 14px; background:#f7f7f9; border-radius:10px; }
+    .rutina-seccion-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--gray); margin-bottom:4px; }
+    .rutina-seccion-valor { font-size:13px; color:var(--dark); line-height:1.6; white-space:pre-wrap; }
+    .rutina-seccion-valor a { color:var(--coral); text-decoration:none; }
+    .rutina-seccion-valor a:hover { text-decoration:underline; }
+    .rutina-nivel { display:inline-block; padding:3px 10px; border-radius:6px; font-size:11px; font-weight:700; background:rgba(139,106,255,.1); color:var(--purple); margin-bottom:10px; }
+    .rutina-clase-selector { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+    .rutina-clase-btn { padding:5px 12px; border-radius:8px; border:1.5px solid var(--border); background:#fff; font-size:12px; font-weight:600; cursor:pointer; transition:all .2s; }
+    .rutina-clase-btn.active { background:var(--coral); color:#fff; border-color:var(--coral); }
+
 
     .acciones-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .accion-btn {
@@ -358,18 +369,104 @@
   }
 
   async function cargarRutina() {
-    const hoy = new Date().toISOString().split('T')[0];
-    const { data: rutina } = await sb.from('wod').select('*').eq('fecha', hoy).single();
     const contenedor = document.getElementById('rutina-contenido');
-    if (!rutina) {
-      contenedor.innerHTML = `<div class="sin-rutina"><span class="icon">🌸</span>Aún no hay rutina publicada para hoy.</div>`;
+    const hoyInicio = new Date(); hoyInicio.setHours(0,0,0,0);
+    const hoyFin    = new Date(); hoyFin.setHours(23,59,59,999);
+
+    // Obtener clases de hoy en que está inscrita la alumna
+    const { data: inscripciones } = await sb
+      .from('inscripciones')
+      .select('clase_id, clases(id, nombre, fecha_hora)')
+      .eq('alumna_id', userId)
+      .eq('estado', 'confirmada')
+      .gte('clases.fecha_hora', hoyInicio.toISOString())
+      .lte('clases.fecha_hora', hoyFin.toISOString());
+
+    const clasesHoy = (inscripciones || [])
+      .filter(i => i.clases)
+      .map(i => i.clases);
+
+    if (!clasesHoy.length) {
+      contenedor.innerHTML = `<div class="sin-rutina"><span class="icon">🌸</span>No tienes clases agendadas para hoy.</div>`;
       return;
     }
-    const fechaLegible = new Date(hoy + 'T12:00:00').toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
-    contenedor.innerHTML = `
-      <div class="rutina-fecha">📅 ${fechaLegible.charAt(0).toUpperCase() + fechaLegible.slice(1)}</div>
-      ${rutina.titulo ? `<div class="rutina-titulo">${rutina.titulo}</div>` : ''}
-      <div class="rutina-contenido">${rutina.descripcion || rutina.contenido || 'Sin descripción.'}</div>`;
+
+    // Obtener rutinas para esas clases
+    const claseIds = clasesHoy.map(c => c.id);
+    const { data: rutinas } = await sb
+      .from('rutinas')
+      .select('*')
+      .in('clase_id', claseIds);
+
+    const rutinaMap = {};
+    (rutinas || []).forEach(r => { rutinaMap[r.clase_id] = r; });
+
+    // Si hay varias clases, mostrar selector
+    let claseActivaRutina = clasesHoy[0].id;
+
+    function renderRutina(claseId) {
+      const clase = clasesHoy.find(c => c.id === claseId);
+      const rutina = rutinaMap[claseId];
+      const hora = new Date(clase.fecha_hora).toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit', hour12:false });
+
+      let html = '';
+
+      // Selector si hay más de una clase
+      if (clasesHoy.length > 1) {
+        html += '<div class="rutina-clase-selector">';
+        clasesHoy.forEach(c => {
+          const h = new Date(c.fecha_hora).toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit', hour12:false });
+          html += `<button class="rutina-clase-btn ${c.id === claseId ? 'active' : ''}" onclick="(function(){ claseActivaRutina='${c.id}'; renderRutina('${c.id}'); })()">${h} ${c.nombre}</button>`;
+        });
+        html += '</div>';
+      }
+
+      html += `<div class="rutina-clase-titulo">🕐 ${hora} · ${clase.nombre}</div>`;
+
+      if (!rutina) {
+        html += `<div class="sin-rutina" style="padding:8px 0"><span class="icon" style="font-size:24px;margin-bottom:4px">🌸</span>La profesora aún no ha publicado la rutina.</div>`;
+        contenedor.innerHTML = html;
+        return;
+      }
+
+      const secciones = [
+        { id:'descripcion',     emoji:'📝', label:'Descripción general' },
+        { id:'objetivo',        emoji:'🎯', label:'Objetivo del día' },
+        { id:'nivel',           emoji:'⭐', label:'Nivel', tipo:'nivel' },
+        { id:'calentamiento',   emoji:'🔥', label:'Calentamiento' },
+        { id:'parte_principal', emoji:'💪', label:'Parte principal' },
+        { id:'posturas',        emoji:'🤸', label:'Posturas / movimientos' },
+        { id:'musica',          emoji:'🎵', label:'Música / Playlist', tipo:'link' },
+        { id:'enfriamiento',    emoji:'❄️', label:'Enfriamiento' },
+        { id:'recomendaciones', emoji:'🧘', label:'Recomendaciones' },
+        { id:'referencia_visual', emoji:'📸', label:'Referencia visual', tipo:'link' },
+      ];
+
+      secciones.forEach(s => {
+        const val = rutina[s.id];
+        if (!val) return;
+        if (s.tipo === 'nivel') {
+          html += `<span class="rutina-nivel">${s.emoji} ${val.charAt(0).toUpperCase() + val.slice(1)}</span>`;
+        } else if (s.tipo === 'link') {
+          const esLink = val.startsWith('http');
+          html += `<div class="rutina-seccion">
+            <div class="rutina-seccion-label">${s.emoji} ${s.label}</div>
+            <div class="rutina-seccion-valor">${esLink ? `<a href="${val}" target="_blank">${val}</a>` : val}</div>
+          </div>`;
+        } else {
+          html += `<div class="rutina-seccion">
+            <div class="rutina-seccion-label">${s.emoji} ${s.label}</div>
+            <div class="rutina-seccion-valor">${val}</div>
+          </div>`;
+        }
+      });
+
+      contenedor.innerHTML = html;
+    }
+
+    // Hacer renderRutina accesible globalmente para el selector
+    window.renderRutina = renderRutina;
+    renderRutina(claseActivaRutina);
   }
 
   document.getElementById('btn-salir').addEventListener('click', async () => {
