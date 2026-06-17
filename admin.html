@@ -725,15 +725,17 @@ async function regenerarTodos(){
   for(const h of activos){
     const {data}=await sb.rpc('generar_clases',{p_horario_id:h.id,p_semanas:4});
     total+=data||0;
-    // Sincronizar tipo en clases futuras ya existentes
-    const tipoHorario = h.tipo || h.restriccion_plan;
-    if(tipoHorario){
-      await sb.from('clases')
-        .update({tipo: tipoHorario})
-        .eq('horario_id', h.id)
-        .gte('fecha_hora', ahora);
-    }
-
+    // Sincronizar todos los campos en clases futuras ya existentes
+    await sb.from('clases')
+      .update({
+        tipo:             h.tipo || h.restriccion_plan,
+        profesora:        h.profesora,
+        nombre:           h.nombre,
+        duracion_minutos: h.duracion_minutos,
+        cupo_maximo:      h.cupo_maximo
+      })
+      .eq('horario_id', h.id)
+      .gte('fecha_hora', ahora);
   }
   toast(`✓ Listo — sincronizados ${activos.length} horarios, ${total} clase${total!==1?'s':''} nuevas`);
 }
@@ -748,7 +750,22 @@ async function generarClases(horarioId, mostrarToastInicio=true){
   if(mostrarToastInicio) toast('Generando clases...');
   const {data,error} = await sb.rpc('generar_clases',{p_horario_id:horarioId,p_semanas:4});
   if(error){toast('Error al generar clases','error');return;}
-  toast(`✓ Se generaron ${data} clase${data!==1?'s':''} nuevas`);
+  // Sincronizar campos del horario en clases futuras
+  const h = todosLosHorarios.find(x=>x.id===horarioId);
+  if(h){
+    const ahora = new Date().toISOString();
+    await sb.from('clases')
+      .update({
+        tipo:             h.tipo || h.restriccion_plan,
+        profesora:        h.profesora,
+        nombre:           h.nombre,
+        duracion_minutos: h.duracion_minutos,
+        cupo_maximo:      h.cupo_maximo
+      })
+      .eq('horario_id', horarioId)
+      .gte('fecha_hora', ahora);
+  }
+  toast(`✓ Se generaron ${data} clase${data!==1?'s':''} nuevas y se sincronizó el horario`);
 }
 
 // ── CLASES ────────────────────────────────────────────────────
