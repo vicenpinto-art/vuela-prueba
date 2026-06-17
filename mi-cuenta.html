@@ -243,11 +243,12 @@
     // Cargar usuario primero para detectar rol
     await cargarUsuario(userId);
     // Solo cargar plan y clases si es alumna
-    const { data: rolCheck } = await sb.from('usuarios').select('rol').eq('id', userId).single();
+    const { data: rolCheck } = await sb.from('usuarios').select('rol,nombre,apellido').eq('id', userId).single();
     if (rolCheck?.rol === 'alumna' || !rolCheck?.rol) {
-      await Promise.all([cargarPlan(userId), cargarClases(userId), cargarRutina()]);
+      await Promise.all([cargarPlan(userId), cargarClases(userId), cargarRutina(userId)]);
     } else if (rolCheck?.rol === 'profesora') {
-      await cargarRutina(); // profesora sí puede ver la rutina del día
+      const nombreCompleto = ((rolCheck.nombre||'') + ' ' + (rolCheck.apellido||'')).trim();
+      await Promise.all([cargarClasesProfesora(nombreCompleto), cargarRutinasProfesora(nombreCompleto)]);
     }
   }
 
@@ -476,6 +477,86 @@
     renderRutina(claseActivaRutina);
   }
 
+
+
+  async function cargarClasesProfesora(nombreCompleto) {
+    const ahora = new Date();
+    const en7dias = new Date(); en7dias.setDate(en7dias.getDate() + 7);
+    const { data: clases } = await sb
+      .from('clases')
+      .select('id, nombre, fecha_hora, profesora, tipo')
+      .ilike('profesora', `%${nombreCompleto}%`)
+      .gte('fecha_hora', ahora.toISOString())
+      .lte('fecha_hora', en7dias.toISOString())
+      .order('fecha_hora')
+      .limit(5);
+
+    const contenedor = document.getElementById('clases-contenido');
+    if (!clases || clases.length === 0) {
+      contenedor.innerHTML = `<div class="sin-clases"><span class="icon">📭</span>No tienes clases asignadas esta semana.</div>`;
+      return;
+    }
+    contenedor.innerHTML = clases.map(c => `
+      <div class="clase-item">
+        <div class="clase-fecha-box">
+          <div class="clase-dia">${dia(c.fecha_hora)}</div>
+          <div class="clase-mes">${nombreMes(c.fecha_hora)}</div>
+        </div>
+        <div class="clase-info">
+          <div class="clase-nombre">${c.nombre}</div>
+          <div class="clase-detalle">${horaMinutos(c.fecha_hora)} · ${c.tipo || ''}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  async function cargarRutinasProfesora(nombreCompleto) {
+    const contenedor = document.getElementById('rutina-contenido');
+    const hoyInicio = new Date(); hoyInicio.setHours(0,0,0,0);
+    const hoyFin = new Date(); hoyFin.setHours(23,59,59,999);
+
+    const { data: clasesHoy } = await sb
+      .from('clases')
+      .select('id, nombre, fecha_hora')
+      .ilike('profesora', `%${nombreCompleto}%`)
+      .gte('fecha_hora', hoyInicio.toISOString())
+      .lte('fecha_hora', hoyFin.toISOString())
+      .order('fecha_hora');
+
+    if (!clasesHoy || clasesHoy.length === 0) {
+      contenedor.innerHTML = `<div class="sin-rutina"><span class="icon">🌸</span>No tienes clases hoy.</div>`;
+      return;
+    }
+
+    const claseIds = clasesHoy.map(c => c.id);
+    const { data: rutinas } = await sb.from('rutinas').select('*').in('clase_id', claseIds);
+    const rutinaMap = {};
+    (rutinas || []).forEach(r => { rutinaMap[r.clase_id] = r; });
+
+    // Mostrar primera clase con su rutina
+    const primera = clasesHoy[0];
+    const rutina = rutinaMap[primera.id];
+    const hora = new Date(primera.fecha_hora).toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit', hour12:false });
+
+    let html = '';
+    if (clasesHoy.length > 1) {
+      html += '<div class="rutina-clase-selector">';
+      clasesHoy.forEach(c => {
+        const h = new Date(c.fecha_hora).toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit', hour12:false });
+        html += `<button class="rutina-clase-btn active" onclick="window.location.href='profesora.html'">${h} ${c.nombre}</button>`;
+      });
+      html += '</div>';
+    }
+    html += `<div class="rutina-clase-titulo">🕐 ${hora} · ${primera.nombre}</div>`;
+    if (!rutina) {
+      html += `<div class="sin-rutina" style="padding:8px 0"><span class="icon" style="font-size:20px;margin-bottom:4px">✏️</span>
+        <span>Aún no has publicado la rutina.</span><br>
+        <a href="profesora.html" style="color:var(--coral);font-weight:600;font-size:13px">Agregar desde mi panel →</a></div>`;
+    } else {
+      html += `<div style="font-size:13px;color:#00a86b;font-weight:600">✓ Rutina publicada</div>`;
+      if (rutina.objetivo) html += `<div class="rutina-seccion"><div class="rutina-seccion-label">🎯 Objetivo</div><div class="rutina-seccion-valor">${rutina.objetivo}</div></div>`;
+    }
+    contenedor.innerHTML = html;
+  }
 
   function adaptarVistaProfesora(u) {
     // Ocultar alertas de plan

@@ -103,7 +103,16 @@
       .cal-wrap{position:static}
       nav{padding:14px 20px}
     }
-  </style>
+  
+  /* FILTROS CALENDARIO */
+  .cal-filtros { padding:10px 16px 0; }
+  .filtro-toggle { display:flex; gap:6px; margin-bottom:8px; }
+  .filtro-btn-cal { padding:5px 12px; border-radius:8px; border:1.5px solid var(--border); background:#fff; font-size:12px; font-weight:600; cursor:pointer; transition:all .2s; font-family:'Outfit',sans-serif; }
+  .filtro-btn-cal.active { background:var(--coral); color:#fff; border-color:var(--coral); }
+  .filtro-profe-wrap { margin-bottom:8px; }
+  .filtro-profe-wrap select { padding:6px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:'Outfit',sans-serif; font-size:12px; width:100%; outline:none; }
+  .filtro-profe-wrap select:focus { border-color:var(--coral); }
+</style>
 </head>
 <body>
 
@@ -117,6 +126,20 @@
 
 <main>
   <!-- CALENDARIO -->
+  <!-- FILTROS (visibles según rol) -->
+  <div class="cal-filtros" id="cal-filtros" style="display:none">
+    <!-- Profesora: toggle mis clases / todas -->
+    <div class="filtro-toggle" id="filtro-profesora" style="display:none">
+      <button class="filtro-btn-cal active" id="btn-todas-cal" onclick="setFiltroProfe('todas')">Todas las clases</button>
+      <button class="filtro-btn-cal" id="btn-mis-cal" onclick="setFiltroProfe('mias')">Solo mis clases</button>
+    </div>
+    <!-- Admin: dropdown de profesoras -->
+    <div class="filtro-profe-wrap" id="filtro-admin" style="display:none">
+      <select id="select-profe-admin" onchange="setFiltroAdmin(this.value)">
+        <option value="">Todas las profesoras</option>
+      </select>
+    </div>
+  </div>
   <div class="cal-wrap">
     <div class="cal-header">
       <button class="cal-nav" id="btn-prev">‹</button>
@@ -203,6 +226,9 @@ let clasesDelMes = [];  // todas las clases del mes cargado
 let misInscripciones = new Set();
 let tieneplanActivo  = false;
 let diaSeleccionado  = null;
+let filtroProfe      = 'todas'; // 'todas' | 'mias'
+let filtroAdminProfe = '';      // nombre de profesora para admin
+let nombreUsuario    = '';      // nombre completo del usuario logueado
 
 // ── UTILS ─────────────────────────────────────────────────────
 function isoFecha(date){ return date.toISOString().split('T')[0]; }
@@ -224,19 +250,56 @@ function toast(msg,tipo='ok'){
   setTimeout(()=>t.classList.remove('visible'),2500);
 }
 
+
+// ── FILTROS ────────────────────────────────────────────────────
+function setFiltroProfe(modo){
+  filtroProfe = modo;
+  document.getElementById('btn-todas-cal').classList.toggle('active', modo==='todas');
+  document.getElementById('btn-mis-cal').classList.toggle('active', modo==='mias');
+  cargarMes(anioActual, mesActual);
+}
+
+function setFiltroAdmin(nombreProfe){
+  filtroAdminProfe = nombreProfe;
+  cargarMes(anioActual, mesActual);
+}
+
+async function cargarDropdownProfesoras(){
+  const {data} = await sb.from('usuarios').select('nombre,apellido').eq('rol','profesora').order('nombre');
+  const sel = document.getElementById('select-profe-admin');
+  (data||[]).forEach(p => {
+    const nombre = ((p.nombre||'') + ' ' + (p.apellido||'')).trim();
+    const opt = document.createElement('option');
+    opt.value = nombre;
+    opt.textContent = nombre;
+    sel.appendChild(opt);
+  });
+}
+
 // ── INIT ──────────────────────────────────────────────────────
 async function init(){
   const {data:{session}} = await sb.auth.getSession();
   if(!session){window.location.href='login-nuevo.html';return;}
   userId = session.user.id;
 
-  const {data:u} = await sb.from('usuarios').select('rol,nombre').eq('id',userId).single();
+  const {data:u} = await sb.from('usuarios').select('rol,nombre,apellido').eq('id',userId).single();
   userRol = u?.rol || 'alumna';
+  nombreUsuario = ((u?.nombre||'') + ' ' + (u?.apellido||'')).trim();
 
   // Actualizar nav según rol
   const navBack = document.getElementById('nav-back');
   if(userRol==='admin'){navBack.href='admin.html'; navBack.textContent='← Admin';}
   else if(userRol==='profesora'){navBack.href='profesora.html'; navBack.textContent='← Panel profesora';}
+
+  // Mostrar filtros según rol
+  if(userRol==='profesora'){
+    document.getElementById('cal-filtros').style.display='block';
+    document.getElementById('filtro-profesora').style.display='flex';
+  } else if(userRol==='admin'){
+    document.getElementById('cal-filtros').style.display='block';
+    document.getElementById('filtro-admin').style.display='block';
+    await cargarDropdownProfesoras();
+  }
 
   // Verificar plan activo (solo alumnas)
   if(userRol==='alumna'){
@@ -261,10 +324,12 @@ async function cargarMes(anio, mes){
   const fin    = new Date(anio, mes+1, 0, 23, 59, 59).toISOString();
 
   let query = sb.from('clases').select('*').gte('fecha_hora',inicio).lte('fecha_hora',fin).eq('cancelada',false).order('fecha_hora');
-  if(userRol==='profesora'){
-    // Solo sus clases - necesitamos su nombre
-    const {data:u} = await sb.from('usuarios').select('nombre').eq('id',userId).single();
-    if(u?.nombre) query = query.ilike('profesora',`%${u.nombre}%`);
+
+  // Aplicar filtros según rol
+  if(userRol==='profesora' && filtroProfe==='mias' && nombreUsuario){
+    query = query.ilike('profesora',`%${nombreUsuario}%`);
+  } else if(userRol==='admin' && filtroAdminProfe){
+    query = query.ilike('profesora',`%${filtroAdminProfe}%`);
   }
 
   const {data} = await query;
