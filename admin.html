@@ -721,11 +721,19 @@ async function regenerarTodos(){
   if(activos.length===0){toast('No hay horarios activos','error');return;}
   toast(`Actualizando ${activos.length} horarios...`);
   let total=0;
+  const ahora = new Date().toISOString();
   for(const h of activos){
     const {data}=await sb.rpc('generar_clases',{p_horario_id:h.id,p_semanas:4});
     total+=data||0;
+    // Sincronizar tipo en clases futuras ya existentes
+    if(h.plan){
+      await sb.from('clases')
+        .update({tipo: h.plan})
+        .eq('horario_id', h.id)
+        .gte('fecha_hora', ahora);
+    }
   }
-  toast(`✓ Listo — ${total} clase${total!==1?'s':''} nueva${total!==1?'s':''} generadas`);
+  toast(`✓ Listo — sincronizados ${activos.length} horarios, ${total} clase${total!==1?'s':''} nuevas`);
 }
 
 async function toggleHorario(id, actual){
