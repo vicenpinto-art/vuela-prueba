@@ -319,36 +319,13 @@ function abrirIGVuela(){
 
     <!-- RUTINA DEL DÍA -->
     <div class="section" id="sec-rutina">
-      <div class="section-title">Rutina del día</div>
-      <div class="section-sub">Publica la rutina que verán las alumnas en su dashboard.</div>
+      <div class="section-title">Rutinas de clases</div>
+      <div class="section-sub">Rutinas publicadas por las profesoras para las próximas 144 horas.</div>
       <div class="card">
-        <div class="card-header"><div class="card-title">Nueva rutina</div></div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Fecha</label>
-            <input type="date" id="wod-fecha">
-          </div>
-          <div class="form-group">
-            <label>Tipo (opcional)</label>
-            <input type="text" id="wod-tipo" placeholder="Ej: Cardio, Fuerza, Stretching">
-          </div>
-          <div class="form-group full">
-            <label>Título</label>
-            <input type="text" id="wod-titulo" placeholder="Ej: Entrenamiento de piernas">
-          </div>
-          <div class="form-group full">
-            <label>Descripción</label>
-            <textarea id="wod-descripcion" placeholder="Describe la rutina del día..."></textarea>
-          </div>
+        <div id="lista-rutinas">
+          <div class="sk" style="height:60px;margin-bottom:8px"></div>
+          <div class="sk" style="height:60px"></div>
         </div>
-        <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
-          <button class="btn btn-primary" onclick="publicarRutina()">Publicar rutina</button>
-          <span id="wod-msg" style="font-size:13px;color:var(--cyan)"></span>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">Rutinas recientes</div></div>
-        <div id="lista-rutinas"><div class="sk" style="height:50px"></div></div>
       </div>
     </div>
 
@@ -1298,24 +1275,69 @@ async function publicarRutina(){
   cargarRutinas();
 }
 async function cargarRutinas(){
-  const {data} = await sb.from('wod').select('*').order('fecha',{ascending:false}).limit(7);
   const el = document.getElementById('lista-rutinas');
-  if(!data||data.length===0){el.innerHTML='<p style="font-size:13px;color:var(--gray)">No hay rutinas publicadas aún.</p>';return;}
-  el.innerHTML=data.map(w=>`
-    <div style="display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)">
-      <div style="min-width:70px;font-size:12px;font-weight:700;color:var(--coral)">${new Date(w.fecha+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'short'})}</div>
-      <div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:2px">${w.titulo}</div>
-        <div style="font-size:12px;color:var(--gray)">${w.descripcion?.slice(0,80)}${w.descripcion?.length>80?'...':''}</div>
+  const ahora = new Date();
+  const en144h = new Date(ahora.getTime() + 144*60*60*1000);
+
+  // Cargar clases próximas 144h que tengan rutina publicada
+  const {data: rutinas} = await sb
+    .from('rutinas')
+    .select('*, clases(id, nombre, fecha_hora, profesora)')
+    .gte('clases.fecha_hora', ahora.toISOString())
+    .lte('clases.fecha_hora', en144h.toISOString())
+    .order('clases.fecha_hora', {ascending: true});
+
+  const conClase = (rutinas||[]).filter(r => r.clases);
+
+  if(conClase.length === 0){
+    el.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--gray)">
+      <div style="font-size:32px;margin-bottom:12px">📋</div>
+      <p style="font-size:14px">No hay rutinas publicadas para las próximas 144 horas.</p>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = conClase.map(r => {
+    const c = r.clases;
+    const fecha = new Date(c.fecha_hora);
+    const fechaStr = fecha.toLocaleDateString('es-CL', {weekday:'short', day:'numeric', month:'short'});
+    const horaStr  = fecha.toLocaleTimeString('es-CL', {hour:'2-digit', minute:'2-digit', hour12:false});
+    const secciones = [
+      {k:'descripcion',     e:'📝', l:'Descripción'},
+      {k:'objetivo',        e:'🎯', l:'Objetivo'},
+      {k:'nivel',           e:'⭐', l:'Nivel'},
+      {k:'calentamiento',   e:'🔥', l:'Calentamiento'},
+      {k:'parte_principal', e:'💪', l:'Parte principal'},
+      {k:'posturas',        e:'🤸', l:'Posturas'},
+      {k:'musica',          e:'🎵', l:'Música'},
+      {k:'enfriamiento',    e:'❄️', l:'Enfriamiento'},
+      {k:'recomendaciones', e:'🧘', l:'Recomendaciones'},
+      {k:'referencia_visual',e:'📸', l:'Referencia visual'},
+    ];
+    const detalle = secciones.filter(s => r[s.k]).map(s => {
+      const val = r[s.k];
+      const esLink = typeof val === 'string' && val.startsWith('http');
+      return `<div style="margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gray);margin-bottom:3px">${s.e} ${s.l}</div>
+        <div style="font-size:13px;color:#333;line-height:1.6">${esLink ? `<a href="${val}" target="_blank" style="color:var(--coral)">${val}</a>` : val}</div>
+      </div>`;
+    }).join('');
+
+    return `
+    <div style="border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;background:#fff"
+           onclick="this.nextSibling.style.display=this.nextSibling.style.display==='none'?'block':'none'">
+        <div>
+          <div style="font-size:14px;font-weight:700">${c.nombre}</div>
+          <div style="font-size:12px;color:var(--gray);margin-top:2px">${fechaStr} · ${horaStr} · 👩‍🏫 ${c.profesora||'Sin asignar'}</div>
+        </div>
+        <span style="font-size:18px;color:var(--gray)">▾</span>
       </div>
-      <button class="btn btn-danger btn-sm" style="margin-left:auto;flex-shrink:0" onclick="eliminarRutina('${w.id}')">Eliminar</button>
-    </div>`).join('');
-}
-async function eliminarRutina(id){
-  if(!confirm('¿Eliminar esta rutina?')) return;
-  await sb.from('wod').delete().eq('id',id);
-  toast('Rutina eliminada');
-  cargarRutinas();
+      <div style="display:none;padding:16px;background:#f9f9f9;border-top:1px solid var(--border)">
+        ${detalle || '<p style="font-size:13px;color:var(--gray)">Sin contenido publicado.</p>'}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ── NAVEGACIÓN MÓVIL ─────────────────────────────────────────
