@@ -565,7 +565,7 @@ function cerrarModal(id){document.getElementById(id).classList.remove('open');do
 // ── INIT ──────────────────────────────────────────────────────
 async function init(){
   const {data:{session}} = await sb.auth.getSession();
-  if(!session){window.location.href='login-nuevo.html';return;}
+  if(!session){window.location.href='login.html';return;}
   userId = session.user.id;
   const {data:u} = await sb.from('usuarios').select('nombre,apellido,rol').eq('id',userId).single();
   if(!u||u.rol!=='admin'){window.location.href='mi-cuenta.html';return;}
@@ -1541,7 +1541,7 @@ function formatCLP(n){
 // ── CERRAR SESIÓN ─────────────────────────────────────────────
 document.getElementById('btn-salir').addEventListener('click',async()=>{
   await sb.auth.signOut();
-  window.location.href='login-nuevo.html';
+  window.location.href='login.html';
 });
 
 document.querySelectorAll('.modal-overlay').forEach(o=>{

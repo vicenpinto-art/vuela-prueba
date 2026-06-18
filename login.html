@@ -2,597 +2,317 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi cuenta — Espacio Vuela</title>
+  <title>Iniciar sesión — Espacio Vuela</title>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root { --coral: #ff4e68; --purple: #a183ff; --cyan: #00c8d4; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Outfit', sans-serif; background: #fff; color: #111; min-height: 100vh; display: flex; flex-direction: column; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    nav { position: fixed; top: 0; width: 100%; z-index: 100; padding: 20px 40px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(0,0,0,0.08); }
-    .nav-back { text-decoration: none; color: rgba(0,0,0,.55); font-size: 14px; font-weight: 500; transition: color .2s; }
-    .nav-back:hover { color: var(--coral); }
-    .nav-brand { font-family: 'Dancing Script', cursive; font-size: 28px; color: var(--coral); text-decoration: none; }
+    :root {
+      --coral: #ff4e68;
+      --magenta: #ff008d;
+      --cyan: #00c8d4;
+      --purple: #8b6aff;
+      --dark: #111111;
+      --gray: #555;
+      --light: #f5f5f7;
+      --border: rgba(0,0,0,0.08);
+    }
 
-    .auth-wrapper { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 100px 20px 60px; background: linear-gradient(135deg, rgba(161,131,255,.06) 0%, rgba(0,200,212,.04) 60%, rgba(255,78,104,.04) 100%); }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #ffffff;
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-    .auth-card { background: #fff; border-radius: 28px; padding: 48px 44px; width: 100%; max-width: 480px; box-shadow: 0 2px 40px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); animation: fadeUp .4s ease both; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    nav {
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-family: 'Dancing Script', cursive;
+      font-size: 28px;
+      color: var(--coral);
+      text-decoration: none;
+    }
+    .nav-link {
+      font-size: 14px;
+      color: var(--gray);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-link:hover { color: var(--coral); }
 
-    .auth-logo { text-align: center; margin-bottom: 28px; }
-    .auth-logo span { font-family: 'Dancing Script', cursive; font-size: 38px; color: var(--coral); }
-    .auth-logo p { font-size: 13px; color: rgba(0,0,0,.4); margin-top: 2px; }
+    .page {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 65px);
+    }
 
-    .tabs { display: flex; background: #f5f5f7; border-radius: 14px; padding: 4px; margin-bottom: 28px; gap: 4px; }
-    .tab-btn { flex: 1; padding: 10px; background: none; border: none; border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; color: rgba(0,0,0,.4); cursor: pointer; transition: all .2s; }
-    .tab-btn.active { background: #fff; color: #111; box-shadow: 0 1px 6px rgba(0,0,0,.1); }
+    .left {
+      background: linear-gradient(145deg, #fff 0%, rgba(0,200,212,.04) 50%, rgba(255,78,104,.04) 100%);
+      padding: 60px 56px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .left-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--coral);
+      margin-bottom: 16px;
+    }
+    .left h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(36px, 4vw, 56px);
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .left h1 span {
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .left p {
+      font-size: 16px;
+      color: rgba(0,0,0,.5);
+      line-height: 1.7;
+      max-width: 380px;
+    }
 
-    .form-panel { display: none; }
-    .form-panel.active { display: block; animation: fadeIn .25s ease; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .right {
+      padding: 60px 56px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-left: 1px solid var(--border);
+    }
 
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 12px; font-weight: 600; color: rgba(0,0,0,.4); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; }
-    .form-group input, .form-group select { width: 100%; padding: 13px 16px; border: 1.5px solid rgba(0,0,0,.1); border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 15px; color: #111; background: #fff; outline: none; transition: border-color .2s; appearance: none; }
-    .form-group input:focus, .form-group select:focus { border-color: var(--purple); }
-    .form-group input::placeholder { color: rgba(0,0,0,.25); }
-    .form-group input:disabled { background: #f5f5f7; color: rgba(0,0,0,.4); cursor: not-allowed; }
+    .form-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .form-subtitle { font-size: 14px; color: var(--gray); margin-bottom: 40px; }
+    .form-subtitle a { color: var(--coral); text-decoration: none; font-weight: 500; }
 
-    .btn-primary { width: 100%; padding: 14px; background: var(--coral); color: #fff; border: none; border-radius: 100px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: transform .2s, box-shadow .2s; }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,78,104,.35); }
-    .btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    label { font-size: 13px; font-weight: 500; color: #444; }
+    input {
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      color: var(--dark);
+      background: #fff;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+    input:focus {
+      border-color: var(--coral);
+      box-shadow: 0 0 0 3px rgba(255,78,104,.08);
+    }
+    input::placeholder { color: #bbb; }
 
-    .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: rgba(0,0,0,.25); font-size: 12px; }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(0,0,0,.08); }
+    .forgot {
+      text-align: right;
+      margin-top: -8px;
+      margin-bottom: 8px;
+    }
+    .forgot a {
+      font-size: 12px;
+      color: var(--gray);
+      text-decoration: none;
+    }
+    .forgot a:hover { color: var(--coral); }
 
-    .btn-google { width: 100%; padding: 13px; background: #fff; border: 1.5px solid rgba(0,0,0,.12); border-radius: 100px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: border-color .2s, box-shadow .2s; }
-    .btn-google:hover { border-color: rgba(0,0,0,.25); box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-    .btn-google svg { width: 18px; height: 18px; }
+    .btn-primary {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255,78,104,.35);
+    }
+    .btn-primary:disabled {
+      opacity: .6; cursor: not-allowed; transform: none; box-shadow: none;
+    }
 
-    .forgot-link { display: block; text-align: right; font-size: 12px; color: var(--purple); text-decoration: none; margin-top: -8px; margin-bottom: 16px; font-weight: 500; }
-    .forgot-link:hover { text-decoration: underline; }
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+      color: #ccc;
+      font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
 
-    .msg { padding: 12px 16px; border-radius: 12px; font-size: 13px; font-weight: 500; margin-bottom: 16px; display: none; }
-    .msg.error { background: rgba(255,78,104,.1); color: #c0001a; display: block; }
-    .msg.success { background: rgba(0,200,212,.1); color: #006b72; display: block; }
+    .registro-link {
+      text-align: center;
+      font-size: 14px;
+      color: var(--gray);
+    }
+    .registro-link a {
+      color: var(--coral);
+      text-decoration: none;
+      font-weight: 600;
+    }
 
-    /* ── PANEL USUARIO ── */
-    .user-panel { display: none; }
+    .mensaje {
+      margin-top: 14px; padding: 12px 16px; border-radius: 10px;
+      font-size: 13px; font-weight: 500; display: none;
+    }
+    .mensaje.error {
+      background: rgba(255,78,104,.08); color: var(--coral);
+      border: 1px solid rgba(255,78,104,.2); display: block;
+    }
+    .mensaje.success {
+      background: rgba(0,200,212,.08); color: #007a82;
+      border: 1px solid rgba(0,200,212,.2); display: block;
+    }
 
-    .profile-header { text-align: center; margin-bottom: 28px; }
-    .avatar-wrap { position: relative; width: 90px; height: 90px; margin: 0 auto 14px; cursor: pointer; }
-    .avatar-wrap:hover .avatar-overlay { opacity: 1; }
-    .user-avatar { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--coral)); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: #fff; overflow: hidden; }
-    .user-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-    .avatar-overlay { position: absolute; inset: 0; border-radius: 50%; background: rgba(0,0,0,.45); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity .2s; font-size: 11px; font-weight: 600; color: #fff; gap: 4px; }
-    .avatar-overlay span { font-size: 20px; }
-    #foto-input { display: none; }
-    .user-name-display { font-size: 20px; font-weight: 700; color: #111; margin-bottom: 3px; }
-    .user-email-display { font-size: 13px; color: rgba(0,0,0,.4); }
-
-    /* ── SECCIONES PERFIL ── */
-    .edit-section { background: #f9f9fb; border-radius: 16px; padding: 20px; margin-bottom: 14px; }
-    .edit-section h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(0,0,0,.35); margin-bottom: 14px; }
-
-    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .field-grid .full { grid-column: 1 / 3; }
-
-    .field-item label { display: block; font-size: 11px; font-weight: 600; color: rgba(0,0,0,.35); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 5px; }
-    .field-item input, .field-item select { width: 100%; padding: 10px 12px; border: 1.5px solid rgba(0,0,0,.1); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; color: #111; background: #fff; outline: none; transition: border-color .2s; appearance: none; }
-    .field-item input:focus, .field-item select:focus { border-color: var(--purple); }
-    .field-item input:disabled { background: #f0f0f3; color: rgba(0,0,0,.4); cursor: not-allowed; }
-    .field-item input::placeholder { color: rgba(0,0,0,.22); }
-
-    .edad-badge { display: inline-block; background: rgba(161,131,255,.15); color: #6b4fc8; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 100px; margin-top: 5px; }
-
-    .save-row { margin-top: 16px; display: flex; align-items: center; gap: 12px; }
-    .btn-save-full { flex: 1; padding: 12px; background: var(--coral); color: #fff; border: none; border-radius: 100px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity .2s, transform .2s; }
-    .btn-save-full:hover { opacity: .88; transform: translateY(-1px); }
-    .btn-save-full:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-    .edit-msg { font-size: 12px; font-weight: 500; display: none; }
-    .edit-msg.ok  { color: #009980; display: inline; }
-    .edit-msg.err { color: var(--coral); display: inline; }
-
-    .btn-secondary { width: 100%; padding: 13px; background: #f5f5f7; border: none; border-radius: 100px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; color: #444; cursor: pointer; transition: background .2s; margin-bottom: 10px; }
-    .btn-secondary:hover { background: #ebebef; }
-    .btn-logout { width: 100%; padding: 13px; background: none; border: 1.5px solid rgba(0,0,0,.1); border-radius: 100px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; color: rgba(0,0,0,.4); cursor: pointer; transition: border-color .2s, color .2s; }
-    .btn-logout:hover { border-color: var(--coral); color: var(--coral); }
-
-    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 6px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    footer { padding: 24px 40px; text-align: center; border-top: 1px solid rgba(0,0,0,.06); }
-    footer p { font-size: 12px; color: #bbb; }
-
-    @media (max-width: 480px) {
-      nav { padding: 14px 16px; }
-      .auth-card { padding: 32px 20px; border-radius: 20px; }
-      .field-grid { grid-template-columns: 1fr; }
-      .field-grid .full { grid-column: 1; }
+    @media (max-width: 768px) {
+      .page { grid-template-columns: 1fr; }
+      .left { display: none; }
+      .right { padding: 40px 24px; }
+      nav { padding: 16px 24px; }
     }
   </style>
-  <script>window.EV_GA = 'G-YN4CVRVX4C';</script>
-  <script src="cookie-banner.js"></script>
 </head>
 <body>
 
 <nav>
-  <a href="index.html" class="nav-brand">Vuela</a>
-  <a href="index.html" class="nav-back">← Volver al inicio</a>
+  <a href="index.html" class="logo">Espacio Vuela</a>
+  <a href="registro.html" class="nav-link">¿No tienes cuenta? Regístrate →</a>
 </nav>
 
-<div class="auth-wrapper">
-  <div class="auth-card">
+<div class="page">
 
-    <div class="auth-logo">
-      <span>Espacio Vuela</span>
-      <p>Solo para mujeres 💜</p>
+  <div class="left">
+    <p class="left-eyebrow">Bienvenida de vuelta</p>
+    <h1>Nos alegra <span>verte</span> otra vez</h1>
+    <p>Inicia sesión para agendar tus clases, ver la rutina del día y revisar el estado de tu plan.</p>
+  </div>
+
+  <div class="right">
+    <div class="form-title">Iniciar sesión</div>
+    <div class="form-subtitle">
+      ¿No tienes cuenta? <a href="registro.html">Regístrate gratis</a>
     </div>
 
-    <!-- Panel: no logueada -->
-    <div id="auth-panel">
-      <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('login')">Entrar</button>
-        <button class="tab-btn" onclick="switchTab('register')">Crear cuenta</button>
-      </div>
-      <div class="msg" id="msg"></div>
-
-      <!-- LOGIN -->
-      <div class="form-panel active" id="panel-login">
-        <div class="form-group">
-          <label>Correo electrónico</label>
-          <input type="email" id="login-email" placeholder="tu@email.com" autocomplete="email">
-        </div>
-        <div class="form-group">
-          <label>Contraseña</label>
-          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
-        </div>
-        <a href="#" class="forgot-link" onclick="forgotPassword(event)">¿Olvidaste tu contraseña?</a>
-        <button class="btn-primary" id="btn-login" onclick="loginEmail()">Entrar</button>
-        <div class="divider">o</div>
-        <button class="btn-google" onclick="loginGoogle()">
-          <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-          Continuar con Google
-        </button>
+    <form id="form-login" autocomplete="off">
+      <div class="form-group">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" placeholder="tu@correo.cl" required>
       </div>
 
-      <!-- REGISTRO -->
-      <div class="form-panel" id="panel-register">
-        <div class="form-group">
-          <label>Nombre</label>
-          <input type="text" id="reg-name" placeholder="Tu nombre" autocomplete="name">
-        </div>
-        <div class="form-group">
-          <label>Correo electrónico</label>
-          <input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email">
-        </div>
-        <div class="form-group">
-          <label>Contraseña</label>
-          <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
-        </div>
-        <button class="btn-primary" id="btn-register" onclick="registerEmail()">Crear cuenta</button>
-        <div class="divider">o</div>
-        <button class="btn-google" onclick="loginGoogle()">
-          <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-          Continuar con Google
-        </button>
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" placeholder="Tu contraseña" required>
       </div>
+
+      <div class="forgot">
+        <a href="recuperar.html">¿Olvidaste tu contraseña?</a>
+      </div>
+
+      <div class="mensaje" id="mensaje"></div>
+
+      <button type="submit" class="btn-primary" id="btn-login">
+        Iniciar sesión →
+      </button>
+    </form>
+
+    <div class="divider">o</div>
+
+    <div class="registro-link">
+      ¿Primera vez aquí? <a href="registro.html">Crea tu cuenta</a>
     </div>
-
-    <!-- Panel: logueada -->
-    <div class="user-panel" id="user-panel">
-
-      <div class="profile-header">
-        <div class="avatar-wrap" onclick="document.getElementById('foto-input').click()">
-          <div class="user-avatar" id="user-avatar-el">?</div>
-          <div class="avatar-overlay"><span>📷</span>Cambiar foto</div>
-        </div>
-        <input type="file" id="foto-input" accept="image/*">
-        <div class="user-name-display" id="user-name-display">—</div>
-        <div class="user-email-display" id="user-email-display">—</div>
-      </div>
-
-      <!-- Formulario de perfil -->
-      <div class="edit-section">
-        <h4>Mi información</h4>
-        <div class="field-grid">
-
-          <div class="field-item full">
-            <label>Nombre completo</label>
-            <input type="text" id="edit-name" placeholder="Tu nombre">
-          </div>
-
-          <div class="field-item">
-            <label>Fecha de nacimiento</label>
-            <input type="date" id="edit-nacimiento" onchange="calcularEdad()">
-          </div>
-
-          <div class="field-item">
-            <label>Edad</label>
-            <input type="text" id="edit-edad" disabled placeholder="—">
-          </div>
-
-          <div class="field-item full">
-            <label>Correo electrónico</label>
-            <input type="email" id="edit-email" disabled>
-          </div>
-
-          <div class="field-item full">
-            <label>Teléfono</label>
-            <input type="tel" id="edit-telefono" placeholder="+56 9 1234 5678">
-          </div>
-
-          <div class="field-item full">
-            <label>Comuna</label>
-            <select id="edit-comuna">
-              <option value="">Selecciona tu comuna</option>
-              <option>Cerrillos</option><option>Cerro Navia</option><option>Conchalí</option>
-              <option>El Bosque</option><option>Estación Central</option><option>Huechuraba</option>
-              <option>Independencia</option><option>La Cisterna</option><option>La Florida</option>
-              <option>La Granja</option><option>La Pintana</option><option>La Reina</option>
-              <option>Las Condes</option><option>Lo Barnechea</option><option>Lo Espejo</option>
-              <option>Lo Prado</option><option>Macul</option><option>Maipú</option>
-              <option>Ñuñoa</option><option>Pedro Aguirre Cerda</option><option>Peñalolén</option>
-              <option>Providencia</option><option>Pudahuel</option><option>Quilicura</option>
-              <option>Quinta Normal</option><option>Recoleta</option><option>Renca</option>
-              <option>San Joaquín</option><option>San Miguel</option><option>San Ramón</option>
-              <option>Santiago</option><option>Vitacura</option>
-              <option>──────────</option>
-              <option>Puente Alto</option><option>San Bernardo</option><option>Buin</option>
-              <option>Calera de Tango</option><option>Colina</option><option>El Monte</option>
-              <option>Isla de Maipo</option><option>Lampa</option><option>María Pinto</option>
-              <option>Melipilla</option><option>Padre Hurtado</option><option>Paine</option>
-              <option>Peñaflor</option><option>San José de Maipo</option><option>San Pedro</option>
-              <option>Talagante</option><option>Tiltil</option>
-            </select>
-          </div>
-
-        </div>
-        <div class="save-row">
-          <button class="btn-save-full" id="btn-save-perfil" onclick="savePerfil()">Guardar cambios</button>
-          <div class="edit-msg" id="msg-perfil"></div>
-        </div>
-      </div>
-
-      <button class="btn-secondary" onclick="window.location.href='index.html'">← Volver al inicio</button>
-      <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
-    </div>
-
   </div>
 </div>
 
-<footer>
-  <p style="font-size:12px; color:#888;">© 2026 Espacio Vuela Limitada — RUT 76.843.889-7 &nbsp;·&nbsp; Dr. Luis Middleton 1638, Providencia &nbsp;·&nbsp; <a href="terminos.html" style="color:#ff4e68; text-decoration:none;">Términos y condiciones</a> &nbsp;·&nbsp; <a href="privacidad.html" style="color:#ff4e68; text-decoration:none;">Política de privacidad</a></p>
-</footer>
+<script>
+  const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, updateProfile, sendPasswordResetEmail }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  const form = document.getElementById('form-login');
+  const btn = document.getElementById('btn-login');
+  const msg = document.getElementById('mensaje');
 
-  const firebaseConfig = {
-    apiKey:            "AIzaSyCE3qm-Fs0hPM_D56K-UlZ9Ka4cXwikA3Q",
-    authDomain:        "espacio-vuela-91a84.firebaseapp.com",
-    projectId:         "espacio-vuela-91a84",
-    storageBucket:     "espacio-vuela-91a84.firebasestorage.app",
-    messagingSenderId: "515497928481",
-    appId:             "1:515497928481:web:627883d783124ea1f00060",
-    measurementId:     "G-K1H2LQYDH5"
-  };
-
-  const app      = initializeApp(firebaseConfig);
-  const auth     = getAuth(app);
-  const db       = getFirestore(app);
-  const provider = new GoogleAuthProvider();
-
-  // ── Helpers ────────────────────────────────
-  function showMsg(text, type = 'error') {
-    const el = document.getElementById('msg');
-    el.textContent = text; el.className = 'msg ' + type;
-  }
-  function clearMsg() { document.getElementById('msg').className = 'msg'; }
-  function setLoading(btnId, loading, label) {
-    const btn = document.getElementById(btnId);
-    btn.disabled = loading;
-    btn.innerHTML = loading ? '<span class="spinner"></span> Un momento…' : label;
+  function mostrar(texto, tipo) {
+    msg.textContent = texto;
+    msg.className = 'mensaje ' + tipo;
   }
 
-  // ── Calcular edad ───────────────────────────
-  window.calcularEdad = function() {
-    const val = document.getElementById('edit-nacimiento').value;
-    if (!val) { document.getElementById('edit-edad').value = ''; return; }
-    const hoy   = new Date();
-    const nac   = new Date(val);
-    let edad    = hoy.getFullYear() - nac.getFullYear();
-    const mes   = hoy.getMonth() - nac.getMonth();
-    if (mes < 0 || (mes === 0 && hoy.getDate() < nac.getDate())) edad--;
-    document.getElementById('edit-edad').value = edad + ' años';
-  };
-
-  // ── Cargar perfil ───────────────────────────
-  async function loadProfile(user) {
-    const ref  = doc(db, 'usuarios', user.uid);
-    const snap = await getDoc(ref);
-    const d    = snap.exists() ? snap.data() : {};
-
-    const name = d.nombre || user.displayName || user.email.split('@')[0];
-    const foto = d.foto   || user.photoURL    || null;
-
-    document.getElementById('user-name-display').textContent  = name;
-    document.getElementById('user-email-display').textContent = user.email;
-    document.getElementById('edit-name').value      = name;
-    document.getElementById('edit-email').value     = user.email;
-    document.getElementById('edit-telefono').value  = d.telefono  || '';
-    document.getElementById('edit-nacimiento').value= d.nacimiento|| '';
-    document.getElementById('edit-comuna').value    = d.comuna    || '';
-    if (d.nacimiento) calcularEdad();
-
-    const avatarEl = document.getElementById('user-avatar-el');
-    avatarEl.innerHTML = foto ? `<img src="${foto}" alt="foto">` : name[0].toUpperCase();
-  }
-
-  // ── Estado sesión ───────────────────────────
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      document.getElementById('auth-panel').style.display = 'none';
-      document.getElementById('user-panel').style.display = 'block';
-      await loadProfile(user);
-    } else {
-      document.getElementById('auth-panel').style.display = 'block';
-      document.getElementById('user-panel').style.display = 'none';
+  // Si ya está logueada, redirigir directo
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const { data: u } = await sb.from('usuarios').select('rol').eq('id', session.user.id).single();
+      if (u?.rol === 'admin') window.location.href = 'admin.html';
+      else if (u?.rol === 'profesora') window.location.href = 'profesora.html';
+      else window.location.href = 'mi-cuenta.html';
     }
-  });
+  })();
 
-  // ── Guardar perfil completo ─────────────────
-  window.savePerfil = async function() {
-    const user   = auth.currentUser;
-    const msgEl  = document.getElementById('msg-perfil');
-    const name   = document.getElementById('edit-name').value.trim();
-    const tel    = document.getElementById('edit-telefono').value.trim();
-    const nac    = document.getElementById('edit-nacimiento').value;
-    const comuna = document.getElementById('edit-comuna').value;
-    msgEl.className = 'edit-msg';
-    if (!name) { msgEl.textContent = 'El nombre no puede estar vacío.'; msgEl.className = 'edit-msg err'; return; }
-    document.getElementById('btn-save-perfil').disabled = true;
-    document.getElementById('btn-save-perfil').innerHTML = '<span class="spinner"></span> Guardando…';
-    try {
-      await updateProfile(user, { displayName: name });
-      await setDoc(doc(db, 'usuarios', user.uid), { nombre: name, telefono: tel, nacimiento: nac, comuna }, { merge: true });
-      document.getElementById('user-name-display').textContent = name;
-      const avatarEl = document.getElementById('user-avatar-el');
-      if (!avatarEl.querySelector('img')) avatarEl.textContent = name[0].toUpperCase();
-      msgEl.textContent = '¡Guardado! 🩷'; msgEl.className = 'edit-msg ok';
-    } catch(e) {
-      msgEl.textContent = 'Error al guardar.'; msgEl.className = 'edit-msg err';
-    }
-    document.getElementById('btn-save-perfil').disabled = false;
-    document.getElementById('btn-save-perfil').textContent = 'Guardar cambios';
-    setTimeout(() => { msgEl.className = 'edit-msg'; }, 3000);
-  };
-
-  // ── Foto ────────────────────────────────────
-  document.getElementById('foto-input').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Límite de tamaño: 8MB antes de comprimir
-    const MAX_BYTES = 8 * 1024 * 1024;
-    if (file.size > MAX_BYTES) {
-      alert('La imagen es demasiado grande. Usa una imagen de menos de 8 MB.');
-      e.target.value = '';
-      return;
-    }
-
-    // Verificar que sea un tipo de imagen válido
-    const TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!TIPOS_PERMITIDOS.includes(file.type)) {
-      alert('Solo se permiten imágenes en formato JPG, PNG, GIF o WebP.');
-      e.target.value = '';
-      return;
-    }
-
-    const user = auth.currentUser;
-    const btnSave = document.getElementById('btn-save-perfil');
-    btnSave.disabled = true;
-    btnSave.innerHTML = '<span class="spinner"></span> Subiendo foto…';
-
-    try {
-      const comprimida = await comprimirImagen(file, 800, 0.75);
-
-      // Verificar que el resultado base64 no supere ~700KB (límite seguro para Firestore)
-      // base64 de 700KB ≈ 950KB real, suficiente margen bajo el límite de 1MB del documento
-      if (comprimida.length > 700_000) {
-        alert('La imagen es demasiado grande incluso después de comprimirla. Prueba con una más pequeña.');
-        return;
-      }
-
-      await setDoc(doc(db, 'usuarios', user.uid), { foto: comprimida }, { merge: true });
-      const avatarEl = document.getElementById('user-avatar-el');
-      avatarEl.innerHTML = '';
-      const img = document.createElement('img');
-      img.src = comprimida;
-      img.alt = 'foto';
-      avatarEl.appendChild(img);
-    } catch(err) {
-      alert('Error al guardar la foto. Intenta de nuevo.');
-    } finally {
-      btnSave.disabled = false;
-      btnSave.textContent = 'Guardar cambios';
-      e.target.value = '';
-    }
-  });
-
-  function comprimirImagen(file, maxSize, calidad) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onerror = () => reject(new Error('No se pudo leer el archivo.'));
-      reader.onload = (ev) => {
-        const img = new Image();
-        img.onerror = () => reject(new Error('El archivo no es una imagen válida.'));
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let w = img.width, h = img.height;
-          if (w > h && w > maxSize) { h = h * maxSize / w; w = maxSize; }
-          else if (h > maxSize)     { w = w * maxSize / h; h = maxSize; }
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', calidad));
-        };
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  // ── Login email ─────────────────────────────
-  window.loginEmail = async function() {
-    clearMsg();
-    const email = document.getElementById('login-email').value.trim();
-    const pass  = document.getElementById('login-pass').value;
-    if (!email || !pass) { showMsg('Por favor completa todos los campos.'); return; }
-    setLoading('btn-login', true, 'Entrar');
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-    } catch (e) { setLoading('btn-login', false, 'Entrar'); showMsg(translateError(e.code)); }
-  };
-
-  // ── Registro ────────────────────────────────
-  window.registerEmail = async function() {
-    clearMsg();
-    const name  = document.getElementById('reg-name').value.trim();
-    const email = document.getElementById('reg-email').value.trim();
-    const pass  = document.getElementById('reg-pass').value;
-    if (!name || !email || !pass) { showMsg('Por favor completa todos los campos.'); return; }
-    if (pass.length < 6) { showMsg('La contraseña debe tener al menos 6 caracteres.'); return; }
-    setLoading('btn-register', true, 'Crear cuenta');
-    try {
-      const cred = await createUserWithEmailAndPassword(auth, email, pass);
-      await updateProfile(cred.user, { displayName: name });
-      await setDoc(doc(db, 'usuarios', cred.user.uid), { nombre: name, email });
-    } catch (e) { setLoading('btn-register', false, 'Crear cuenta'); showMsg(translateError(e.code)); }
-  };
-
-  // ── Google ──────────────────────────────────
-  window.loginGoogle = async function() {
-    clearMsg();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const ref  = doc(db, 'usuarios', user.uid);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) await setDoc(ref, { nombre: user.displayName || '', email: user.email, foto: user.photoURL || '' });
-    } catch (e) { showMsg(translateError(e.code)); }
-  };
-
-  // ── Recuperar contraseña ────────────────────
-  window.forgotPassword = async function(e) {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('login-email').value.trim();
-    if (!email) { showMsg('Escribe tu correo arriba y luego haz click aquí.'); return; }
-    try {
-      await sendPasswordResetEmail(auth, email);
-      showMsg('Te enviamos un correo para restablecer tu contraseña 🩷', 'success');
-    } catch (e) { showMsg(translateError(e.code)); }
-  };
 
-  window.logout = () => signOut(auth);
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
 
-  function translateError(code) {
-    const map = {
-      'auth/invalid-email':          'El correo no tiene un formato válido.',
-      'auth/user-not-found':         'No encontramos una cuenta con ese correo.',
-      'auth/wrong-password':         'Contraseña incorrecta.',
-      'auth/invalid-credential':     'Correo o contraseña incorrectos.',
-      'auth/email-already-in-use':   'Ya existe una cuenta con ese correo.',
-      'auth/weak-password':          'La contraseña es muy débil. Usa al menos 6 caracteres.',
-      'auth/too-many-requests':      'Demasiados intentos. Intenta más tarde.',
-      'auth/network-request-failed': 'Error de conexión. Revisa tu internet.',
-      'auth/popup-blocked':          'Tu navegador bloqueó la ventana de Google. Permite los pop-ups.',
-    };
-    return map[code] || 'Ocurrió un error inesperado. Intenta de nuevo.';
-  }
+    btn.disabled = true;
+    btn.textContent = 'Ingresando...';
 
-  document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') window.loginEmail(); });
-  document.getElementById('reg-pass').addEventListener('keydown',   e => { if (e.key === 'Enter') window.registerEmail(); });
-</script>
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
 
-<script>
-  window.switchTab = function(tab) {
-    document.querySelectorAll('.tab-btn').forEach((b, i) => {
-      b.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
-    });
-    document.getElementById('panel-login').classList.toggle('active', tab === 'login');
-    document.getElementById('panel-register').classList.toggle('active', tab === 'register');
-    document.getElementById('msg').className = 'msg';
-  };
-</script>
-<!-- ── BOTÓN FLOTANTE INSTAGRAM DIRECT ── -->
-<a id="ig-float" title="Escríbenos por Instagram Direct">
-  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="white">
-    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-  </svg>
-</a>
-<style>
-  #ig-float {
-    position: fixed;
-    bottom: 28px;
-    right: 28px;
-    z-index: 9999;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    box-shadow: 0 4px 20px rgba(220,39,67,.45);
-    text-decoration: none;
-    cursor: pointer;
-    transition: transform .2s, box-shadow .2s;
-  }
-  #ig-float:hover {
-    transform: scale(1.12);
-    box-shadow: 0 8px 32px rgba(220,39,67,.6);
-  }
-  @media (max-width: 600px) {
-    #ig-float {
-      width: 52px;
-      height: 52px;
-      bottom: 20px;
-      right: 16px;
+    if (error) {
+      const msg = error.message || '';
+      if (msg.includes('Invalid login') || msg.includes('invalid_credentials')) {
+        mostrar('Correo o contraseña incorrectos.', 'error');
+      } else if (msg.includes('Email not confirmed')) {
+        mostrar('Confirma tu email antes de iniciar sesión.', 'error');
+      } else {
+        mostrar('Error al iniciar sesión: ' + msg, 'error');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Iniciar sesión →';
+      return;
     }
-    #ig-float svg {
-      width: 24px;
-      height: 24px;
-    }
-  }
-</style>
-<script>
-  document.getElementById('ig-float').addEventListener('click', function() {
-    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobile) {
-      var isIOS     = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-      var isAndroid = /Android/i.test(navigator.userAgent);
-      // Deep link directo al chat de espacio_vuela
-      var deepLink  = 'instagram://user?username=espacio_vuela';
-      // Fallback web si no tiene la app
-      var webLink   = 'https://www.instagram.com/espacio_vuela/';
-      // Intentar abrir la app nativa
-      window.location = deepLink;
-      // Si después de 1.5s sigue aquí, la app no está instalada → abrir web
-      setTimeout(function() {
-        window.location = webLink;
-      }, 1500);
+
+    // Obtener rol del usuario
+    const { data: usuario } = await sb.from('usuarios').select('rol').eq('id', data.user.id).single();
+
+    if (usuario?.rol === 'admin') {
+      window.location.href = 'admin.html';
+    } else if (usuario?.rol === 'profesora') {
+      window.location.href = 'profesora.html';
     } else {
-      // En PC: abrir ig.me/m/ directamente
-      window.open('https://ig.me/m/espacio_vuela', '_blank');
+      window.location.href = 'mi-cuenta.html';
     }
   });
 </script>

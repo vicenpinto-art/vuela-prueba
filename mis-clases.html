@@ -128,7 +128,7 @@ let filtroActual = 'todas';
 async function init() {
   const {data:{session}} = await sb.auth.getSession();
   if (!session) {
-    window.location.href = 'login-nuevo.html';
+    window.location.href = 'login.html';
     return;
   }
   userId = session.user.id;

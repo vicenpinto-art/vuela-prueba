@@ -284,7 +284,7 @@
   <a href="index.html" class="logo">Espacio Vuela</a>
   <div class="nav-right">
     <a href="mi-cuenta.html" class="nav-link" id="nav-cuenta" style="display:none;">Mi cuenta</a>
-    <a href="login-nuevo.html" class="btn-nav" id="nav-login">Iniciar sesión</a>
+    <a href="login.html" class="btn-nav" id="nav-login">Iniciar sesión</a>
   </div>
 </nav>
 
@@ -661,7 +661,7 @@
   async function onComprar(planId) {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) {
-      window.location.href = 'login-nuevo.html';
+      window.location.href = 'login.html';
       return;
     }
 

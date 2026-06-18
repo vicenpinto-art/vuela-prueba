@@ -238,7 +238,7 @@
 
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.href = 'login-nuevo.html'; return; }
+    if (!session) { window.location.href = 'login.html'; return; }
     const userId = session.user.id;
     // Cargar usuario primero para detectar rol
     await cargarUsuario(userId);
@@ -595,7 +595,7 @@
   }
   document.getElementById('btn-salir').addEventListener('click', async () => {
     await sb.auth.signOut();
-    window.location.href = 'login-nuevo.html';
+    window.location.href = 'login.html';
   });
 
   init();

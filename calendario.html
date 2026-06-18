@@ -279,7 +279,7 @@ async function cargarDropdownProfesoras(){
 // ── INIT ──────────────────────────────────────────────────────
 async function init(){
   const {data:{session}} = await sb.auth.getSession();
-  if(!session){window.location.href='login-nuevo.html';return;}
+  if(!session){window.location.href='login.html';return;}
   userId = session.user.id;
 
   const {data:u} = await sb.from('usuarios').select('rol,nombre,apellido').eq('id',userId).single();
