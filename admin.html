@@ -26,7 +26,7 @@
     .sidebar-item:hover{color:var(--dark);background:var(--light)}
     .sidebar-item.active{color:var(--coral);background:rgba(255,78,104,.05);border-left-color:var(--coral);font-weight:600}
     .sidebar-icon{font-size:16px;width:20px;text-align:center}
-    .admin-main{flex:1;padding:28px;overflow-x:hidden;max-width:1000px}
+    .admin-main{flex:1;padding:28px;overflow-x:hidden;max-width:1000px;min-width:0}
 
     /* SECTION */
     .section{display:none}
@@ -129,24 +129,82 @@
 
     @media(max-width:768px){
       .sidebar{display:none}
-      .admin-main{padding:16px}
+      .admin-main{padding:16px;min-width:0}
       .stats-grid{grid-template-columns:1fr 1fr}
       .form-grid{grid-template-columns:1fr}
       .asis-layout{grid-template-columns:1fr}
+      .mobile-nav-select{display:block}
+      .nav-nombre-admin{display:none}
+      .tabla-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+      .tabla{min-width:500px}
+    }
+    .mobile-nav-select{
+      display:none;width:100%;padding:10px 14px;margin:0 0 16px;
+      border:1.5px solid rgba(0,0,0,.1);border-radius:10px;
+      font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;
+      background:#fff;color:#111;outline:none;cursor:pointer;
+    }
+    .mobile-nav-select:focus{border-color:#ff4e68}
+  
+    /* ── NAV OFICIAL ── */
+    .ev-nav {
+      position: sticky; top: 0; width: 100%; z-index: 200;
+      padding: 14px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      box-sizing: border-box;
+    }
+    .ev-nav-logo { height: 40px; display: block; }
+    .ev-nav-logo-txt { display: none; font-family:'Dancing Script',cursive; font-size:26px; color:#ff4e68; text-decoration:none; }
+    .ev-nav-links { list-style:none; display:flex; gap:24px; align-items:center; margin:0; padding:0; }
+    .ev-nav-links a { text-decoration:none; color:rgba(0,0,0,.6); font-size:14px; font-weight:500; transition:color .2s; }
+    .ev-nav-links a:hover { color:#ff4e68; }
+    .ev-nav-cta { background:#ff4e68; color:#fff !important; padding:9px 20px; border-radius:100px; font-weight:600 !important; transition:transform .2s,box-shadow .2s; }
+    .ev-nav-cta:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(255,78,104,.4); }
+    .ev-nav-salir { background:none; border:none; font-family:'Outfit',sans-serif; font-size:13px; color:#888; cursor:pointer; padding:0; font-weight:500; }
+    .ev-nav-salir:hover { color:#ff4e68; }
+    .ev-nav-rol { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:rgba(255,78,104,.1); color:#ff4e68; text-transform:uppercase; letter-spacing:1px; }
+    .ev-nav-mobile { display:none; align-items:center; gap:10px; }
+    .ev-nav-menu-btn { background:none; border:1.5px solid rgba(0,0,0,.15); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:18px; color:#333; line-height:1; }
+    @media(max-width:768px){
+      .ev-nav { padding:12px 16px; flex-wrap:wrap; }
+      .ev-nav-links { display:none; flex-direction:column; width:100%; padding:8px 0; gap:0; border-top:1px solid rgba(0,0,0,.08); margin-top:8px; order:3; }
+      .ev-nav-links.nav-open { display:flex !important; }
+      .ev-nav-links li { display:block; }
+      .ev-nav-links a { display:block; padding:12px 16px; font-size:15px; border-bottom:1px solid rgba(0,0,0,.05); color:rgba(0,0,0,.7); }
+      .ev-nav-links li:last-child a,.ev-nav-links li:last-child button { border-bottom:none; padding:12px 16px; }
+      .ev-nav-mobile { display:flex; }
+      .ev-nav-logo { height:32px; }
     }
   </style>
 </head>
 <body>
 
-<nav>
-  <a href="index.html" class="logo">Espacio Vuela</a>
-  <div class="nav-right">
-    <a href="index.html" style="font-size:13px;color:#888;text-decoration:none;font-weight:500">← Web</a>
-    <span class="rol-badge">Admin</span>
-    <span id="nav-nombre" style="font-size:13px;color:var(--gray)">...</span>
-    <button class="btn-salir" id="btn-salir">Salir</button>
+<nav class="ev-nav">
+  <a href="index.html"><img src="images/logo.png" alt="Espacio Vuela" class="ev-nav-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="ev-nav-logo-txt">Espacio Vuela</span></a>
+  <ul class="ev-nav-links" id="ev-nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="index.html#clases">Clases</a></li>
+    <li><a href="index.html#planes">Planes</a></li>
+    <li><a href="profes.html">Profes</a></li>
+    <li><span class="ev-nav-rol" id="nav-rol-badge">Admin</span></li>
+    <li><a href="admin.html" id="nav-user-link">Panel</a></li>
+    <li><a href="javascript:void(0)" onclick="abrirIGVuela()" class="ev-nav-cta">Súmate a Vuela</a></li>
+    <li><button class="ev-nav-salir" id="btn-salir-nav">Salir</button></li>
+  </ul>
+  <div class="ev-nav-mobile">
+    <button class="ev-nav-menu-btn" onclick="document.getElementById('ev-nav-links').classList.toggle('nav-open')">☰</button>
   </div>
 </nav>
+<script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
+  else{window.open('https://ig.me/m/espacio_vuela','_blank');}
+}
+</script>
 
 <div class="admin-layout">
   <aside class="sidebar">
@@ -164,6 +222,18 @@
   </aside>
 
   <main class="admin-main">
+  <select class="mobile-nav-select" id="mobile-nav-select" onchange="navegarMobile(this.value)">
+    <option value="resumen">📊 Resumen</option>
+    <option value="horarios">⏰ Horarios</option>
+    <option value="clases">👩‍🎓 Clases</option>
+    <option value="asistencia">✅ Asistencia</option>
+    <option value="alumnas">👩‍🦰 Alumnas</option>
+    <option value="rutina">📝 Rutina del día</option>
+    <option value="roles">👥 Roles</option>
+    <option value="disciplinas">🏷️ Disciplinas</option>
+    <option value="eliminar-usuario">🗑️ Eliminar usuaria</option>
+    <option value="ingresos">💰 Ingresos</option>
+  </select>
 
     <!-- RESUMEN -->
     <div class="section active" id="sec-resumen">
@@ -1218,6 +1288,14 @@ async function eliminarRutina(id){
   cargarRutinas();
 }
 
+// ── NAVEGACIÓN MÓVIL ─────────────────────────────────────────
+function navegarMobile(sec) {
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  const match = document.querySelector(`.sidebar-item[data-sec="${sec}"]`);
+  if (match) match.classList.add('active');
+  mostrarSeccion(sec);
+}
+
 // ── ROLES ─────────────────────────────────────────────────────
 async function cargarRoles(){
   const {data} = await sb.from('usuarios').select('id,nombre,apellido,email,rol').order('created_at',{ascending:false});
@@ -1540,7 +1618,7 @@ function formatCLP(n){
 }
 
 // ── CERRAR SESIÓN ─────────────────────────────────────────────
-document.getElementById('btn-salir').addEventListener('click',async()=>{
+document.getElementById('btn-salir-nav').addEventListener('click',async()=>{
   await sb.auth.signOut();
   window.location.href='login.html';
 });

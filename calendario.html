@@ -11,7 +11,7 @@
     :root{--coral:#ff4e68;--magenta:#ff008d;--cyan:#00c8d4;--purple:#8b6aff;--yellow:#fecb29;--dark:#111;--gray:#555;--light:#f5f5f7;--border:rgba(0,0,0,.08)}
     body{font-family:'Outfit',sans-serif;background:#f7f7f9;color:var(--dark);min-height:100vh}
 
-    nav{background:#fff;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+    nav{background:#fff;padding:16px 40px;overflow:hidden;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
     .logo{font-family:'Dancing Script',cursive;font-size:26px;color:var(--coral);text-decoration:none}
     .nav-right{display:flex;align-items:center;gap:16px}
     .nav-back{font-size:14px;color:var(--gray);text-decoration:none;transition:color .2s}
@@ -112,18 +112,79 @@
   .filtro-profe-wrap { margin-bottom:8px; }
   .filtro-profe-wrap select { padding:6px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:'Outfit',sans-serif; font-size:12px; width:100%; outline:none; }
   .filtro-profe-wrap select:focus { border-color:var(--coral); }
-</style>
+
+    @media(max-width:480px){
+      .cal-wrap{padding:12px 8px 8px}
+      .cal-mes-anio{font-size:16px}
+      .cal-nav{font-size:20px;padding:4px 8px}
+      .cal-dia-lbl{font-size:10px}
+      .cal-dia{font-size:12px;min-height:36px;padding:4px 2px}
+      .cal-dia-num{font-size:11px}
+      .day-panel{padding:16px}
+      .day-panel-fecha{font-size:20px}
+      .clase-card-cal{padding:12px 14px}
+      .clase-nombre-cal{font-size:14px}
+      .hora-cal{font-size:16px;min-width:40px}
+    }
+  
+    /* ── NAV OFICIAL ── */
+    .ev-nav {
+      position: sticky; top: 0; width: 100%; z-index: 200;
+      padding: 14px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      box-sizing: border-box;
+    }
+    .ev-nav-logo { height: 40px; display: block; }
+    .ev-nav-logo-txt { display: none; font-family:'Dancing Script',cursive; font-size:26px; color:#ff4e68; text-decoration:none; }
+    .ev-nav-links { list-style:none; display:flex; gap:24px; align-items:center; margin:0; padding:0; }
+    .ev-nav-links a { text-decoration:none; color:rgba(0,0,0,.6); font-size:14px; font-weight:500; transition:color .2s; }
+    .ev-nav-links a:hover { color:#ff4e68; }
+    .ev-nav-cta { background:#ff4e68; color:#fff !important; padding:9px 20px; border-radius:100px; font-weight:600 !important; transition:transform .2s,box-shadow .2s; }
+    .ev-nav-cta:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(255,78,104,.4); }
+    .ev-nav-salir { background:none; border:none; font-family:'Outfit',sans-serif; font-size:13px; color:#888; cursor:pointer; padding:0; font-weight:500; }
+    .ev-nav-salir:hover { color:#ff4e68; }
+    .ev-nav-rol { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:rgba(255,78,104,.1); color:#ff4e68; text-transform:uppercase; letter-spacing:1px; }
+    .ev-nav-mobile { display:none; align-items:center; gap:10px; }
+    .ev-nav-menu-btn { background:none; border:1.5px solid rgba(0,0,0,.15); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:18px; color:#333; line-height:1; }
+    @media(max-width:768px){
+      .ev-nav { padding:12px 16px; flex-wrap:wrap; }
+      .ev-nav-links { display:none; flex-direction:column; width:100%; padding:8px 0; gap:0; border-top:1px solid rgba(0,0,0,.08); margin-top:8px; order:3; }
+      .ev-nav-links.nav-open { display:flex !important; }
+      .ev-nav-links li { display:block; }
+      .ev-nav-links a { display:block; padding:12px 16px; font-size:15px; border-bottom:1px solid rgba(0,0,0,.05); color:rgba(0,0,0,.7); }
+      .ev-nav-links li:last-child a,.ev-nav-links li:last-child button { border-bottom:none; padding:12px 16px; }
+      .ev-nav-mobile { display:flex; }
+      .ev-nav-logo { height:32px; }
+    }
+  </style>
 </head>
 <body>
 
-<nav>
-  <a href="index.html" class="logo">Espacio Vuela</a>
-  <div class="nav-right">
-    <a href="index.html" style="font-size:13px;color:#888;text-decoration:none;font-weight:500">← Web</a>
-    <a href="agendar.html" class="nav-lista">Vista lista</a>
-    <a href="mi-cuenta.html" class="nav-back" id="nav-back">← Mi cuenta</a>
+<nav class="ev-nav">
+  <a href="index.html"><img src="images/logo.png" alt="Espacio Vuela" class="ev-nav-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="ev-nav-logo-txt">Espacio Vuela</span></a>
+  <ul class="ev-nav-links" id="ev-nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="index.html#clases">Clases</a></li>
+    <li><a href="index.html#planes">Planes</a></li>
+    <li><a href="profes.html">Profes</a></li>
+    <li><a href="mi-cuenta.html">Mi cuenta</a></li>
+    <li><a href="javascript:void(0)" onclick="abrirIGVuela()" class="ev-nav-cta">Súmate a Vuela</a></li>
+    <li><button class="ev-nav-salir" id="btn-salir-nav">Salir</button></li>
+  </ul>
+  <div class="ev-nav-mobile">
+    <button class="ev-nav-menu-btn" onclick="document.getElementById('ev-nav-links').classList.toggle('nav-open')">☰</button>
   </div>
 </nav>
+<script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
+  else{window.open('https://ig.me/m/espacio_vuela','_blank');}
+}
+</script>
 
 <main>
   <!-- CALENDARIO -->

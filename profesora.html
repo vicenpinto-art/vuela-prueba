@@ -185,19 +185,66 @@
     .btn-rutina-card { font-size:11px; font-weight:700; padding:4px 10px; border-radius:6px; background:rgba(139,106,255,.1); color:var(--purple); border:none; cursor:pointer; margin-top:8px; }
     .btn-rutina-card:hover { background:rgba(139,106,255,.2); }
     .rutina-guardada { font-size:11px; color:#00a86b; font-weight:600; }
+  
+    /* ── NAV OFICIAL ── */
+    .ev-nav {
+      position: sticky; top: 0; width: 100%; z-index: 200;
+      padding: 14px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      box-sizing: border-box;
+    }
+    .ev-nav-logo { height: 40px; display: block; }
+    .ev-nav-logo-txt { display: none; font-family:'Dancing Script',cursive; font-size:26px; color:#ff4e68; text-decoration:none; }
+    .ev-nav-links { list-style:none; display:flex; gap:24px; align-items:center; margin:0; padding:0; }
+    .ev-nav-links a { text-decoration:none; color:rgba(0,0,0,.6); font-size:14px; font-weight:500; transition:color .2s; }
+    .ev-nav-links a:hover { color:#ff4e68; }
+    .ev-nav-cta { background:#ff4e68; color:#fff !important; padding:9px 20px; border-radius:100px; font-weight:600 !important; transition:transform .2s,box-shadow .2s; }
+    .ev-nav-cta:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(255,78,104,.4); }
+    .ev-nav-salir { background:none; border:none; font-family:'Outfit',sans-serif; font-size:13px; color:#888; cursor:pointer; padding:0; font-weight:500; }
+    .ev-nav-salir:hover { color:#ff4e68; }
+    .ev-nav-rol { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:rgba(255,78,104,.1); color:#ff4e68; text-transform:uppercase; letter-spacing:1px; }
+    .ev-nav-mobile { display:none; align-items:center; gap:10px; }
+    .ev-nav-menu-btn { background:none; border:1.5px solid rgba(0,0,0,.15); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:18px; color:#333; line-height:1; }
+    @media(max-width:768px){
+      .ev-nav { padding:12px 16px; flex-wrap:wrap; }
+      .ev-nav-links { display:none; flex-direction:column; width:100%; padding:8px 0; gap:0; border-top:1px solid rgba(0,0,0,.08); margin-top:8px; order:3; }
+      .ev-nav-links.nav-open { display:flex !important; }
+      .ev-nav-links li { display:block; }
+      .ev-nav-links a { display:block; padding:12px 16px; font-size:15px; border-bottom:1px solid rgba(0,0,0,.05); color:rgba(0,0,0,.7); }
+      .ev-nav-links li:last-child a,.ev-nav-links li:last-child button { border-bottom:none; padding:12px 16px; }
+      .ev-nav-mobile { display:flex; }
+      .ev-nav-logo { height:32px; }
+    }
   </style>
 </head>
 <body>
 
-<nav>
-  <a href="index.html" class="logo">Espacio Vuela</a>
-  <div class="nav-right">
-    <a href="index.html" style="font-size:13px;color:#888;text-decoration:none;font-weight:500;margin-right:8px">← Web</a><span class="rol-badge" id="nav-rol">Profesora</span>
-    <span class="nav-nombre" id="nav-nombre">...</span>
-    <a href="mi-cuenta.html" style="font-size:13px;color:var(--gray);text-decoration:none;font-weight:500">Mi cuenta</a>
-    <button class="btn-salir" id="btn-salir">Cerrar sesión</button>
+<nav class="ev-nav">
+  <a href="index.html"><img src="images/logo.png" alt="Espacio Vuela" class="ev-nav-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="ev-nav-logo-txt">Espacio Vuela</span></a>
+  <ul class="ev-nav-links" id="ev-nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="index.html#clases">Clases</a></li>
+    <li><a href="index.html#planes">Planes</a></li>
+    <li><a href="profes.html">Profes</a></li>
+    <li><span class="ev-nav-rol">Profesora</span></li>
+    <li><a href="mi-cuenta.html">Mi cuenta</a></li>
+    <li><a href="javascript:void(0)" onclick="abrirIGVuela()" class="ev-nav-cta">Súmate a Vuela</a></li>
+    <li><button class="ev-nav-salir" id="btn-salir-nav">Salir</button></li>
+  </ul>
+  <div class="ev-nav-mobile">
+    <button class="ev-nav-menu-btn" onclick="document.getElementById('ev-nav-links').classList.toggle('nav-open')">☰</button>
   </div>
 </nav>
+<script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
+  else{window.open('https://ig.me/m/espacio_vuela','_blank');}
+}
+</script>
 
 <div class="layout">
 
@@ -545,7 +592,7 @@
   }
 
   // ── CERRAR SESIÓN ─────────────────────────────────────────────
-  document.getElementById('btn-salir').addEventListener('click', async () => {
+  document.getElementById('btn-salir-nav').addEventListener('click', async () => {
     await sb.auth.signOut();
     window.location.href = 'login.html';
   });
