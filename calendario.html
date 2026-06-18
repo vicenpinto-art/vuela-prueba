@@ -348,10 +348,12 @@ async function init(){
   userRol = u?.rol || 'alumna';
   nombreUsuario = ((u?.nombre||'') + ' ' + (u?.apellido||'')).trim();
 
-  // Actualizar nav según rol
+  // Actualizar nav según rol (nav-back ya no existe, ignorar)
   const navBack = document.getElementById('nav-back');
-  if(userRol==='admin'){navBack.href='admin.html'; navBack.textContent='← Admin';}
-  else if(userRol==='profesora'){navBack.href='profesora.html'; navBack.textContent='← Panel profesora';}
+  if(navBack){
+    if(userRol==='admin'){navBack.href='admin.html'; navBack.textContent='← Admin';}
+    else if(userRol==='profesora'){navBack.href='profesora.html'; navBack.textContent='← Panel profesora';}
+  }
 
   // Mostrar filtros según rol
   if(userRol==='profesora'){
