@@ -335,7 +335,7 @@ function abrirIGVuela(){
 
   // ── UTILS ─────────────────────────────────────────────────────
   function horaStr(fechaHora) {
-    return new Date(fechaHora).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+    return new Date(fechaHora).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
   }
   function fechaLegible(fechaHora) {
     return new Date(fechaHora).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -467,6 +467,10 @@ function abrirIGVuela(){
       }
     } else if (sinCupo) {
       accionHtml = `<button class="btn-sin-cupo" disabled>Sin cupo</button>`;
+    } else if (horasHasta > 24) {
+      const fechaDisp = new Date(new Date(c.fecha_hora).getTime() - 24*60*60*1000);
+      const diaDisp = fechaDisp.toLocaleDateString('es-CL', {weekday:'short', day:'numeric', month:'short'});
+      accionHtml = `<button class="btn-sin-cupo" disabled title="Podrás agendar desde ${diaDisp}">Disponible ${diaDisp}</button>`;
     } else {
       accionHtml = `<button class="btn-agendar" onclick="abrirAgendar('${c.id}')">Agendar →</button>`;
     }
