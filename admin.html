@@ -342,15 +342,21 @@ function abrirIGVuela(){
     <div class="section active" id="sec-resumen">
       <div class="section-title">Resumen</div>
       <div class="section-sub" id="resumen-fecha">Cargando...</div>
-      <div class="stats-grid">
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
         <div class="stat-card"><div class="val" id="st-alumnas">—</div><div class="lbl">Alumnas registradas</div></div>
+        <div class="stat-card"><div class="val" id="st-activas">—</div><div class="lbl">Activas (últ. 30d)</div></div>
         <div class="stat-card"><div class="val" id="st-planes">—</div><div class="lbl">Planes activos</div></div>
         <div class="stat-card"><div class="val" id="st-hoy">—</div><div class="lbl">Clases hoy</div></div>
         <div class="stat-card"><div class="val" id="st-inscritas">—</div><div class="lbl">Inscripciones hoy</div></div>
+        <div class="stat-card"><div class="val" id="st-ingreso-hoy">—</div><div class="lbl">Ingreso de hoy</div></div>
       </div>
       <div class="card">
         <div class="card-header"><div class="card-title">Clases de hoy</div></div>
         <div id="resumen-clases-hoy"><div class="sk" style="height:50px;margin-bottom:8px"></div><div class="sk" style="height:50px"></div></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-header"><div class="card-title">Planes activos por mes de vencimiento</div><div style="font-size:12px;color:var(--gray)">Potencial de renovación</div></div>
+        <div id="resumen-proximos-meses"><div class="sk" style="height:80px"></div></div>
       </div>
     </div>
 
@@ -489,6 +495,29 @@ function abrirIGVuela(){
     <div class="section" id="sec-ingresos">
       <div class="section-title">Ingresos</div>
       <div class="section-sub">Total recaudado según planes registrados en el sistema.</div>
+
+      <!-- ── ANALYTICS MULTIPERIODO ── -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div class="card-title">Ventas — últimos 6 meses</div>
+          <div style="font-size:12px;color:var(--gray)">Ingresos totales por mes</div>
+        </div>
+        <div id="chart-ventas-wrap"><div class="sk" style="height:120px"></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Top 5 membresías (6 meses)</div></div>
+          <div id="ing-top5"><div class="sk" style="height:110px"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Reservas por mes</div>
+            <div style="font-size:12px;color:var(--gray)">Inscripciones confirmadas</div>
+          </div>
+          <div id="chart-reservas-wrap"><div class="sk" style="height:110px"></div></div>
+        </div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--border);margin-bottom:20px">
 
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
         <select id="ing-mes" onchange="cargarIngresos()" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;outline:none">
@@ -792,18 +821,59 @@ document.querySelectorAll('.sidebar-item').forEach(item=>{
 async function cargarResumen(){
   const hoyI = new Date(); hoyI.setHours(0,0,0,0);
   const hoyF = new Date(); hoyF.setHours(23,59,59,999);
+  const hace30 = new Date(); hace30.setDate(hace30.getDate()-30);
 
-  const [{count:cAlumnas},{count:cPlanes},{data:clasesHoy},{count:cInscritas}] = await Promise.all([
+  const [{count:cAlumnas},{count:cPlanes},{data:clasesHoy},{count:cInscritas},
+         {data:activasData},{data:comprasHoyData},{data:planesProximos}] = await Promise.all([
     sb.from('usuarios').select('*',{count:'exact',head:true}).eq('rol','alumna'),
     sb.from('compras').select('*',{count:'exact',head:true}).eq('estado','activo').gte('fecha_fin',hoy()),
     sb.from('clases').select('*').gte('fecha_hora',hoyI.toISOString()).lte('fecha_hora',hoyF.toISOString()).order('fecha_hora'),
-    sb.from('inscripciones').select('*',{count:'exact',head:true}).gte('created_at',hoyI.toISOString())
+    sb.from('inscripciones').select('*',{count:'exact',head:true}).gte('created_at',hoyI.toISOString()),
+    sb.from('inscripciones').select('alumna_id').gte('created_at',hace30.toISOString()).eq('estado','confirmada'),
+    sb.from('compras').select('monto_pagado').gte('created_at',hoyI.toISOString()).lte('created_at',hoyF.toISOString()),
+    sb.from('compras').select('fecha_fin').eq('estado','activo').gte('fecha_fin',hoy()).order('fecha_fin')
   ]);
 
+  // Stats base
   document.getElementById('st-alumnas').textContent  = cAlumnas||0;
   document.getElementById('st-planes').textContent   = cPlanes||0;
   document.getElementById('st-hoy').textContent      = (clasesHoy||[]).length;
   document.getElementById('st-inscritas').textContent= cInscritas||0;
+
+  // #22 — Alumnas activas (30d)
+  const cActivas = new Set((activasData||[]).map(i=>i.alumna_id)).size;
+  document.getElementById('st-activas').textContent = cActivas;
+
+  // #18 — Ingreso de hoy
+  const ingresoHoy = (comprasHoyData||[]).reduce((s,c)=>s+(c.monto_pagado||0),0);
+  document.getElementById('st-ingreso-hoy').textContent = formatCLP(ingresoHoy)||'$0';
+
+  // #8 — Próximos meses: planes agrupados por mes de vencimiento
+  const proxMeses = {};
+  const mLabs = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  (planesProximos||[]).forEach(p=>{
+    const d=new Date(p.fecha_fin), k=`${d.getFullYear()}-${d.getMonth()+1}`;
+    proxMeses[k]=(proxMeses[k]||0)+1;
+  });
+  const proxEl = document.getElementById('resumen-proximos-meses');
+  const sorted = Object.entries(proxMeses).sort(([a],[b])=>a.localeCompare(b)).slice(0,5);
+  if(sorted.length===0){
+    proxEl.innerHTML='<p style="font-size:13px;color:var(--gray);padding:8px 0">Sin planes activos.</p>';
+  } else {
+    const maxC = Math.max(...sorted.map(([,c])=>c));
+    proxEl.innerHTML = sorted.map(([key,count])=>{
+      const [anio,mes]=key.split('-').map(Number);
+      const label=`${mLabs[mes-1]} ${anio}`;
+      const pct=Math.round((count/maxC)*100);
+      return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:13px;font-weight:600;min-width:70px;color:var(--dark)">${label}</span>
+        <div style="flex:1;height:6px;background:var(--light);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--purple),#6b3fd4);border-radius:4px"></div>
+        </div>
+        <span style="font-size:13px;font-weight:700;color:var(--purple);min-width:55px;text-align:right">${count} plan${count!==1?'es':''}</span>
+      </div>`;
+    }).join('');
+  }
 
   const el = document.getElementById('resumen-clases-hoy');
   if(!clasesHoy||clasesHoy.length===0){
@@ -1207,6 +1277,7 @@ function renderAlumnas(lista){
           ${c&&c.estado==='activo'?`<button class="btn btn-purple btn-sm" onclick="congelarPlan('${c.id}')">Congelar</button>`:''}
           ${c&&c.estado==='congelado'?`<button class="btn btn-cyan btn-sm" onclick="descongelarPlan('${c.id}')">Descongelar</button>`:''}
           ${c?`<button class="btn btn-secondary btn-sm" onclick="abrirExtender('${c.id}','${a.nombre} ${a.apellido}')">Extender</button>`:''}
+          ${c&&c.estado==='activo'?`<button class="btn btn-boost-sm btn-sm" onclick="boostPlan('${c.id}','${(a.nombre+' '+(a.apellido||'')).trim()}')">⚡ +1d</button>`:''}
         </td>
       </tr>`;
     }).join('')}
@@ -1415,6 +1486,16 @@ async function confirmarExtender(){
   if(error||!data?.ok){toast('Error al extender','error');return;}
   toast(`Plan extendido ${dias} días ✓`);
   cerrarModal('modal-extender');
+  cargarAlumnas();
+}
+
+
+// ── BOOST PLAN (+1 DÍA) ───────────────────────────────────────
+async function boostPlan(compraId, nombre){
+  if(!confirm(`¿Agregar 1 día al plan de ${nombre}?`)) return;
+  const {data,error} = await sb.rpc('extender_plan',{p_compra_id:compraId, p_dias:1});
+  if(error||!data?.ok){ toast('Error al aplicar boost','error'); return; }
+  toast(`⚡ Boost aplicado — 1 día extra a ${nombre.split(' ')[0]} ✓`);
   cargarAlumnas();
 }
 
@@ -1783,7 +1864,100 @@ async function eliminarDisciplina(id){
 }
 
 // ── INGRESOS ──────────────────────────────────────────────────
+
+// ── #19 #20 #21 ANALYTICS ────────────────────────────────────
+let analyticsLoaded = false;
+
+function fmtK(v){ return v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+Math.round(v/1000)+'K':v>0?'$'+v:''; }
+
+function renderBarChart(containerId, items, formatVal){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  const maxVal = Math.max(...items.map(i=>i.value), 1);
+  el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:6px;height:110px;padding:8px 4px 0">${
+    items.map(({label,value,color})=>{
+      const pct = Math.max(4, Math.round((value/maxVal)*100));
+      const bg  = color||'linear-gradient(180deg,var(--coral),var(--magenta))';
+      const fmt = formatVal ? formatVal(value) : value;
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0">
+        <div style="font-size:9px;color:var(--gray);white-space:nowrap;text-align:center">${value>0?fmt:''}</div>
+        <div style="width:100%;background:${bg};height:${pct}%;border-radius:3px 3px 0 0;min-height:4px"></div>
+        <div style="font-size:10px;color:var(--gray);text-align:center;overflow:hidden;max-width:100%;text-overflow:ellipsis;white-space:nowrap">${label}</div>
+      </div>`;
+    }).join('')
+  }</div>`;
+}
+
+async function cargarAnalytics(){
+  if(analyticsLoaded) return;
+  analyticsLoaded = true;
+
+  const meses = [];
+  for(let i=5;i>=0;i--){
+    const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
+    meses.push({anio:d.getFullYear(), mes:d.getMonth()+1});
+  }
+  const desde = new Date(meses[0].anio, meses[0].mes-1, 1).toISOString();
+  const mLabs = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+  const [{data:comprasPer},{data:inscPer}] = await Promise.all([
+    sb.from('compras').select('monto_pagado,created_at,planes(nombre)').gte('created_at',desde),
+    sb.from('inscripciones').select('created_at').gte('created_at',desde)
+  ]);
+
+  // Agrupar compras
+  const ingPorMes={}, planCount={};
+  meses.forEach(({anio,mes})=>{ ingPorMes[`${anio}-${mes}`]=0; });
+  (comprasPer||[]).forEach(c=>{
+    const d=new Date(c.created_at), k=`${d.getFullYear()}-${d.getMonth()+1}`;
+    if(ingPorMes[k]!==undefined) ingPorMes[k]+=c.monto_pagado||0;
+    const nombre=c.planes?.nombre||'Sin plan';
+    planCount[nombre]=(planCount[nombre]||0)+1;
+  });
+
+  // Agrupar inscripciones
+  const inscPorMes={};
+  meses.forEach(({anio,mes})=>{ inscPorMes[`${anio}-${mes}`]=0; });
+  (inscPer||[]).forEach(i=>{
+    const d=new Date(i.created_at), k=`${d.getFullYear()}-${d.getMonth()+1}`;
+    if(inscPorMes[k]!==undefined) inscPorMes[k]++;
+  });
+
+  // Gráfico ventas (#20)
+  renderBarChart('chart-ventas-wrap',
+    meses.map(({anio,mes})=>({label:mLabs[mes-1], value:ingPorMes[`${anio}-${mes}`]})),
+    fmtK
+  );
+
+  // Gráfico reservas (#21)
+  renderBarChart('chart-reservas-wrap',
+    meses.map(({anio,mes})=>({label:mLabs[mes-1], value:inscPorMes[`${anio}-${mes}`], color:'linear-gradient(180deg,var(--cyan),#007a82)'})),
+    v=>String(v)
+  );
+
+  // Top 5 planes (#19)
+  const top5El = document.getElementById('ing-top5');
+  if(top5El){
+    const sorted = Object.entries(planCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const maxC = sorted[0]?.[1]||1;
+    top5El.innerHTML = sorted.length===0
+      ? '<p style="font-size:13px;color:var(--gray)">Sin datos.</p>'
+      : sorted.map(([nombre,count],i)=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:11px;font-weight:800;color:var(--gray);min-width:16px">${i+1}</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nombre}</div>
+              <div style="height:4px;background:var(--light);border-radius:4px;overflow:hidden">
+                <div style="height:100%;width:${Math.round((count/maxC)*100)}%;background:linear-gradient(90deg,var(--coral),var(--magenta));border-radius:4px"></div>
+              </div>
+            </div>
+            <span style="font-size:14px;font-weight:700;color:var(--coral);min-width:24px;text-align:right">${count}</span>
+          </div>`).join('');
+  }
+}
+
 function iniciarIngresos(){
+  cargarAnalytics();
   const sel = document.getElementById('ing-mes');
   if(sel.options.length > 0){ cargarIngresos(); return; }
   // Generar últimos 12 meses
