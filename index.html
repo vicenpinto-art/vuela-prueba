@@ -1411,14 +1411,18 @@ function pvSelCard(el){
   const { data: { session } } = await sb.auth.getSession();
 
   if (session) {
-    // Redirigir directamente a mi cuenta
-    window.location.href = 'mi-cuenta.html';
-    return;
+    // Usuaria logueada: mostrar inicial en el avatar, sin redirigir
+    const {data:u} = await sb.from('usuarios').select('nombre,rol').eq('id',session.user.id).single();
+    const nombre = u?.nombre || '';
+    const href = u?.rol === 'admin' ? 'admin.html' : u?.rol === 'profesora' ? 'profesora.html' : 'mi-cuenta.html';
+    const inner = `<span style="font-size:15px;font-weight:700;color:#fff;line-height:1">${(nombre[0]||'?').toUpperCase()}</span>`;
+    if (navCuenta) navCuenta.innerHTML = `<a href="${href}" title="${nombre}" style="${active}">${inner}</a>`;
+    if (mob) { mob.setAttribute('style', active); mob.innerHTML = inner; }
+  } else {
+    // No logueada: mostrar ícono genérico
+    if (navCuenta) navCuenta.innerHTML = `<a href="login.html" title="Mi cuenta" style="${inactive}">${svgIcon}</a>`;
+    if (mob) { mob.setAttribute('style', inactive); mob.innerHTML = svgIcon; }
   }
-
-  // No logueada: mostrar ícono genérico
-  if (navCuenta) navCuenta.innerHTML = `<a href="login.html" title="Mi cuenta" style="${inactive}">${svgIcon}</a>`;
-  if (mob) { mob.setAttribute('style', inactive); mob.innerHTML = svgIcon; }
 })();
 </script>
 <!-- ── BOTÓN FLOTANTE INSTAGRAM DIRECT ── -->
