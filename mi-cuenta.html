@@ -286,10 +286,12 @@ function abrirIGVuela(){
   function dia(date)        { return new Date(date).getDate(); }
   function horaMinutos(date){ return new Date(date).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }); }
 
+  let userId = null;
+
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'login.html'; return; }
-    const userId = session.user.id;
+    userId = session.user.id;
     // Cargar usuario primero para detectar rol
     await cargarUsuario(userId);
     // Solo cargar plan y clases si es alumna
