@@ -333,8 +333,7 @@ function abrirIGVuela(){
       .from('compras')
       .select('*, planes(nombre, tipo)')
       .eq('alumna_id', userId)
-      .eq('estado', 'activo')
-      .gte('fecha_fin', hoy)
+      .in('estado', ['activo', 'congelado'])
       .order('created_at', { ascending: false });
 
     const contenedor = document.getElementById('plan-contenido');
@@ -348,13 +347,23 @@ function abrirIGVuela(){
 
     // Badge
     if (c.estado === 'congelado') {
-      badge.textContent = 'Congelado'; badge.className = 'card-badge badge-congelado';
+      badge.textContent = '❄️ Congelado'; badge.className = 'card-badge badge-congelado';
     } else {
       badge.textContent = 'Activo'; badge.className = 'card-badge badge-activo';
     }
 
     // Alertas
-    if (!c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles <= 2) {
+    if (c.estado === 'congelado') {
+      // Plan congelado: mostrar alerta especial
+      const alertaCongelado = document.getElementById('alerta-sin-plan');
+      alertaCongelado.className = 'alerta congelado';
+      alertaCongelado.innerHTML = '❄️ Tu plan está congelado. Contacta a Espacio Vuela para reactivarlo.';
+      alertaCongelado.style.display = 'flex';
+    } else if (!c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles <= 0) {
+      // #4: clases agotadas pero días restantes — plan sigue activo hasta fecha_fin
+      document.getElementById('alerta-pocas').style.display = 'flex';
+      document.getElementById('alerta-pocas').innerHTML = '⚠️ Has usado todas las clases de tu plan. Vence el ' + formatFecha(c.fecha_fin) + '.';
+    } else if (!c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles <= 2) {
       document.getElementById('alerta-pocas').style.display = 'flex';
     }
 

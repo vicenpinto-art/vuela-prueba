@@ -187,11 +187,11 @@ async function init() {
 }
 
 async function cargarClases() {
-  const {data: inscripciones} = await sb
+  // Traer todas las inscripciones (sin order en tabla relacionada — no soportado)
+  const {data: inscripciones, error: errInsc} = await sb
     .from('inscripciones')
-    .select('*, clases(nombre, fecha_hora, profesora, tipo)')
-    .eq('alumna_id', userId)
-    .order('clases.fecha_hora', {ascending: false});
+    .select('*, clases(id, nombre, fecha_hora, profesora, tipo)')
+    .eq('alumna_id', userId);
 
   const {data: asistencias} = await sb
     .from('asistencias')
@@ -203,10 +203,14 @@ async function cargarClases() {
     asistenciaMap[a.clase_id] = a.presente;
   });
 
-  todasLasClases = (inscripciones || []).map(i => ({
-    ...i,
-    asistio: asistenciaMap[i.clase_id] !== undefined ? asistenciaMap[i.clase_id] : null
-  }));
+  // Filtrar solo las que tienen clase válida y ordenar por fecha desc en JS
+  todasLasClases = (inscripciones || [])
+    .filter(i => i.clases && i.clases.fecha_hora)
+    .map(i => ({
+      ...i,
+      asistio: asistenciaMap[i.clase_id] !== undefined ? asistenciaMap[i.clase_id] : null
+    }))
+    .sort((a, b) => new Date(b.clases.fecha_hora) - new Date(a.clases.fecha_hora));
 
   actualizarStats();
   renderizar();
@@ -273,6 +277,11 @@ function renderizar() {
 }
 
 init();
+
+document.getElementById('btn-salir-nav').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  window.location.href = 'login.html';
+});
 </script>
 
 </body>
