@@ -788,25 +788,35 @@ function renderHorarios(){
   if(todosLosHorarios.length===0){
     el.innerHTML='<p style="font-size:14px;color:var(--gray);padding:8px 0">No hay horarios creados. Crea el primero arriba.</p>';return;
   }
-  el.innerHTML=`<table class="tabla">
-    <thead><tr><th>Día</th><th>Hora</th><th>Clase</th><th>Profesora</th><th>Cupo</th><th>Plan</th><th>Activo</th><th></th></tr></thead>
-    <tbody>${todosLosHorarios.map(h=>`
-      <tr>
-        <td><span class="dia">${DIAS[h.dia_semana]}</span></td>
-        <td style="font-weight:600">${h.hora?.slice(0,5)||'—'}</td>
-        <td>${h.nombre}</td>
-        <td style="color:var(--gray)">${h.profesora}</td>
-        <td>${h.cupo_maximo}</td>
-        <td><span class="badge badge-${h.restriccion_plan==='vuela'?'vuela':h.restriccion_plan==='muevete'?'muevete':'sin'}">${h.restriccion_plan==='vuela'?'Vuela':h.restriccion_plan==='muevete'?'Muévete':'Libre'}</span></td>
-        <td>
-          <button class="toggle-activo ${h.activo?'on':'off'}" onclick="toggleHorario('${h.id}',${h.activo})"></button>
-        </td>
-        <td style="display:flex;gap:6px">
-          <button class="btn btn-cyan btn-sm" onclick="generarClases('${h.id}')">Generar</button>
-          <button class="btn btn-secondary btn-sm" onclick="editarHorario('${h.id}')">Editar</button>
-        </td>
-      </tr>`).join('')}
-    </tbody></table>`;
+  // Agrupar por día
+  const porDia = {};
+  todosLosHorarios.forEach(h => {
+    const d = h.dia_semana;
+    if(!porDia[d]) porDia[d] = [];
+    porDia[d].push(h);
+  });
+  const filasTabla = (lista) => lista.map(h=>`
+    <tr>
+      <td style="font-weight:600">${h.hora?.slice(0,5)||'—'}</td>
+      <td>${h.nombre}</td>
+      <td style="color:var(--gray);font-size:12px">${h.profesora}</td>
+      <td>${h.cupo_maximo}</td>
+      <td><span class="badge badge-${h.restriccion_plan==='vuela'?'vuela':h.restriccion_plan==='muevete'?'muevete':'sin'}">${h.restriccion_plan==='vuela'?'Vuela':h.restriccion_plan==='muevete'?'Muévete':'Libre'}</span></td>
+      <td><button class="toggle-activo ${h.activo?'on':'off'}" onclick="toggleHorario('${h.id}',${h.activo})"></button></td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-cyan btn-sm" onclick="generarClases('${h.id}')">Generar</button>
+        <button class="btn btn-secondary btn-sm" onclick="editarHorario('${h.id}')">Editar</button>
+      </td>
+    </tr>`).join('');
+
+  el.innerHTML = Object.keys(porDia).sort((a,b)=>a-b).map(dia => `
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--coral);padding:8px 0 6px;border-bottom:2px solid var(--coral);margin-bottom:8px">${DIAS[dia]}</div>
+      <div class="tabla-wrap"><table class="tabla" style="min-width:500px">
+        <thead><tr><th>Hora</th><th>Clase</th><th>Profesora</th><th>Cupo</th><th>Plan</th><th>Activo</th><th></th></tr></thead>
+        <tbody>${filasTabla(porDia[dia])}</tbody>
+      </table></div>
+    </div>`).join('');
 }
 
 async function abrirModalHorario(){
@@ -944,20 +954,32 @@ function renderClases(){
   if(todasLasClases.length===0){
     el.innerHTML='<p style="font-size:14px;color:var(--gray);padding:8px 0">No hay clases en las próximas 2 semanas. Genera clases desde Horarios.</p>';return;
   }
-  el.innerHTML=`<table class="tabla">
-    <thead><tr><th>Fecha</th><th>Hora</th><th>Clase</th><th>Profesora</th><th>Cupo</th><th>Sobrecupo</th><th>Estado</th><th></th></tr></thead>
-    <tbody>${todasLasClases.map(c=>`
-      <tr style="${c.cancelada?'opacity:.5':''}">
-        <td>${fechaStr(c.fecha_hora)}</td>
-        <td style="font-weight:600;color:var(--coral)">${horaStr(c.fecha_hora)}</td>
-        <td>${c.nombre}</td>
-        <td style="color:var(--gray);font-size:12px">${c.profesora}</td>
-        <td>${(c.cupo_maximo||15)-(c.cupo_disponible||0)}/${c.cupo_maximo||15}</td>
-        <td>${c.sobrecupo||0}</td>
-        <td><span class="badge ${c.cancelada?'badge-vencido':'badge-activo'}">${c.cancelada?'Cancelada':'Activa'}</span></td>
-        <td>${!c.cancelada?`<button class="btn btn-secondary btn-sm" onclick="abrirEditarClase('${c.id}')">Editar</button>`:''} <button class="btn btn-danger btn-sm" onclick="eliminarClase('${c.id}')">Eliminar</button></td>
-      </tr>`).join('')}
-    </tbody></table>`;
+  // Agrupar por día
+  const porDia = {};
+  todasLasClases.forEach(c => {
+    const key = new Date(c.fecha_hora).toLocaleDateString('es-CL', {weekday:'long', day:'numeric', month:'long'});
+    if(!porDia[key]) porDia[key] = [];
+    porDia[key].push(c);
+  });
+  const filasClases = (lista) => lista.map(c=>`
+    <tr style="${c.cancelada?'opacity:.5':''}">
+      <td style="font-weight:600;color:var(--coral)">${horaStr(c.fecha_hora)}</td>
+      <td>${c.nombre}</td>
+      <td style="color:var(--gray);font-size:12px">${c.profesora}</td>
+      <td>${(c.cupo_maximo||15)-(c.cupo_disponible||0)}/${c.cupo_maximo||15}</td>
+      <td>${c.sobrecupo||0}</td>
+      <td><span class="badge ${c.cancelada?'badge-vencido':'badge-activo'}">${c.cancelada?'Cancelada':'Activa'}</span></td>
+      <td>${!c.cancelada?`<button class="btn btn-secondary btn-sm" onclick="abrirEditarClase('${c.id}')">Editar</button>`:''} <button class="btn btn-danger btn-sm" onclick="eliminarClase('${c.id}')">Eliminar</button></td>
+    </tr>`).join('');
+
+  el.innerHTML = Object.keys(porDia).map(dia => `
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--coral);padding:8px 0 6px;border-bottom:2px solid var(--coral);margin-bottom:8px">${dia}</div>
+      <div class="tabla-wrap"><table class="tabla">
+        <thead><tr><th>Hora</th><th>Clase</th><th>Profesora</th><th>Cupo</th><th>Sobrecupo</th><th>Estado</th><th></th></tr></thead>
+        <tbody>${filasClases(porDia[dia])}</tbody>
+      </table></div>
+    </div>`).join('');
 }
 
 function abrirEditarClase(id){
@@ -1002,10 +1024,10 @@ async function cancelarClase(){
 // ── ASISTENCIA ────────────────────────────────────────────────
 let clasesAsistencia = [];
 async function cargarClasesAsistencia(){
-  const hoyI = new Date(); hoyI.setHours(0,0,0,0);
-  const en7 = new Date(); en7.setDate(en7.getDate()+7);
+  const ahora = new Date();
+  const en144h = new Date(ahora.getTime() + 144*60*60*1000);
   const {data} = await sb.from('clases').select('*')
-    .gte('fecha_hora',hoyI.toISOString()).lte('fecha_hora',en7.toISOString())
+    .gte('fecha_hora',ahora.toISOString()).lte('fecha_hora',en144h.toISOString())
     .eq('cancelada',false).order('fecha_hora');
   clasesAsistencia = data||[];
   renderClasesAsistencia(clasesAsistencia);
@@ -1016,12 +1038,23 @@ function filtrarClasesAsistencia(){
 }
 function renderClasesAsistencia(lista){
   const el = document.getElementById('asis-lista-clases');
-  if(!lista||lista.length===0){el.innerHTML='<p style="font-size:13px;color:var(--gray)">No hay clases.</p>';return;}
-  el.innerHTML=lista.map(c=>`
-    <div class="clase-chip ${claseAsisActiva===c.id?'sel':''}" onclick="selClaseAsis('${c.id}')">
-      <div class="chip-hora">${horaStr(c.fecha_hora)} · ${fechaStr(c.fecha_hora)}</div>
-      <div class="chip-nombre">${c.nombre}</div>
-      <div class="chip-meta">👩‍🏫 ${c.profesora}</div>
+  if(!lista||lista.length===0){el.innerHTML='<p style="font-size:13px;color:var(--gray)">No hay clases en las próximas 144 horas.</p>';return;}
+  // Agrupar por día
+  const porDia = {};
+  lista.forEach(c => {
+    const key = new Date(c.fecha_hora).toLocaleDateString('es-CL', {weekday:'long', day:'numeric', month:'short'});
+    if(!porDia[key]) porDia[key] = [];
+    porDia[key].push(c);
+  });
+  el.innerHTML = Object.keys(porDia).map(dia => `
+    <div style="margin-bottom:4px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--coral);padding:10px 12px 4px">${dia}</div>
+      ${porDia[dia].map(c=>`
+        <div class="clase-chip ${claseAsisActiva===c.id?'sel':''}" onclick="selClaseAsis('${c.id}')">
+          <div class="chip-hora">${horaStr(c.fecha_hora)}</div>
+          <div class="chip-nombre">${c.nombre}</div>
+          <div class="chip-meta">👩‍🏫 ${c.profesora}</div>
+        </div>`).join('')}
     </div>`).join('');
 }
 async function selClaseAsis(claseId){
@@ -1490,7 +1523,7 @@ function renderRoles(lista){
       <tr>
         <td style="font-weight:600">${u.nombre||''} ${u.apellido||''}</td>
         <td style="font-size:12px;color:var(--gray)">${u.email}</td>
-        <td><span class="badge badge-${u.rol==='admin'?'admin':u.rol==='profesora'?'prof':'alumna'}">${u.rol}</span></td>
+        <td><span class="badge badge-${u.rol==='admin'?'admin':u.rol==='profesora'?'prof':'alumna'}">${u.rol.charAt(0).toUpperCase()+u.rol.slice(1)}</span></td>
         <td style="display:flex;gap:6px">
           ${u.rol!=='alumna'?`<button class="btn btn-secondary btn-sm" onclick="cambiarRol('${u.id}','alumna')">Alumna</button>`:''}
           ${u.rol!=='profesora'?`<button class="btn btn-purple btn-sm" onclick="cambiarRol('${u.id}','profesora')">Profesora</button>`:''}

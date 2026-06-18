@@ -88,7 +88,7 @@
     .btn-agendar-cal.cancelar{background:rgba(255,78,104,.1);color:var(--coral)}
     .btn-agendar-cal.sin-cupo{background:var(--light);color:var(--gray);cursor:not-allowed}
     .btn-agendar-cal.ver-lista{background:rgba(139,106,255,.1);color:var(--purple)}
-    .btn-agendar-cal.sin-plan{background:var(--light);color:var(--gray);cursor:not-allowed}
+    .btn-agendar-cal.sin-plan{background:linear-gradient(135deg,var(--coral),var(--magenta));color:#fff;cursor:pointer}
 
     .sin-clases-dia{padding:32px 28px;text-align:center;color:var(--gray);font-size:14px}
 
@@ -528,9 +528,16 @@ function renderClaseCard(c, esFeriado){
     } else if(cupoDisp<=0){
       botonHtml=`<button class="btn-agendar-cal sin-cupo" disabled>Sin cupo</button>`;
     } else if(!tieneplanActivo){
-      botonHtml=`<button class="btn-agendar-cal sin-plan" onclick="window.location.href='planes.html'">Ver planes</button>`;
+      botonHtml=`<button class="btn-agendar-cal sin-plan" onclick="window.location.href='planes.html'">Agendar →</button>`;
     } else {
-      botonHtml=`<button class="btn-agendar-cal agendar" onclick="agendarClase('${c.id}')">Agendar →</button>`;
+      const horasHastaClase = (new Date(c.fecha_hora) - new Date()) / (1000*60*60);
+      if(horasHastaClase > 144){
+        const fechaDisp = new Date(new Date(c.fecha_hora).getTime() - 144*60*60*1000);
+        const diaDisp = fechaDisp.toLocaleDateString('es-CL', {weekday:'short', day:'numeric', month:'short'});
+        botonHtml=`<button class="btn-agendar-cal sin-cupo" disabled style="font-size:11px">Desde ${diaDisp}</button>`;
+      } else {
+        botonHtml=`<button class="btn-agendar-cal agendar" onclick="agendarClase('${c.id}')">Agendar →</button>`;
+      }
     }
   } else {
     botonHtml=`<button class="btn-agendar-cal ver-lista" onclick="window.location.href='${userRol==='admin'?'admin.html':'profesora.html'}'">Ver lista</button>`;
