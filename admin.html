@@ -133,18 +133,31 @@
       .stats-grid{grid-template-columns:1fr 1fr}
       .form-grid{grid-template-columns:1fr}
       .asis-layout{grid-template-columns:1fr}
-      .mobile-nav-select{display:block}
-      .nav-nombre-admin{display:none}
+      .mobile-nav-select{display:none}
+      .admin-mobile-menu-btn{display:flex !important}
       .tabla-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
       .tabla{min-width:500px}
     }
-    .mobile-nav-select{
-      display:none;width:100%;padding:10px 14px;margin:0 0 16px;
-      border:1.5px solid rgba(0,0,0,.1);border-radius:10px;
-      font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;
-      background:#fff;color:#111;outline:none;cursor:pointer;
+    .mobile-nav-select{display:none}
+    .admin-mobile-menu-btn{
+      display:none;align-items:center;gap:8px;
+      background:none;border:1.5px solid rgba(0,0,0,.12);border-radius:10px;
+      padding:8px 14px;cursor:pointer;font-family:'Outfit',sans-serif;
+      font-size:13px;font-weight:600;color:#333;margin-bottom:16px;
     }
-    .mobile-nav-select:focus{border-color:#ff4e68}
+    .admin-mobile-menu-btn:hover{border-color:#ff4e68;color:#ff4e68}
+    .admin-mobile-nav{
+      display:none;background:#fff;border-radius:14px;border:1px solid rgba(0,0,0,.08);
+      padding:8px 0;margin-bottom:16px;box-shadow:0 4px 16px rgba(0,0,0,.08);
+    }
+    .admin-mobile-nav.open{display:block}
+    .admin-mobile-nav-item{
+      display:flex;align-items:center;gap:10px;padding:12px 16px;
+      font-size:14px;font-weight:500;color:#555;cursor:pointer;
+      border-left:3px solid transparent;transition:all .15s;
+    }
+    .admin-mobile-nav-item:hover{color:#ff4e68;background:rgba(255,78,104,.04)}
+    .admin-mobile-nav-item.active{color:#ff4e68;background:rgba(255,78,104,.05);border-left-color:#ff4e68;font-weight:600}
   
     /* ── NAV OFICIAL ── */
     .ev-nav {
@@ -222,18 +235,21 @@ function abrirIGVuela(){
   </aside>
 
   <main class="admin-main">
-  <select class="mobile-nav-select" id="mobile-nav-select" onchange="navegarMobile(this.value)">
-    <option value="resumen">📊 Resumen</option>
-    <option value="horarios">⏰ Horarios</option>
-    <option value="clases">👩‍🎓 Clases</option>
-    <option value="asistencia">✅ Asistencia</option>
-    <option value="alumnas">👩‍🦰 Alumnas</option>
-    <option value="rutina">📝 Rutina del día</option>
-    <option value="roles">👥 Roles</option>
-    <option value="disciplinas">🏷️ Disciplinas</option>
-    <option value="eliminar-usuario">🗑️ Eliminar usuaria</option>
-    <option value="ingresos">💰 Ingresos</option>
-  </select>
+  <button class="admin-mobile-menu-btn" id="admin-mobile-menu-btn" onclick="toggleAdminMobileMenu()">
+    ☰ <span id="admin-mobile-menu-label">Resumen</span>
+  </button>
+  <div class="admin-mobile-nav" id="admin-mobile-nav">
+    <div class="admin-mobile-nav-item active" onclick="navegarMobile('resumen')">📊 Resumen</div>
+    <div class="admin-mobile-nav-item" onclick="navegarMobile('horarios')">⏰ Horarios</div>
+    <div class="admin-mobile-nav-item" onclick="navegarMobile('clases')">👩‍🎓 Clases</div>
+    <div class="admin-mobile-nav-item" onclick="navegarMobile('asistencia')">✅ Asistencia</div>
+    <div class="admin-mobile-nav-item" onclick="navegarMobile('alumnas')">👩‍🦰 Alumnas</div>
+    <div class="admin-mobile-nav-item" onclick="navegarMobile('rutina')">📝 Rutina del día</div>
+    <div class="admin-mobile-nav-item" onclick="navegarMobile('roles')">👥 Roles</div>
+    <div class="admin-mobile-nav-item" onclick="navegarMobile('disciplinas')">🏷️ Disciplinas</div>
+    <div class="admin-mobile-nav-item" onclick="navegarMobile('eliminar-usuario')">🗑️ Eliminar usuaria</div>
+    <div class="admin-mobile-nav-item" onclick="navegarMobile('ingresos')">💰 Ingresos</div>
+  </div>
 
     <!-- RESUMEN -->
     <div class="section active" id="sec-resumen">
@@ -1303,10 +1319,32 @@ async function eliminarRutina(id){
 }
 
 // ── NAVEGACIÓN MÓVIL ─────────────────────────────────────────
+function toggleAdminMobileMenu() {
+  const nav = document.getElementById('admin-mobile-nav');
+  nav.classList.toggle('open');
+}
+
 function navegarMobile(sec) {
+  // Actualizar sidebar desktop
   document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
   const match = document.querySelector(`.sidebar-item[data-sec="${sec}"]`);
   if (match) match.classList.add('active');
+
+  // Actualizar menú móvil
+  document.querySelectorAll('.admin-mobile-nav-item').forEach(el => el.classList.remove('active'));
+  const labels = {
+    resumen:'Resumen', horarios:'Horarios', clases:'Clases',
+    asistencia:'Asistencia', alumnas:'Alumnas', rutina:'Rutina del día',
+    roles:'Roles', disciplinas:'Disciplinas', 'eliminar-usuario':'Eliminar usuaria',
+    ingresos:'Ingresos'
+  };
+  const items = document.querySelectorAll('.admin-mobile-nav-item');
+  items.forEach(el => { if(el.textContent.trim().includes(labels[sec]||sec)) el.classList.add('active'); });
+  const labelEl = document.getElementById('admin-mobile-menu-label');
+  if(labelEl) labelEl.textContent = labels[sec] || sec;
+
+  // Cerrar menú y mostrar sección
+  document.getElementById('admin-mobile-nav').classList.remove('open');
   mostrarSeccion(sec);
 }
 
