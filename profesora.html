@@ -192,7 +192,7 @@
 <nav>
   <a href="index.html" class="logo">Espacio Vuela</a>
   <div class="nav-right">
-    <span class="rol-badge" id="nav-rol">Profesora</span>
+    <a href="index.html" style="font-size:13px;color:#888;text-decoration:none;font-weight:500;margin-right:8px">← Web</a><span class="rol-badge" id="nav-rol">Profesora</span>
     <span class="nav-nombre" id="nav-nombre">...</span>
     <a href="mi-cuenta.html" style="font-size:13px;color:var(--gray);text-decoration:none;font-weight:500">Mi cuenta</a>
     <button class="btn-salir" id="btn-salir">Cerrar sesión</button>
@@ -608,8 +608,8 @@
     const badge = document.getElementById(`rutina-badge-${claseId}`);
     if (badge) badge.style.display = 'inline';
 
-    toast('✓ Rutina guardada correctamente');
     cerrarModalRutina();
+    setTimeout(() => toast('✓ Rutina guardada correctamente'), 100);
   }
 
   // Cerrar modal al hacer clic fuera
