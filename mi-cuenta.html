@@ -284,7 +284,7 @@ function abrirIGVuela(){
   }
   function nombreMes(date) { return new Date(date).toLocaleDateString('es-CL', { month: 'short' }).toUpperCase(); }
   function dia(date)        { return new Date(date).getDate(); }
-  function horaMinutos(date){ return new Date(date).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }); }
+  function horaMinutos(date){ return new Date(date).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false }); }
 
   let userId = null;
 
@@ -581,7 +581,7 @@ function abrirIGVuela(){
       .order('fecha_hora');
 
     if (!clasesHoy || clasesHoy.length === 0) {
-      contenedor.innerHTML = `<div class="sin-rutina"><span class="icon">🌸</span>No tienes clases hoy.</div>`;
+      contenedor.innerHTML = `<div class="sin-rutina"><span class="icon">🌸</span>No tienes clases en los próximos 6 días.</div>`;
       return;
     }
 
@@ -590,30 +590,42 @@ function abrirIGVuela(){
     const rutinaMap = {};
     (rutinas || []).forEach(r => { rutinaMap[r.clase_id] = r; });
 
-    // Mostrar primera clase con su rutina
-    const primera = clasesHoy[0];
-    const rutina = rutinaMap[primera.id];
-    const hora = new Date(primera.fecha_hora).toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit', hour12:false });
+    const secciones = [
+      {k:'descripcion',e:'📝',l:'Descripción'},{k:'objetivo',e:'🎯',l:'Objetivo'},
+      {k:'nivel',e:'⭐',l:'Nivel'},{k:'calentamiento',e:'🔥',l:'Calentamiento'},
+      {k:'parte_principal',e:'💪',l:'Parte principal'},{k:'posturas',e:'🤸',l:'Posturas'},
+      {k:'musica',e:'🎵',l:'Música'},{k:'enfriamiento',e:'❄️',l:'Enfriamiento'},
+      {k:'recomendaciones',e:'🧘',l:'Recomendaciones'},{k:'referencia_visual',e:'📸',l:'Referencia'},
+    ];
 
-    let html = '';
-    if (clasesHoy.length > 1) {
-      html += '<div class="rutina-clase-selector">';
-      clasesHoy.forEach(c => {
-        const h = new Date(c.fecha_hora).toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit', hour12:false });
-        html += `<button class="rutina-clase-btn active" onclick="window.location.href='profesora.html'">${h} ${c.nombre}</button>`;
-      });
-      html += '</div>';
-    }
-    html += `<div class="rutina-clase-titulo">🕐 ${hora} · ${primera.nombre}</div>`;
-    if (!rutina) {
-      html += `<div class="sin-rutina" style="padding:8px 0"><span class="icon" style="font-size:20px;margin-bottom:4px">✏️</span>
-        <span>Aún no has publicado la rutina.</span><br>
-        <a href="profesora.html" style="color:var(--coral);font-weight:600;font-size:13px">Agregar desde mi panel →</a></div>`;
-    } else {
-      html += `<div style="font-size:13px;color:#00a86b;font-weight:600">✓ Rutina publicada</div>`;
-      if (rutina.objetivo) html += `<div class="rutina-seccion"><div class="rutina-seccion-label">🎯 Objetivo</div><div class="rutina-seccion-valor">${rutina.objetivo}</div></div>`;
-    }
-    contenedor.innerHTML = html;
+    contenedor.innerHTML = clasesHoy.map((c, idx) => {
+      const r = rutinaMap[c.id];
+      const hora = new Date(c.fecha_hora).toLocaleTimeString('es-CL', {hour:'2-digit',minute:'2-digit',hour12:false});
+      const fecha = new Date(c.fecha_hora).toLocaleDateString('es-CL', {weekday:'short',day:'numeric',month:'short'});
+      const tieneRutina = !!r;
+      const detalle = r ? secciones.filter(s => r[s.k]).map(s => {
+        const val = r[s.k];
+        const esLink = typeof val === 'string' && val.startsWith('http');
+        return `<div style="margin-bottom:10px">
+          <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">${s.e} ${s.l}</div>
+          <div style="font-size:13px;color:#333;line-height:1.6">${esLink ? `<a href="${val}" target="_blank" style="color:var(--coral)">${val}</a>` : val}</div>
+        </div>`;
+      }).join('') : '';
+
+      return `<div style="border:1px solid rgba(0,0,0,.08);border-radius:12px;margin-bottom:8px;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#fff;cursor:pointer"
+             onclick="const d=this.nextSibling;d.style.display=d.style.display==='none'?'block':'none'">
+          <div>
+            <div style="font-size:14px;font-weight:700">${c.nombre}</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:2px">${fecha} · ${hora}</div>
+          </div>
+          <span style="font-size:12px;font-weight:600;color:${tieneRutina ? '#00a86b' : '#ccc'}">${tieneRutina ? '✓ Publicada' : 'Sin rutina'}</span>
+        </div>
+        <div style="display:${idx===0 ? 'block' : 'none'};padding:14px;background:#f9f9f9;border-top:1px solid rgba(0,0,0,.06)">
+          ${tieneRutina ? detalle : '<p style="font-size:13px;color:var(--gray)">Aún no has publicado la rutina para esta clase.<br><a href="profesora.html" style="color:var(--coral);font-weight:600">Agregar desde mi panel →</a></p>'}
+        </div>
+      </div>`;
+    }).join('');
   }
 
   function adaptarVistaProfesora(u) {
