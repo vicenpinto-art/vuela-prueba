@@ -243,7 +243,7 @@ function abrirIGVuela(){
     <div class="col-right">
       <div class="card">
         <div class="card-header">
-          <div class="card-titulo">Rutina del día</div>
+          <div class="card-titulo">Próximas rutinas</div>
           <div style="font-size:20px;">🏃‍♀️</div>
         </div>
         <div id="rutina-contenido">
@@ -432,24 +432,28 @@ function abrirIGVuela(){
 
   async function cargarRutina() {
     const contenedor = document.getElementById('rutina-contenido');
-    const hoyInicio = new Date(); hoyInicio.setHours(0,0,0,0);
-    const hoyFin    = new Date(); hoyFin.setHours(23,59,59,999);
+    const ahora = new Date();
+    const en144h = new Date(ahora.getTime() + 144*60*60*1000);
 
-    // Obtener clases de hoy en que está inscrita la alumna
+    // Obtener clases próximas 144h en que está inscrita la alumna
     const { data: inscripciones } = await sb
       .from('inscripciones')
       .select('clase_id, clases(id, nombre, fecha_hora)')
       .eq('alumna_id', userId)
       .eq('estado', 'confirmada')
-      .gte('clases.fecha_hora', hoyInicio.toISOString())
-      .lte('clases.fecha_hora', hoyFin.toISOString());
+      .gte('clases.fecha_hora', ahora.toISOString())
+      .lte('clases.fecha_hora', en144h.toISOString());
 
-    const clasesHoy = (inscripciones || [])
+    const clasesProximas = (inscripciones || [])
       .filter(i => i.clases)
-      .map(i => i.clases);
+      .map(i => i.clases)
+      .sort((a,b) => new Date(a.fecha_hora) - new Date(b.fecha_hora));
+
+    // Compatibilidad: mantener clasesHoy para el resto de la función
+    const clasesHoy = clasesProximas;
 
     if (!clasesHoy.length) {
-      contenedor.innerHTML = `<div class="sin-rutina"><span class="icon">🌸</span>No tienes clases agendadas para hoy.</div>`;
+      contenedor.innerHTML = `<div class="sin-rutina"><span class="icon">🌸</span>No tienes clases agendadas en los próximos 6 días.</div>`;
       return;
     }
 
@@ -565,15 +569,15 @@ function abrirIGVuela(){
 
   async function cargarRutinasProfesora(nombreCompleto) {
     const contenedor = document.getElementById('rutina-contenido');
-    const hoyInicio = new Date(); hoyInicio.setHours(0,0,0,0);
-    const hoyFin = new Date(); hoyFin.setHours(23,59,59,999);
+    const ahora = new Date();
+    const en144h = new Date(ahora.getTime() + 144*60*60*1000);
 
     const { data: clasesHoy } = await sb
       .from('clases')
       .select('id, nombre, fecha_hora')
       .ilike('profesora', `%${nombreCompleto}%`)
-      .gte('fecha_hora', hoyInicio.toISOString())
-      .lte('fecha_hora', hoyFin.toISOString())
+      .gte('fecha_hora', ahora.toISOString())
+      .lte('fecha_hora', en144h.toISOString())
       .order('fecha_hora');
 
     if (!clasesHoy || clasesHoy.length === 0) {

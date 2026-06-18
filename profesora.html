@@ -257,6 +257,7 @@ function abrirIGVuela(){
     <div class="tabs">
       <button class="tab active" data-tab="hoy">Hoy</button>
       <button class="tab" data-tab="semana">Esta semana</button>
+      <button class="tab" data-tab="rutinas">📋 Rutinas</button>
     </div>
     <div id="lista-clases">
       <div class="skeleton" style="height:80px; border-radius:14px; margin-bottom:10px;"></div>
@@ -379,6 +380,7 @@ function abrirIGVuela(){
 
     const filtradas = todasLasClases.filter(c => {
       const f = new Date(c.fecha_hora);
+      if (tabActiva === 'rutinas') return true; // rutinas tiene su propio render
       if (tabActiva === 'hoy') return f >= hoyInicio && f <= hoyFin;
       return true;
     });
@@ -420,7 +422,12 @@ function abrirIGVuela(){
       document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       tabActiva = btn.dataset.tab;
-      renderClases();
+      if (tabActiva === 'rutinas') {
+        renderRutinasProf();
+      } else {
+        renderClases();
+        marcarRutinasExistentes();
+      }
     });
   });
 
@@ -598,6 +605,71 @@ function abrirIGVuela(){
   });
 
   init();
+
+  // ── VISTA RUTINAS PROFESORA ──────────────────────────────────
+  async function renderRutinasProf() {
+    const contenedor = document.getElementById('lista-clases');
+    contenedor.innerHTML = `<div style="padding:20px;text-align:center;color:var(--gray)">Cargando rutinas...</div>`;
+
+    const ahora = new Date();
+    const en144h = new Date(ahora.getTime() + 144*60*60*1000);
+
+    // Clases de la profesora en próximas 144h
+    const clasesIds = todasLasClases
+      .filter(c => new Date(c.fecha_hora) >= ahora && new Date(c.fecha_hora) <= en144h)
+      .map(c => c.id);
+
+    if (!clasesIds.length) {
+      contenedor.innerHTML = `<div style="padding:28px;text-align:center;color:var(--gray)"><div style="font-size:32px;margin-bottom:8px">📋</div><p>No tienes clases en los próximos 6 días.</p></div>`;
+      return;
+    }
+
+    const { data: rutinas } = await sb.from('rutinas').select('*').in('clase_id', clasesIds);
+    const rutinaMap = {};
+    (rutinas||[]).forEach(r => { rutinaMap[r.clase_id] = r; });
+
+    const secciones = [
+      {k:'descripcion',e:'📝',l:'Descripción'},{k:'objetivo',e:'🎯',l:'Objetivo'},
+      {k:'nivel',e:'⭐',l:'Nivel'},{k:'calentamiento',e:'🔥',l:'Calentamiento'},
+      {k:'parte_principal',e:'💪',l:'Parte principal'},{k:'posturas',e:'🤸',l:'Posturas'},
+      {k:'musica',e:'🎵',l:'Música'},{k:'enfriamiento',e:'❄️',l:'Enfriamiento'},
+      {k:'recomendaciones',e:'🧘',l:'Recomendaciones'},{k:'referencia_visual',e:'📸',l:'Referencia'},
+    ];
+
+    const clases = todasLasClases.filter(c => clasesIds.includes(c.id))
+      .sort((a,b) => new Date(a.fecha_hora) - new Date(b.fecha_hora));
+
+    contenedor.innerHTML = clases.map(c => {
+      const r = rutinaMap[c.id];
+      const hora = new Date(c.fecha_hora).toLocaleTimeString('es-CL', {hour:'2-digit',minute:'2-digit',hour12:false});
+      const fecha = fechaCorta(c.fecha_hora);
+      const tieneRutina = !!r;
+      const detalle = r ? secciones.filter(s => r[s.k]).map(s => {
+        const val = r[s.k];
+        const esLink = typeof val === 'string' && val.startsWith('http');
+        return `<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--gray);margin-bottom:3px">${s.e} ${s.l}</div>
+          <div style="font-size:13px;line-height:1.6">${esLink ? `<a href="${val}" target="_blank" style="color:var(--coral)">${val}</a>` : val}</div></div>`;
+      }).join('') : '';
+
+      return `<div style="border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#fff;cursor:pointer"
+             onclick="this.nextSibling.style.display=this.nextSibling.style.display==='none'?'block':'none'">
+          <div>
+            <div style="font-size:14px;font-weight:700">${c.nombre}</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:2px">${fecha} · ${hora}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            ${tieneRutina ? '<span style="font-size:11px;color:#00a86b;font-weight:600">✓ Publicada</span>' : '<span style="font-size:11px;color:#ccc">Sin rutina</span>'}
+            <button class="btn-rutina-card" onclick="event.stopPropagation();abrirModalRutina('${c.id}','${c.nombre.replace(/'/g,"\'")}')">✏️ Editar</button>
+          </div>
+        </div>
+        <div style="display:none;padding:14px;background:#f9f9f9;border-top:1px solid var(--border)">
+          ${tieneRutina ? detalle : '<p style="font-size:13px;color:var(--gray)">Aún no has publicado la rutina. Usa el botón Editar para agregarla.</p>'}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
   // ── RUTINAS ───────────────────────────────────────────────────
   async function abrirModalRutina(claseId, nombreClase) {
     document.getElementById('rutina-clase-id').value = claseId;

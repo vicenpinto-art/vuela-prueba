@@ -128,15 +128,69 @@
     @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
     @media(max-width:768px){
+      /* Layout */
       .sidebar{display:none !important}
-      .admin-main{padding:16px;min-width:0}
-      .stats-grid{grid-template-columns:1fr 1fr}
-      .form-grid{grid-template-columns:1fr}
-      .asis-layout{grid-template-columns:1fr}
+      .admin-main{padding:12px;min-width:0}
+      .admin-layout{overflow-x:hidden}
+
+      /* Menú móvil */
       .mobile-nav-select{display:none}
       .admin-mobile-menu-btn{display:flex !important}
-      .tabla-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-      .tabla{min-width:500px}
+
+      /* Grids */
+      .stats-grid{grid-template-columns:1fr 1fr;gap:10px}
+      .form-grid{grid-template-columns:1fr}
+      .asis-layout{grid-template-columns:1fr}
+
+      /* Tablas: scroll horizontal */
+      .tabla-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px}
+      .tabla{min-width:480px;font-size:12px}
+      .tabla th{padding:6px 8px;font-size:10px}
+      .tabla td{padding:8px}
+
+      /* Cards y secciones */
+      .card{padding:14px}
+      .card-header{flex-wrap:wrap;gap:8px}
+      .section-title{font-size:20px}
+
+      /* Botones en tablas */
+      .btn-sm{padding:4px 8px;font-size:11px}
+      .tabla .btn{padding:4px 8px;font-size:11px}
+
+      /* Stat cards */
+      .stat-card{padding:14px}
+      .stat-card h2,.stat-val{font-size:22px}
+
+      /* Modales */
+      .modal{padding:20px 16px;max-height:90vh;overflow-y:auto;margin:16px}
+      .modal-overlay{align-items:flex-end}
+      .modal{border-radius:20px 20px 0 0;max-width:100%}
+
+      /* Form groups */
+      .form-group label{font-size:12px}
+      input,select,textarea{font-size:14px;padding:9px 12px}
+
+      /* Sección horarios tabla */
+      #tabla-horarios .tabla{min-width:600px}
+      #tabla-clases .tabla{min-width:500px}
+      #tabla-alumnas .tabla{min-width:400px}
+
+      /* Ingresos */
+      .ing-resumen{flex-direction:column}
+
+      /* Botones de acción */
+      .modal-btns{flex-direction:column}
+      .modal-btns .btn{width:100%}
+
+      /* Admin-main-menu-btn */
+      .admin-mobile-menu-btn{width:100%;justify-content:center;margin-bottom:12px}
+    }
+    @media(max-width:480px){
+      .stats-grid{grid-template-columns:1fr 1fr;gap:8px}
+      .stat-card{padding:12px}
+      .admin-main{padding:10px}
+      .card{padding:12px}
+      .tabla{font-size:11px}
     }
     .mobile-nav-select{display:none}
     .admin-mobile-menu-btn{
@@ -637,6 +691,16 @@ async function init(){
   document.getElementById('resumen-fecha').textContent = new Date().toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('wod-fecha').value = hoy();
   cargarResumen();
+
+  // Auto-wrap tablas sin contenedor de scroll
+  document.querySelectorAll('.tabla').forEach(t => {
+    if(!t.parentElement.classList.contains('tabla-wrap')){
+      const wrap = document.createElement('div');
+      wrap.className = 'tabla-wrap';
+      t.parentNode.insertBefore(wrap, t);
+      wrap.appendChild(t);
+    }
+  });
 }
 
 // ── NAVEGACIÓN ────────────────────────────────────────────────
