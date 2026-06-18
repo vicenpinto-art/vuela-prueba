@@ -8,75 +8,62 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--coral:#ff4e68;--magenta:#ff008d;--cyan:#00c8d4;--purple:#8b6aff;--yellow:#fecb29;--dark:#111;--gray:#555;--light:#f5f5f7;--border:rgba(0,0,0,.08)}
+    :root{--coral:#ff4e68;--magenta:#ff008d;--cyan:#00c8d4;--purple:#8b6aff;--dark:#111;--gray:#555;--light:#f5f5f7;--border:rgba(0,0,0,.08)}
     body{font-family:'Outfit',sans-serif;background:linear-gradient(135deg,#fff 0%,#f0f0f5 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-
-    .login-container{
-      background:#fff;border-radius:24px;box-shadow:0 8px 32px rgba(0,0,0,.08);
-      width:100%;max-width:420px;padding:48px 32px;
-    }
+    .container{background:#fff;border-radius:24px;box-shadow:0 8px 32px rgba(0,0,0,.08);width:100%;max-width:420px;padding:48px 32px;}
     .logo{font-family:'Dancing Script',cursive;font-size:28px;color:var(--coral);text-align:center;margin-bottom:32px}
-    .form-title{font-size:20px;font-weight:700;text-align:center;margin-bottom:8px;color:var(--dark)}
-    .form-subtitle{font-size:13px;color:var(--gray);text-align:center;margin-bottom:24px;line-height:1.5}
-    
+    .titulo{font-size:20px;font-weight:700;text-align:center;margin-bottom:8px;color:var(--dark)}
+    .subtitulo{font-size:13px;color:var(--gray);text-align:center;margin-bottom:24px;line-height:1.5}
     .form-group{margin-bottom:18px}
     .form-group label{font-size:12px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px}
-    .form-group input{
-      width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;
-      font-size:14px;font-family:'Outfit',sans-serif;transition:border .2s;
-    }
+    .form-group input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:'Outfit',sans-serif;transition:border .2s;}
     .form-group input:focus{outline:none;border-color:var(--coral)}
     .form-group input::placeholder{color:#ccc}
-
-    .btn{
-      width:100%;padding:13px;border:none;border-radius:12px;font-family:'Outfit',sans-serif;
-      font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;
-      display:inline-block;text-align:center;
-    }
+    .btn{width:100%;padding:13px;border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;}
     .btn-primary{background:linear-gradient(135deg,var(--coral),var(--magenta));color:#fff}
     .btn-primary:hover{opacity:.9;transform:translateY(-2px)}
-    .btn-secondary{background:var(--light);color:var(--dark)}
-    .btn-secondary:hover{background:#e8e8e8}
-
-    .alert{
-      padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:16px;
-      display:none;
-    }
-    .alert.visible{display:block}
-    .alert.success{background:#e0fdf4;color:#065f46;border:1px solid #a7f3d0}
-    .alert.error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
-    .alert.info{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
-
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .alerta{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;}
+    .alerta.visible{display:block}
+    .alerta.success{background:#e0fdf4;color:#065f46;border:1px solid #a7f3d0}
+    .alerta.error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
     .link-group{text-align:center;margin-top:20px;font-size:13px}
-    .link-group a{color:var(--coral);text-decoration:none;font-weight:600;transition:color .2s}
+    .link-group a{color:var(--coral);text-decoration:none;font-weight:600}
     .link-group a:hover{color:var(--magenta)}
-
-    .loading{display:none}
-    .loading.visible{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
-
-<div class="login-container">
+<div class="container">
   <div class="logo">Espacio Vuela</div>
-  
-  <h2 class="form-title" id="titulo">Recuperar contraseña</h2>
-  <p class="form-subtitle" id="subtitulo">Ingresa tu email y te enviaremos un link para resetear tu contraseña.</p>
+  <h2 class="titulo" id="titulo">Recuperar contraseña</h2>
+  <p class="subtitulo" id="subtitulo">Ingresa tu email y te enviaremos un link para resetear tu contraseña.</p>
+  <div class="alerta" id="alerta"></div>
 
-  <div class="alert" id="alerta"></div>
-
-  <form id="form-recuperar" onsubmit="handleSubmit(event)">
+  <!-- PASO 1: Solicitar email -->
+  <div id="paso-email">
     <div class="form-group">
       <label>Correo electrónico</label>
-      <input type="email" id="email" placeholder="tu@email.com" required>
+      <input type="email" id="input-email" placeholder="tu@email.com">
     </div>
-
-    <button type="submit" class="btn btn-primary">
+    <button class="btn btn-primary" id="btn-enviar" onclick="enviarEmail()">
       Enviar email de recuperación
-      <span class="loading" id="loading"></span>
     </button>
-  </form>
+  </div>
+
+  <!-- PASO 2: Nueva contraseña (visible solo si viene del link) -->
+  <div id="paso-password" style="display:none">
+    <div class="form-group">
+      <label>Nueva contraseña</label>
+      <input type="password" id="input-password" placeholder="Mínimo 6 caracteres">
+    </div>
+    <div class="form-group">
+      <label>Repetir contraseña</label>
+      <input type="password" id="input-password2" placeholder="Repite tu nueva contraseña">
+    </div>
+    <button class="btn btn-primary" id="btn-cambiar" onclick="cambiarPassword()">
+      Cambiar contraseña
+    </button>
+  </div>
 
   <div class="link-group">
     <a href="login-nuevo.html">← Volver al login</a>
@@ -89,72 +76,71 @@ const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
 const {createClient} = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function handleSubmit(e) {
-  e.preventDefault();
-  const email = document.getElementById('email').value.trim();
-  const btn = e.target.querySelector('button');
-  const loading = document.getElementById('loading');
-  const alerta = document.getElementById('alerta');
+function alerta(msg, tipo) {
+  const el = document.getElementById('alerta');
+  el.textContent = msg;
+  el.className = 'alerta visible ' + tipo;
+}
 
-  if (!email) {
-    mostrarAlerta('Por favor ingresa tu email', 'error');
+async function enviarEmail() {
+  const email = document.getElementById('input-email').value.trim();
+  if (!email) { alerta('Por favor ingresa tu email', 'error'); return; }
+
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/recuperar.html'
+  });
+
+  if (error) {
+    alerta('Error: ' + error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Enviar email de recuperación';
     return;
   }
 
+  document.getElementById('paso-email').style.display = 'none';
+  document.getElementById('titulo').textContent = '✓ Email enviado';
+  document.getElementById('subtitulo').textContent = 'Revisa tu bandeja de entrada y haz clic en el link. Si no lo ves, revisa spam.';
+  alerta('Email enviado correctamente.', 'success');
+}
+
+async function cambiarPassword() {
+  const p1 = document.getElementById('input-password').value;
+  const p2 = document.getElementById('input-password2').value;
+
+  if (!p1 || p1.length < 6) { alerta('La contraseña debe tener al menos 6 caracteres', 'error'); return; }
+  if (p1 !== p2) { alerta('Las contraseñas no coinciden', 'error'); return; }
+
+  const btn = document.getElementById('btn-cambiar');
   btn.disabled = true;
-  loading.classList.add('visible');
+  btn.textContent = 'Guardando...';
 
-  try {
-    const { error } = await sb.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login-nuevo.html`
-    });
+  const { error } = await sb.auth.updateUser({ password: p1 });
 
-    if (error) {
-      mostrarAlerta('Error: ' + (error.message || 'No se pudo enviar el email'), 'error');
-      btn.disabled = false;
-      loading.classList.remove('visible');
-      return;
-    }
-
-    // Éxito
-    document.getElementById('form-recuperar').style.display = 'none';
-    document.getElementById('titulo').textContent = '✓ Email enviado';
-    document.getElementById('subtitulo').textContent = 'Revisa tu bandeja de entrada y haz clic en el link para resetear tu contraseña. Si no ves el email, revisa spam.';
-    mostrarAlerta('Email de recuperación enviado correctamente. Revivirá en 1 hora.', 'success');
-    
-  } catch (err) {
-    mostrarAlerta('Error inesperado: ' + err.message, 'error');
+  if (error) {
+    alerta('Error: ' + error.message, 'error');
     btn.disabled = false;
-    loading.classList.remove('visible');
+    btn.textContent = 'Cambiar contraseña';
+    return;
   }
+
+  alerta('✓ Contraseña cambiada correctamente. Redirigiendo...', 'success');
+  document.getElementById('paso-password').style.display = 'none';
+  setTimeout(() => { window.location.href = 'login-nuevo.html'; }, 2000);
 }
 
-function mostrarAlerta(msg, tipo) {
-  const alerta = document.getElementById('alerta');
-  alerta.textContent = msg;
-  alerta.className = `alert visible ${tipo}`;
-}
-
-// Si viene del link de reseteo, mostrar formulario para nueva contraseña
-window.addEventListener('load', () => {
-  const hash = window.location.hash;
-  if (hash.includes('type=recovery')) {
+// Detectar si viene del link de recuperación
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    document.getElementById('paso-email').style.display = 'none';
+    document.getElementById('paso-password').style.display = 'block';
     document.getElementById('titulo').textContent = 'Nueva contraseña';
     document.getElementById('subtitulo').textContent = 'Ingresa tu nueva contraseña.';
-    document.getElementById('email').style.display = 'none';
-    document.getElementById('email').removeAttribute('required');
-    
-    const label = document.querySelector('label');
-    label.textContent = 'Nueva contraseña';
-    document.getElementById('email').id = 'password';
-    document.getElementById('email').type = 'password';
-    document.getElementById('email').placeholder = 'Nueva contraseña';
-    document.getElementById('email').style.display = 'block';
-    
-    document.querySelector('button').textContent = 'Cambiar contraseña';
   }
 });
 </script>
-
 </body>
 </html>

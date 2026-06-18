@@ -280,7 +280,14 @@
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
 
     if (error) {
-      mostrar('Correo o contraseña incorrectos.', 'error');
+      const msg = error.message || '';
+      if (msg.includes('Invalid login') || msg.includes('invalid_credentials')) {
+        mostrar('Correo o contraseña incorrectos.', 'error');
+      } else if (msg.includes('Email not confirmed')) {
+        mostrar('Confirma tu email antes de iniciar sesión.', 'error');
+      } else {
+        mostrar('Error al iniciar sesión: ' + msg, 'error');
+      }
       btn.disabled = false;
       btn.textContent = 'Iniciar sesión →';
       return;
