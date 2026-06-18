@@ -236,6 +236,33 @@
       .ev-nav-logo { height:32px; }
     }
   </style>
+
+  /* ── #23 #24 NAV DERECHO: badge rol + avatar ── */
+  .ev-nav-right { display:flex; align-items:center; gap:10px; }
+  .ev-nav-user-pill {
+    display:flex; align-items:center; gap:7px;
+    text-decoration:none; color:rgba(0,0,0,.7);
+    padding:4px 13px 4px 4px; border-radius:100px;
+    border:1.5px solid rgba(0,0,0,.08); background:#fff;
+    font-size:13px; font-weight:600;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .ev-nav-user-pill:hover { border-color:rgba(255,78,104,.3); box-shadow:0 2px 12px rgba(255,78,104,.1); }
+  .ev-nav-avatar-circle {
+    width:28px; height:28px; border-radius:50%;
+    background:linear-gradient(135deg,#a183ff,#ff4e68);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; color:#fff; flex-shrink:0; overflow:hidden;
+  }
+  .ev-nav-avatar-circle img { width:100%; height:100%; object-fit:cover; display:block; }
+  .ev-nav-badge-rol {
+    font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;
+    text-transform:uppercase; letter-spacing:1px;
+  }
+  .ev-nav-badge-rol.admin     { background:rgba(139,106,255,.15); color:#6b3fd4; }
+  .ev-nav-badge-rol.profesora { background:rgba(0,200,212,.12);   color:#007a82; }
+  .ev-nav-badge-rol.alumna    { background:rgba(255,78,104,.1);   color:#ff4e68; }
+  @media(max-width:768px){ .ev-nav-right { display:none !important; } }
 </head>
 <body>
 
@@ -247,9 +274,16 @@
     <li><a href="index.html#planes">Planes</a></li>
     <li><a href="profes.html">Profes</a></li>
     <li><a href="mi-cuenta.html">Mi cuenta</a></li>
-    <li><a href="javascript:void(0)" onclick="abrirIGVuela()" class="ev-nav-cta">Súmate a Vuela</a></li>
+    <li><a href="planes.html" class="ev-nav-cta">Súmate a Vuela</a></li>
     <li><button class="ev-nav-salir" id="btn-salir-nav">Salir</button></li>
   </ul>
+  <div class="ev-nav-right" id="ev-nav-right" style="display:none;">
+    <span class="ev-nav-badge-rol" id="ev-nav-badge-rol"></span>
+    <a href="mi-cuenta.html" class="ev-nav-user-pill" id="ev-nav-user-pill">
+      <div class="ev-nav-avatar-circle" id="ev-nav-avatar-circle">?</div>
+      <span id="ev-nav-user-nombre">Mi cuenta</span>
+    </a>
+  </div>
   <div class="ev-nav-mobile">
     <button class="ev-nav-menu-btn" onclick="document.getElementById('ev-nav-links').classList.toggle('nav-open')">☰</button>
   </div>
@@ -297,6 +331,12 @@ function abrirIGVuela(){
     <button class="modal-close" onclick="cerrarModal('modal-agendar')">✕</button>
     <h2>Confirmar agendamiento</h2>
     <div class="modal-clase-detalle" id="modal-detalle"></div>
+    <!-- Botón ver rutina (se muestra solo si hay rutina publicada) -->
+    <div id="rutina-preview" style="display:none; margin-bottom:16px;">
+      <button onclick="abrirRutina()" style="width:100%;padding:11px;border-radius:12px;border:1.5px solid rgba(161,131,255,.35);background:rgba(161,131,255,.06);color:#6b3fd4;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s;">
+        <span>📋</span> Ver rutina de la clase
+      </button>
+    </div>
     <div class="modal-btns">
       <button class="btn-confirmar" id="btn-confirmar-agendar" onclick="confirmarAgendar()">Confirmar →</button>
       <button class="btn-modal-sec" onclick="cerrarModal('modal-agendar')">Cancelar</button>
@@ -316,6 +356,18 @@ function abrirIGVuela(){
       <button class="btn-modal-sec" onclick="cerrarModal('modal-cancelar')">Volver</button>
     </div>
     <div class="modal-msg" id="modal-cancelar-msg"></div>
+  </div>
+</div>
+
+<!-- MODAL VER RUTINA -->
+<div class="modal-overlay" id="modal-rutina">
+  <div class="modal" style="max-width:520px; max-height:85vh; overflow-y:auto;">
+    <button class="modal-close" onclick="cerrarModal('modal-rutina')">✕</button>
+    <h2 style="display:flex;align-items:center;gap:8px;">📋 Rutina de la clase</h2>
+    <div id="modal-rutina-contenido" style="margin-top:4px;"></div>
+    <div class="modal-btns" style="margin-top:20px;">
+      <button class="btn-modal-sec" onclick="cerrarModal('modal-rutina')">Cerrar</button>
+    </div>
   </div>
 </div>
 
@@ -369,10 +421,42 @@ function abrirIGVuela(){
   }
 
   // ── INIT ──────────────────────────────────────────────────────
+  
+  // ── #23 #24 initNavUser: badge rol + avatar ──────────────────
+  async function initNavUser() {
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) return;
+      const { data: u } = await sb.from('usuarios')
+        .select('nombre,rol,foto')
+        .eq('id', session.user.id)
+        .maybeSingle();
+      if (!u) return;
+      const right  = document.getElementById('ev-nav-right');
+      const badge  = document.getElementById('ev-nav-badge-rol');
+      const circle = document.getElementById('ev-nav-avatar-circle');
+      const nombre = document.getElementById('ev-nav-user-nombre');
+      if (!right) return;
+      if (badge) {
+        const labels = { admin:'Admin', profesora:'Profesora', alumna:'Alumna' };
+        badge.textContent = labels[u.rol] || u.rol;
+        badge.className = 'ev-nav-badge-rol ' + (u.rol || 'alumna');
+      }
+      if (circle) {
+        circle.innerHTML = u.foto
+          ? `<img src="${u.foto}" alt="">`
+          : (u.nombre || '?')[0].toUpperCase();
+      }
+      if (nombre) nombre.textContent = (u.nombre || 'Mi cuenta').split(' ')[0];
+      right.style.display = 'flex';
+    } catch(e) {}
+  }
+
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'login.html'; return; }
     userId = session.user.id;
+    initNavUser();
     await Promise.all([verificarPlan(), cargarClases()]);
   }
 
@@ -513,7 +597,9 @@ function abrirIGVuela(){
   });
 
   // ── MODAL AGENDAR ─────────────────────────────────────────────
-  function abrirAgendar(claseId) {
+  let rutinaActual = null;
+
+  async function abrirAgendar(claseId) {
     if (!tieneplanActivo) {
       window.location.href = 'planes.html';
       return;
@@ -533,6 +619,23 @@ function abrirIGVuela(){
     document.getElementById('modal-agendar-msg').className = 'modal-msg';
     document.getElementById('btn-confirmar-agendar').disabled = false;
     document.getElementById('btn-confirmar-agendar').textContent = 'Confirmar →';
+
+    // Consultar si hay rutina publicada para esta clase
+    rutinaActual = null;
+    document.getElementById('rutina-preview').style.display = 'none';
+    try {
+      const { data: rutina } = await sb
+        .from('rutinas')
+        .select('descripcion, objetivo, calentamiento, parte_principal, posturas, musica, enfriamiento, recomendaciones, nivel')
+        .eq('clase_id', claseSeleccionada.id)
+        .limit(1)
+        .maybeSingle();
+      if (rutina) {
+        rutinaActual = rutina;
+        document.getElementById('rutina-preview').style.display = 'block';
+      }
+    } catch(e) {}
+
     abrirModal('modal-agendar');
   }
 
@@ -575,6 +678,34 @@ function abrirIGVuela(){
       cerrarModal('modal-agendar');
       renderClases();
     }, 1500);
+  }
+
+  // ── MODAL RUTINA ──────────────────────────────────────────────
+  function abrirRutina() {
+    if (!rutinaActual) return;
+    const r = rutinaActual;
+
+    function bloque(emoji, titulo, contenido) {
+      if (!contenido) return '';
+      return `<div style="margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:#6b3fd4;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;">${emoji} ${titulo}</div>
+        <div style="font-size:14px;color:#444;line-height:1.65;background:rgba(161,131,255,.05);border-radius:10px;padding:10px 13px;">${contenido}</div>
+      </div>`;
+    }
+
+    let html = '';
+    if (r.nivel) html += `<div style="margin-bottom:14px;"><span style="font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;background:rgba(161,131,255,.15);color:#6b3fd4;">Nivel: ${r.nivel}</span></div>`;
+    html += bloque('🎯', 'Objetivo', r.objetivo);
+    html += bloque('📝', 'Descripción', r.descripcion);
+    html += bloque('🔥', 'Calentamiento', r.calentamiento);
+    html += bloque('💪', 'Parte principal', r.parte_principal);
+    html += bloque('🧘', 'Posturas / Movimientos', r.posturas);
+    html += bloque('🎵', 'Música', r.musica);
+    html += bloque('❄️', 'Enfriamiento', r.enfriamiento);
+    html += bloque('💡', 'Recomendaciones', r.recomendaciones);
+
+    document.getElementById('modal-rutina-contenido').innerHTML = html || '<p style="color:#888;font-size:14px;">Sin detalles adicionales.</p>';
+    abrirModal('modal-rutina');
   }
 
   // ── MODAL CANCELAR ────────────────────────────────────────────

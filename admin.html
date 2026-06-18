@@ -246,6 +246,33 @@
       .ev-nav-logo { height:32px; }
     }
   </style>
+
+  /* ── #23 #24 NAV DERECHO: badge rol + avatar ── */
+  .ev-nav-right { display:flex; align-items:center; gap:10px; }
+  .ev-nav-user-pill {
+    display:flex; align-items:center; gap:7px;
+    text-decoration:none; color:rgba(0,0,0,.7);
+    padding:4px 13px 4px 4px; border-radius:100px;
+    border:1.5px solid rgba(0,0,0,.08); background:#fff;
+    font-size:13px; font-weight:600;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .ev-nav-user-pill:hover { border-color:rgba(255,78,104,.3); box-shadow:0 2px 12px rgba(255,78,104,.1); }
+  .ev-nav-avatar-circle {
+    width:28px; height:28px; border-radius:50%;
+    background:linear-gradient(135deg,#a183ff,#ff4e68);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; color:#fff; flex-shrink:0; overflow:hidden;
+  }
+  .ev-nav-avatar-circle img { width:100%; height:100%; object-fit:cover; display:block; }
+  .ev-nav-badge-rol {
+    font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;
+    text-transform:uppercase; letter-spacing:1px;
+  }
+  .ev-nav-badge-rol.admin     { background:rgba(139,106,255,.15); color:#6b3fd4; }
+  .ev-nav-badge-rol.profesora { background:rgba(0,200,212,.12);   color:#007a82; }
+  .ev-nav-badge-rol.alumna    { background:rgba(255,78,104,.1);   color:#ff4e68; }
+  @media(max-width:768px){ .ev-nav-right { display:none !important; } }
 </head>
 <body>
 
@@ -256,11 +283,17 @@
     <li><a href="index.html#clases">Clases</a></li>
     <li><a href="index.html#planes">Planes</a></li>
     <li><a href="profes.html">Profes</a></li>
-    <li><span class="ev-nav-rol" id="nav-rol-badge">Admin</span></li>
     <li><a href="admin.html" id="nav-user-link">Panel</a></li>
-    <li><a href="javascript:void(0)" onclick="abrirIGVuela()" class="ev-nav-cta">Súmate a Vuela</a></li>
+    <li><a href="planes.html" class="ev-nav-cta">Súmate a Vuela</a></li>
     <li><button class="ev-nav-salir" id="btn-salir-nav">Salir</button></li>
   </ul>
+  <div class="ev-nav-right" id="ev-nav-right" style="display:none;">
+    <span class="ev-nav-badge-rol" id="ev-nav-badge-rol"></span>
+    <a href="mi-cuenta.html" class="ev-nav-user-pill" id="ev-nav-user-pill">
+      <div class="ev-nav-avatar-circle" id="ev-nav-avatar-circle">?</div>
+      <span id="ev-nav-user-nombre">Mi cuenta</span>
+    </a>
+  </div>
   <div class="ev-nav-mobile">
     <button class="ev-nav-menu-btn" onclick="document.getElementById('ev-nav-links').classList.toggle('nav-open')">☰</button>
   </div>
@@ -681,10 +714,42 @@ function abrirModal(id){document.getElementById(id).classList.add('open');docume
 function cerrarModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow=''}
 
 // ── INIT ──────────────────────────────────────────────────────
-async function init(){
+
+  // ── #23 #24 initNavUser: badge rol + avatar ──────────────────
+  async function initNavUser() {
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) return;
+      const { data: u } = await sb.from('usuarios')
+        .select('nombre,rol,foto')
+        .eq('id', session.user.id)
+        .maybeSingle();
+      if (!u) return;
+      const right  = document.getElementById('ev-nav-right');
+      const badge  = document.getElementById('ev-nav-badge-rol');
+      const circle = document.getElementById('ev-nav-avatar-circle');
+      const nombre = document.getElementById('ev-nav-user-nombre');
+      if (!right) return;
+      if (badge) {
+        const labels = { admin:'Admin', profesora:'Profesora', alumna:'Alumna' };
+        badge.textContent = labels[u.rol] || u.rol;
+        badge.className = 'ev-nav-badge-rol ' + (u.rol || 'alumna');
+      }
+      if (circle) {
+        circle.innerHTML = u.foto
+          ? `<img src="${u.foto}" alt="">`
+          : (u.nombre || '?')[0].toUpperCase();
+      }
+      if (nombre) nombre.textContent = (u.nombre || 'Mi cuenta').split(' ')[0];
+      right.style.display = 'flex';
+    } catch(e) {}
+  }
+
+  async function init(){
   const {data:{session}} = await sb.auth.getSession();
   if(!session){window.location.href='login.html';return;}
   userId = session.user.id;
+    initNavUser();
   const {data:u} = await sb.from('usuarios').select('nombre,apellido,rol').eq('id',userId).single();
   if(!u||u.rol!=='admin'){window.location.href='mi-cuenta.html';return;}
   const elNavNombre = document.getElementById('nav-nombre'); if(elNavNombre) elNavNombre.textContent=`${u.nombre||''} ${u.apellido||''}`.trim();
