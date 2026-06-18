@@ -236,7 +236,7 @@ function abrirIGVuela(){
 
   <main class="admin-main">
   <button class="admin-mobile-menu-btn" id="admin-mobile-menu-btn" onclick="toggleAdminMobileMenu()">
-    ☰ <span id="admin-mobile-menu-label">Resumen</span>
+    ☰ Panel Admin
   </button>
   <div class="admin-mobile-nav" id="admin-mobile-nav">
     <div class="admin-mobile-nav-item active" onclick="navegarMobile('resumen')">📊 Resumen</div>
@@ -1325,27 +1325,43 @@ function toggleAdminMobileMenu() {
 }
 
 function navegarMobile(sec) {
-  // Actualizar sidebar desktop
-  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-  const match = document.querySelector(`.sidebar-item[data-sec="${sec}"]`);
-  if (match) match.classList.add('active');
-
-  // Actualizar menú móvil
-  document.querySelectorAll('.admin-mobile-nav-item').forEach(el => el.classList.remove('active'));
   const labels = {
     resumen:'Resumen', horarios:'Horarios', clases:'Clases',
     asistencia:'Asistencia', alumnas:'Alumnas', rutina:'Rutina del día',
     roles:'Roles', disciplinas:'Disciplinas', 'eliminar-usuario':'Eliminar usuaria',
     ingresos:'Ingresos'
   };
+
+  // Actualizar sidebar desktop
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  const match = document.querySelector(`.sidebar-item[data-sec="${sec}"]`);
+  if (match) match.classList.add('active');
+
+  // Mostrar sección correcta
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const secEl = document.getElementById('sec-' + sec);
+  if (secEl) secEl.classList.add('active');
+
+  // Cargar datos de la sección
+  if(sec==='horarios' && todosLosHorarios.length===0) cargarHorarios();
+  if(sec==='clases') cargarClases();
+  if(sec==='asistencia') cargarClasesAsistencia();
+  if(sec==='alumnas' && todasLasAlumnas.length===0) cargarAlumnas();
+  if(sec==='rutina') cargarRutinas();
+  if(sec==='eliminar-usuario') cargarBuscarUsuario();
+  if(sec==='disciplinas') cargarDisciplinas();
+  if(sec==='ingresos') iniciarIngresos();
+  if(sec==='roles' && todosLosUsuarios.length===0) cargarRoles();
+
+  // Actualizar menú móvil
+  document.querySelectorAll('.admin-mobile-nav-item').forEach(el => el.classList.remove('active'));
   const items = document.querySelectorAll('.admin-mobile-nav-item');
   items.forEach(el => { if(el.textContent.trim().includes(labels[sec]||sec)) el.classList.add('active'); });
   const labelEl = document.getElementById('admin-mobile-menu-label');
   if(labelEl) labelEl.textContent = labels[sec] || sec;
 
-  // Cerrar menú y mostrar sección
+  // Cerrar menú
   document.getElementById('admin-mobile-nav').classList.remove('open');
-  mostrarSeccion(sec);
 }
 
 // ── ROLES ─────────────────────────────────────────────────────
