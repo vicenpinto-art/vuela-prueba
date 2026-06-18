@@ -561,11 +561,11 @@ function abrirIGVuela(){
         <input type="number" id="asignar-monto" min="0" placeholder="0">
       </div>
       <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px">
-        <input type="checkbox" id="asignar-matricula" style="width:16px;height:16px;accent-color:var(--coral)">
+        <input type="checkbox" id="asignar-matricula" style="width:16px;height:16px;accent-color:var(--coral)" onchange="recalcularMonto()">
         <label for="asignar-matricula" style="font-weight:400;font-size:13px;color:var(--gray)">Incluye matrícula ($12.000)</label>
       </div>
       <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px">
-        <input type="checkbox" id="asignar-addon" style="width:16px;height:16px;accent-color:var(--coral)">
+        <input type="checkbox" id="asignar-addon" style="width:16px;height:16px;accent-color:var(--coral)" onchange="recalcularMonto()">
         <label for="asignar-addon" style="font-weight:400;font-size:13px;color:var(--gray)">Incluye addon gym ($13.000)</label>
       </div>
       <div class="form-group full" style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">
@@ -1087,6 +1087,8 @@ async function abrirAsignarPlan(alumnaId, nombre){
     </option>`).join('');
   sel.onchange = () => {
     const opt = sel.options[sel.selectedIndex];
+    document.getElementById('asignar-matricula').checked = false;
+    document.getElementById('asignar-addon').checked = false;
     document.getElementById('asignar-monto').value = opt.dataset.precio || '';
   };
   sel.dispatchEvent(new Event('change'));
@@ -1153,6 +1155,18 @@ async function eliminarPlan(compraId){
   toast('Plan eliminado ✓');
   cerrarModal('modal-asignar-plan');
   cargarAlumnas();
+}
+
+function recalcularMonto(){
+  // Solo recalcula si no hay monto personalizado
+  const custom = document.getElementById('asignar-monto-custom').value.trim();
+  if(custom) return;
+  const sel = document.getElementById('asignar-plan-id');
+  if(!sel || !sel.options[sel.selectedIndex]) return;
+  const basePrecio = parseInt(sel.options[sel.selectedIndex].dataset.precio)||0;
+  const matricula  = document.getElementById('asignar-matricula')?.checked ? 12000 : 0;
+  const addon      = document.getElementById('asignar-addon')?.checked      ? 13000 : 0;
+  document.getElementById('asignar-monto').value = basePrecio + matricula + addon;
 }
 
 async function confirmarAsignarPlan(){

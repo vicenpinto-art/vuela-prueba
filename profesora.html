@@ -344,8 +344,8 @@ function abrirIGVuela(){
     usuarioNombre = `${u.nombre || ''} ${u.apellido || ''}`.trim();
     usuarioRol    = u.rol;
 
-    document.getElementById('nav-nombre').textContent = usuarioNombre;
-    document.getElementById('nav-rol').textContent    = u.rol === 'admin' ? 'Admin' : 'Profesora';
+    const elNombre = document.getElementById('nav-nombre'); if(elNombre) elNombre.textContent = usuarioNombre;
+    const elRol = document.getElementById('nav-rol'); if(elRol) elRol.textContent = u.rol === 'admin' ? 'Admin' : 'Profesora';
     document.getElementById('panel-fecha').textContent =
       new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
 

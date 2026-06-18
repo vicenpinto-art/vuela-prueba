@@ -316,8 +316,10 @@ function abrirIGVuela(){
     }
     
     const nombre = u.nombre || 'alumna';
-    document.getElementById('nav-nombre').textContent = nombre;
-    document.getElementById('bienvenida-nombre').textContent = nombre;
+    const navNombre = document.getElementById('nav-nombre');
+    if (navNombre) navNombre.textContent = nombre;
+    const bienvenidaNombre = document.getElementById('bienvenida-nombre');
+    if (bienvenidaNombre) bienvenidaNombre.textContent = nombre;
     const hora = new Date().getHours();
     const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
     document.getElementById('bienvenida-sub').textContent = saludo + ' — ' + new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
