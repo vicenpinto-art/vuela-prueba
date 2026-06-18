@@ -729,6 +729,15 @@ function abrirIGVuela(){
 
     cerrarModalRutina();
     setTimeout(() => toast('✓ Rutina guardada correctamente'), 100);
+
+    // Cambiar automáticamente a tab Rutinas para que la vea
+    setTimeout(() => {
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      const tabRutinas = document.querySelector('.tab[data-tab="rutinas"]');
+      if(tabRutinas) tabRutinas.classList.add('active');
+      tabActiva = 'rutinas';
+      renderRutinasProf();
+    }, 300);
   }
 
   // Cerrar modal al hacer clic fuera

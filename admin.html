@@ -689,7 +689,7 @@ async function init(){
   if(!u||u.rol!=='admin'){window.location.href='mi-cuenta.html';return;}
   const elNavNombre = document.getElementById('nav-nombre'); if(elNavNombre) elNavNombre.textContent=`${u.nombre||''} ${u.apellido||''}`.trim();
   document.getElementById('resumen-fecha').textContent = new Date().toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  document.getElementById('wod-fecha').value = hoy();
+  const wodFecha = document.getElementById('wod-fecha'); if(wodFecha) wodFecha.value = hoy();
   cargarResumen();
 
   // Auto-wrap tablas sin contenedor de scroll
