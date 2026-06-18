@@ -1343,15 +1343,36 @@ async function cargarRutinas(){
   const ahora = new Date();
   const en144h = new Date(ahora.getTime() + 144*60*60*1000);
 
-  // Cargar clases próximas 144h que tengan rutina publicada
-  const {data: rutinas} = await sb
-    .from('rutinas')
-    .select('*, clases(id, nombre, fecha_hora, profesora)')
-    .gte('clases.fecha_hora', ahora.toISOString())
-    .lte('clases.fecha_hora', en144h.toISOString())
-    .order('clases.fecha_hora', {ascending: true});
+  // Paso 1: obtener clases próximas 144h
+  const {data: clases144} = await sb
+    .from('clases')
+    .select('id, nombre, fecha_hora, profesora')
+    .gte('fecha_hora', ahora.toISOString())
+    .lte('fecha_hora', en144h.toISOString())
+    .order('fecha_hora', {ascending: true});
 
-  const conClase = (rutinas||[]).filter(r => r.clases);
+  if(!clases144 || clases144.length === 0){
+    el.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--gray)">
+      <div style="font-size:32px;margin-bottom:12px">📋</div>
+      <p style="font-size:14px">No hay clases en las próximas 144 horas.</p>
+    </div>`;
+    return;
+  }
+
+  // Paso 2: obtener rutinas de esas clases
+  const claseIds = clases144.map(c => c.id);
+  const {data: rutinasData} = await sb
+    .from('rutinas')
+    .select('*')
+    .in('clase_id', claseIds);
+
+  const rutinaMap = {};
+  (rutinasData||[]).forEach(r => { rutinaMap[r.clase_id] = r; });
+
+  // Construir lista: solo clases que tienen rutina
+  const conClase = clases144
+    .filter(c => rutinaMap[c.id])
+    .map(c => ({ ...rutinaMap[c.id], clases: c }));
 
   if(conClase.length === 0){
     el.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--gray)">
