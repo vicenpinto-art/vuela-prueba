@@ -267,6 +267,15 @@
     msg.textContent = texto;
     msg.className = 'mensaje ' + tipo;
   }
+  
+// Si ya está logueada, redirigir directo
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    const { data: u } = await sb.from('usuarios').select('rol').eq('id', session.user.id).single();
+    if (u?.rol === 'admin') window.location.href = 'admin.html';
+    else if (u?.rol === 'profesora') window.location.href = 'profesora.html';
+    else window.location.href = 'mi-cuenta.html';
+  }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
