@@ -472,7 +472,8 @@ function abrirIGVuela(){
       .gte('fecha_fin', hoy)
       .order('fecha_fin', { ascending: false })
       .limit(1);
-    tieneplanActivo = !!(data && data.length > 0);
+    // tieneplanActivo solo con estado activo (congelado no puede agendar — RPC lo bloquea)
+    tieneplanActivo = !!(data && data.length > 0 && data[0]?.estado === 'activo');
     tipoPlanUsuario = data?.[0]?.planes?.tipo || null;
     if (!tieneplanActivo) document.getElementById('alerta-plan').classList.add('visible');
   }
