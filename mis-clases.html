@@ -15,8 +15,6 @@
     nav{background:#fff;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
     .logo{font-family:'Dancing Script',cursive;font-size:26px;color:var(--coral);text-decoration:none}
     .nav-right{display:flex;align-items:center;gap:16px}
-    .nav-back{font-size:14px;color:var(--gray);text-decoration:none;transition:color .2s}
-    .nav-back:hover{color:var(--coral)}
 
     main{max-width:900px;margin:0 auto;padding:28px 24px 60px}
 
@@ -64,11 +62,14 @@
       .clases-grid{grid-template-columns:1fr}
       .stats{grid-template-columns:1fr 1fr}
     }
-  </style>
+</style>
 </head>
 <body>
 
 <script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
   else{window.open('https://ig.me/m/espacio_vuela','_blank');}
 }
 </script>
@@ -227,6 +228,9 @@ function renderizar() {
 }
 
 init();
+
+document.getElementById('btn-salir-nav').addEventListener('click', async () => {
+  await sb.auth.signOut();
   window.location.href = 'login.html';
 });
 </script>

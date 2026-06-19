@@ -213,11 +213,14 @@
     }
     .admin-mobile-nav-item:hover{color:#ff4e68;background:rgba(255,78,104,.04)}
     .admin-mobile-nav-item.active{color:#ff4e68;background:rgba(255,78,104,.05);border-left-color:#ff4e68;font-weight:600}
-  </style>
+</style>
 </head>
 <body>
 
 <script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
   else{window.open('https://ig.me/m/espacio_vuela','_blank');}
 }
 </script>
@@ -1775,6 +1778,8 @@ function formatCLP(n){
 }
 
 // ── CERRAR SESIÓN ─────────────────────────────────────────────
+document.getElementById('btn-salir-nav').addEventListener('click',async()=>{
+  await sb.auth.signOut();
   window.location.href='login.html';
 });
 

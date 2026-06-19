@@ -43,13 +43,6 @@
       color: var(--coral);
       text-decoration: none;
     }
-    .nav-link {
-      font-size: 14px;
-      color: var(--gray);
-      text-decoration: none;
-      transition: color .2s;
-    }
-    .nav-link:hover { color: var(--coral); }
 
     .page {
       flex: 1;
@@ -201,11 +194,14 @@
       .right { padding: 40px 24px; }
       nav { padding: 16px 24px; }
     }
-  </style>
+</style>
 </head>
 <body>
 
 <script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
   else{window.open('https://ig.me/m/espacio_vuela','_blank');}
 }
 </script>

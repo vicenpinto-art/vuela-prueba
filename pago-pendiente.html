@@ -22,11 +22,14 @@
     .btns { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
     .btn-primary { padding: 14px; background: linear-gradient(135deg, var(--coral), var(--magenta)); color: #fff; border: none; border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; display: block; }
     .btn-secondary { padding: 13px; background: #f5f5f7; color: #111; border: none; border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; display: block; }
-  </style>
+</style>
   <script src="nav.js"></script>
 </head>
 <body>
 <script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
   else{window.open('https://ig.me/m/espacio_vuela','_blank');}
 }
 </script>

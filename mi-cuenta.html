@@ -139,11 +139,14 @@
       .acciones-grid { grid-template-columns: 1fr 1fr; }
       .bienvenida { padding: 0; }
     }
-  </style>
+</style>
 </head>
 <body>
 
 <script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
   else{window.open('https://ig.me/m/espacio_vuela','_blank');}
 }
 </script>
@@ -620,6 +623,8 @@
         <a href="https://wa.me/56973841513" target="_blank" class="accion-btn"><span class="accion-icon">💬</span><span class="accion-label">WhatsApp</span></a>`;
     }
   }
+  document.getElementById('btn-salir-nav').addEventListener('click', async () => {
+    await sb.auth.signOut();
     window.location.href = 'login.html';
   });
 

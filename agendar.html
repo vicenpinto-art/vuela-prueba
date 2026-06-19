@@ -24,8 +24,6 @@
     }
     .logo { font-family: 'Dancing Script', cursive; font-size: 26px; color: var(--coral); text-decoration: none; }
     .nav-right { display: flex; align-items: center; gap: 16px; }
-    .nav-back { font-size: 14px; color: var(--gray); text-decoration: none; transition: color .2s; }
-    .nav-back:hover { color: var(--coral); }
 
     /* ALERTA SIN PLAN */
     .alerta-plan {
@@ -203,11 +201,14 @@
       .clase-card { flex-wrap: wrap; }
       .clase-accion { width: 100%; flex-direction: row; justify-content: flex-end; }
     }
-  </style>
+</style>
 </head>
 <body>
 
 <script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
   else{window.open('https://ig.me/m/espacio_vuela','_blank');}
 }
 </script>

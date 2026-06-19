@@ -15,8 +15,6 @@
     nav{background:#fff;padding:16px 40px;overflow:hidden;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
     .logo{font-family:'Dancing Script',cursive;font-size:26px;color:var(--coral);text-decoration:none}
     .nav-right{display:flex;align-items:center;gap:16px}
-    .nav-back{font-size:14px;color:var(--gray);text-decoration:none;transition:color .2s}
-    .nav-back:hover{color:var(--coral)}
     .nav-lista{font-size:13px;color:var(--gray);text-decoration:none;background:var(--light);padding:7px 14px;border-radius:8px;transition:background .2s}
     .nav-lista:hover{background:#ebebee}
 
@@ -127,11 +125,14 @@
       .clase-nombre-cal{font-size:14px}
       .hora-cal{font-size:16px;min-width:40px}
     }
-  </style>
+</style>
 </head>
 <body>
 
 <script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
   else{window.open('https://ig.me/m/espacio_vuela','_blank');}
 }
 </script>

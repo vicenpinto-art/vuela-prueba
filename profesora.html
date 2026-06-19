@@ -186,11 +186,14 @@
     .btn-rutina-card { font-size:11px; font-weight:700; padding:4px 10px; border-radius:6px; background:rgba(139,106,255,.1); color:var(--purple); border:none; cursor:pointer; margin-top:8px; }
     .btn-rutina-card:hover { background:rgba(139,106,255,.2); }
     .rutina-guardada { font-size:11px; color:#00a86b; font-weight:600; }
-  </style>
+</style>
 </head>
 <body>
 
 <script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
   else{window.open('https://ig.me/m/espacio_vuela','_blank');}
 }
 </script>
@@ -548,6 +551,8 @@
   }
 
   // ── CERRAR SESIÓN ─────────────────────────────────────────────
+  document.getElementById('btn-salir-nav').addEventListener('click', async () => {
+    await sb.auth.signOut();
     window.location.href = 'login.html';
   });
 
