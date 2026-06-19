@@ -430,7 +430,7 @@ function abrirIGVuela(){
       const { data: { session } } = await sb.auth.getSession();
       if (!session) return;
       const { data: u } = await sb.from('usuarios')
-        .select('nombre,rol,foto')
+        .select('nombre,rol')
         .eq('id', session.user.id)
         .maybeSingle();
       if (!u) return;
@@ -445,9 +445,7 @@ function abrirIGVuela(){
         badge.className = 'ev-nav-badge-rol ' + (u.rol || 'alumna');
       }
       if (circle) {
-        circle.innerHTML = u.foto
-          ? `<img src="${u.foto}" alt="">`
-          : (u.nombre || '?')[0].toUpperCase();
+        circle.innerHTML = (u.nombre || '?')[0].toUpperCase();
       }
       if (nombre) nombre.textContent = (u.nombre || 'Mi cuenta').split(' ')[0];
       right.style.display = 'flex';
@@ -497,6 +495,7 @@ function abrirIGVuela(){
     const [{ data: clases }, { data: inscripciones }] = await Promise.all([
       sb.from('clases')
         .select('*')
+        .eq('cancelada', false)
         .gte('fecha_hora', ahora)
         .lte('fecha_hora', en14dias.toISOString())
         .order('fecha_hora', { ascending: true }),

@@ -666,7 +666,7 @@ function abrirIGVuela(){
     const { data: planes, error } = await sb
       .from('planes')
       .select('*')
-      .not('tipo', 'in', '("matricula","addon_gym")')
+      .not('tipo', 'in', '("matricula","addon_gym","boost")')
       .order('precio', { ascending: true });
 
     if (error || !planes) {
@@ -931,7 +931,7 @@ function abrirIGVuela(){
       .from('compras')
       .select('id,fecha_fin,planes(nombre)')
       .eq('alumna_id', session.user.id)
-      .eq('estado', 'activo')
+      .in('estado', ['activo','congelado'])
       .gte('fecha_fin', hoyStr)
       .order('fecha_fin', { ascending: false })
       .limit(1);

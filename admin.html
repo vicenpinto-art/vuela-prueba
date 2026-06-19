@@ -751,7 +751,7 @@ function cerrarModal(id){document.getElementById(id).classList.remove('open');do
       const { data: { session } } = await sb.auth.getSession();
       if (!session) return;
       const { data: u } = await sb.from('usuarios')
-        .select('nombre,rol,foto')
+        .select('nombre,rol')
         .eq('id', session.user.id)
         .maybeSingle();
       if (!u) return;
@@ -766,9 +766,7 @@ function cerrarModal(id){document.getElementById(id).classList.remove('open');do
         badge.className = 'ev-nav-badge-rol ' + (u.rol || 'alumna');
       }
       if (circle) {
-        circle.innerHTML = u.foto
-          ? `<img src="${u.foto}" alt="">`
-          : (u.nombre || '?')[0].toUpperCase();
+        circle.innerHTML = (u.nombre || '?')[0].toUpperCase();
       }
       if (nombre) nombre.textContent = (u.nombre || 'Mi cuenta').split(' ')[0];
       right.style.display = 'flex';
@@ -832,7 +830,7 @@ async function cargarResumen(){
     sb.from('inscripciones').select('*',{count:'exact',head:true}).gte('created_at',hoyI.toISOString()),
     sb.from('inscripciones').select('alumna_id').gte('created_at',hace30.toISOString()).eq('estado','confirmada'),
     sb.from('compras').select('monto_pagado').gte('created_at',hoyI.toISOString()).lte('created_at',hoyF.toISOString()),
-    sb.from('compras').select('fecha_fin').eq('estado','activo').gte('fecha_fin',hoy()).order('fecha_fin')
+    sb.from('compras').select('fecha_fin').in('estado',['activo','congelado']).gte('fecha_fin',hoy()).order('fecha_fin')
   ]);
 
   // Stats base
