@@ -177,8 +177,8 @@
         <li><a href="index.html#clases">Clases</a></li>
         <li><a href="profes.html">Profes</a></li>
         <li><a href="planes.html" class="ev-nav-cta">Súmate a Vuela</a></li>
-        <li id="ev-li-micuenta-mobile" style="display:none"><a href="mi-cuenta.html">Mi cuenta</a></li>
-        <li id="ev-li-salir" class="ev-li-salir-hidden">
+        <li id="ev-li-micuenta-mobile"><a href="mi-cuenta.html">Mi cuenta</a></li>
+        <li id="ev-li-salir">
           <button class="ev-nav-salir" id="btn-salir-nav">Salir</button>
         </li>
       </ul>
@@ -274,9 +274,9 @@
                   : rol === 'profesora' ? 'mi-cuenta.html'
                   :                       'mi-cuenta.html';
 
-    // "Salir" del menú: visible solo en móvil (CSS lo controla); ocultar "Mi cuenta" texto
+    // "Salir" del menú: visible solo en móvil (CSS lo controla); "Mi cuenta" del menú queda oculto (sin clase activa)
     if (liSalir) liSalir.classList.add('ev-li-salir-activo');
-    if (liMiCuentaMobile) liMiCuentaMobile.style.display = 'none';
+    if (liMiCuentaMobile) liMiCuentaMobile.classList.remove('ev-li-micuenta-activo');
 
     // Desktop derecha: avatar (con rol debajo) + Salir
     if (rightEl) {
