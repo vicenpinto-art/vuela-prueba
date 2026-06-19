@@ -551,10 +551,6 @@ function abrirIGVuela(){
   }
 
   // ── CERRAR SESIÓN ─────────────────────────────────────────────
-  document.getElementById('btn-salir-nav').addEventListener('click', async () => {
-    await sb.auth.signOut();
-    window.location.href = 'login.html';
-  });
 
   init();
 

@@ -36,11 +36,11 @@
     /* Links */
     .ev-nav-links {
       list-style: none; display: flex; align-items: center;
-      gap: 4px; margin: 0; padding: 0; flex: 1; justify-content: center;
+      gap: 10px; margin: 0; padding: 0; flex: 1; justify-content: center;
     }
     .ev-nav-links a {
       text-decoration: none; color: rgba(0,0,0,.6); font-size: 14px;
-      font-weight: 500; padding: 6px 12px; border-radius: 8px;
+      font-weight: 500; padding: 6px 16px; border-radius: 8px;
       transition: color .2s, background .2s;
     }
     .ev-nav-links a:hover { color: #ff4e68; background: rgba(255,78,104,.06); }
@@ -146,10 +146,9 @@
     <ul class="ev-nav-links" id="ev-nav-links">
       <li><a href="index.html">Inicio</a></li>
       <li><a href="index.html#clases">Clases</a></li>
-      <li><a href="planes.html">Planes</a></li>
       <li><a href="profes.html">Profes</a></li>
-      <li id="ev-li-micuenta"><a href="mi-cuenta.html">Mi cuenta</a></li>
-      <li><a href="javascript:void(0)" onclick="abrirIGVuela()" class="ev-nav-cta">Súmate a Vuela</a></li>
+      <li><a href="planes.html" class="ev-nav-cta">Súmate a Vuela</a></li>
+      <li id="ev-li-micuenta-mobile" style="display:none"><a href="mi-cuenta.html">Mi cuenta</a></li>
       <li id="ev-li-salir" style="display:none">
         <button class="ev-nav-salir" id="btn-salir-nav">Salir</button>
       </li>
@@ -210,8 +209,24 @@
       session = res.data.session;
     } catch (e) { return; }
 
-    if (!session) return;
+    const liMiCuentaMobile = document.getElementById('ev-li-micuenta-mobile');
+    const liSalir = document.getElementById('ev-li-salir');
+    const rightEl = document.getElementById('ev-nav-right');
+    const mobileAvatarEl = document.getElementById('ev-nav-mobile-avatar');
 
+    // ── SIN SESIÓN: link "Mi cuenta" → login ─────────────────────
+    if (!session) {
+      if (liMiCuentaMobile) {
+        liMiCuentaMobile.style.display = '';
+        liMiCuentaMobile.querySelector('a').setAttribute('href', 'login.html');
+      }
+      if (rightEl) {
+        rightEl.innerHTML = `<a href="login.html" class="ev-nav-micuenta">Mi cuenta</a>`;
+      }
+      return;
+    }
+
+    // ── CON SESIÓN: avatar + rol + Salir ─────────────────────────
     let u = null;
     try {
       const res = await sb.from('usuarios')
@@ -228,37 +243,29 @@
                   : rol === 'profesora' ? 'mi-cuenta.html'
                   :                       'mi-cuenta.html';
 
-    // -- Ocultar "Mi cuenta" del menú (reemplazado por avatar desktop)
-    const liMiCuenta = document.getElementById('ev-li-micuenta');
-    if (liMiCuenta) liMiCuenta.style.display = 'none';
-
-    // -- Mostrar "Salir" en el menú móvil
-    const liSalir = document.getElementById('ev-li-salir');
+    // Mostrar "Salir" en el menú móvil; ocultar "Mi cuenta" de texto
     if (liSalir) liSalir.style.display = '';
+    if (liMiCuentaMobile) liMiCuentaMobile.style.display = 'none';
 
-    // -- Badge de rol
     const rolBadge = (rol === 'admin')
       ? '<span class="ev-nav-rol">Admin</span>'
       : (rol === 'profesora')
         ? '<span class="ev-nav-rol">Profesora</span>'
         : '';
 
-    // -- Desktop derecha: RolBadge + Avatar + "Mi cuenta" + Salir
-    const rightEl = document.getElementById('ev-nav-right');
+    // Desktop derecha: badge + avatar + Salir
     if (rightEl) {
       rightEl.innerHTML = `
         ${rolBadge}
         <a href="${href}" class="ev-nav-avatar" title="Ir a mi cuenta">
           <span>${inicial}</span>
         </a>
-        <a href="${href}" class="ev-nav-micuenta">Mi cuenta</a>
         <button class="ev-nav-salir" id="btn-salir-desktop">Salir</button>
       `;
       document.getElementById('btn-salir-desktop').addEventListener('click', _salir.bind(null, sb));
     }
 
-    // -- Móvil: avatar pequeño
-    const mobileAvatarEl = document.getElementById('ev-nav-mobile-avatar');
+    // Móvil: avatar pequeño
     if (mobileAvatarEl) {
       mobileAvatarEl.innerHTML = `
         <a href="${href}" class="ev-nav-avatar" title="${nombre}" style="width:32px;height:32px;">
@@ -267,7 +274,7 @@
       `;
     }
 
-    // -- Logout desde menú móvil
+    // Logout desde menú móvil
     const btnSalirNav = document.getElementById('btn-salir-nav');
     if (btnSalirNav) btnSalirNav.addEventListener('click', _salir.bind(null, sb));
   }

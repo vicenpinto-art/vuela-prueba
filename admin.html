@@ -1778,10 +1778,6 @@ function formatCLP(n){
 }
 
 // ── CERRAR SESIÓN ─────────────────────────────────────────────
-document.getElementById('btn-salir-nav').addEventListener('click',async()=>{
-  await sb.auth.signOut();
-  window.location.href='login.html';
-});
 
 document.querySelectorAll('.modal-overlay').forEach(o=>{
   o.addEventListener('click',e=>{if(e.target===o)cerrarModal(o.id);});
