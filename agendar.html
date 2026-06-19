@@ -464,18 +464,30 @@ function abrirIGVuela(){
 
   async function verificarPlan() {
     const hoy = new Date().toISOString().split('T')[0];
-    const { data } = await sb
+
+    // Query 1: verificar si hay plan activo (sin join para evitar errores FK)
+    const { data: compraData } = await sb
       .from('compras')
-      .select('id, planes!plan_id(tipo)')
+      .select('id, estado, plan_id')
       .eq('alumna_id', userId)
       .in('estado', ['activo', 'congelado'])
       .gte('fecha_fin', hoy)
       .order('fecha_fin', { ascending: false })
       .limit(1);
-    // tieneplanActivo solo con estado activo (congelado no puede agendar — RPC lo bloquea)
-    tieneplanActivo = !!(data && data.length > 0 && data[0]?.estado === 'activo');
-    tipoPlanUsuario = data?.[0]?.planes?.tipo || null;
+
+    tieneplanActivo = !!(compraData && compraData.length > 0 && compraData[0]?.estado === 'activo');
     if (!tieneplanActivo) document.getElementById('alerta-plan').classList.add('visible');
+
+    // Query 2: obtener tipo de plan por separado
+    const planId = compraData?.[0]?.plan_id;
+    if (planId) {
+      const { data: planInfo } = await sb
+        .from('planes')
+        .select('tipo')
+        .eq('id', planId)
+        .maybeSingle();
+      tipoPlanUsuario = planInfo?.tipo || null;
+    }
   }
 
   // ¿Puede esta alumna acceder a esta clase según su plan?
