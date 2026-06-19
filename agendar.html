@@ -462,17 +462,30 @@ function abrirIGVuela(){
     await Promise.all([verificarPlan(), cargarClases()]);
   }
 
+  let tipoPlanUsuario = null; // 'vuela' | 'muevete' | 'gym' | null
+
   async function verificarPlan() {
     const hoy = new Date().toISOString().split('T')[0];
     const { data } = await sb
       .from('compras')
-      .select('id')
+      .select('id, planes(tipo)')
       .eq('alumna_id', userId)
-      .eq('estado', 'activo')
+      .in('estado', ['activo', 'congelado'])
       .gte('fecha_fin', hoy)
+      .order('fecha_fin', { ascending: false })
       .limit(1);
     tieneplanActivo = !!(data && data.length > 0);
+    tipoPlanUsuario = data?.[0]?.planes?.tipo || null;
     if (!tieneplanActivo) document.getElementById('alerta-plan').classList.add('visible');
+  }
+
+  // ¿Puede esta alumna acceder a esta clase según su plan?
+  function puedeAccederClase(clase) {
+    if (!tieneplanActivo) return false;
+    const r = clase.restriccion_plan;
+    if (!r || r === 'libre') return true;         // sin restricción o libre → cualquier plan
+    if (tipoPlanUsuario === 'vuela') return true; // vuela accede a todo
+    return r === tipoPlanUsuario;                 // muevete/gym solo su tipo
   }
 
   async function cargarClases() {
@@ -557,6 +570,8 @@ function abrirIGVuela(){
       const fechaDisp = new Date(new Date(c.fecha_hora).getTime() - 144*60*60*1000);
       const diaDisp = fechaDisp.toLocaleDateString('es-CL', {weekday:'short', day:'numeric', month:'short'});
       accionHtml = `<button class="btn-sin-cupo" disabled title="Podrás agendar desde ${diaDisp}">Desde ${diaDisp}</button>`;
+    } else if (!puedeAccederClase(c)) {
+      accionHtml = `<button class="btn-sin-cupo" disabled title="Tu plan no incluye este tipo de clase">Plan no incluye</button>`;
     } else {
       accionHtml = `<button class="btn-agendar" onclick="abrirAgendar('${c.id}')">Agendar →</button>`;
     }
