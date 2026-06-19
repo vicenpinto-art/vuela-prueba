@@ -197,11 +197,9 @@
   <ul class="ev-nav-links" id="ev-nav-links">
     <li><a href="index.html">Inicio</a></li>
     <li><a href="index.html#clases">Clases</a></li>
-    <li><a href="index.html#planes">Planes</a></li>
     <li><a href="profes.html">Profes</a></li>
-    <li><a href="mi-cuenta.html">Mi cuenta</a></li>
     <li><a href="planes.html" class="ev-nav-cta">Súmate a Vuela</a></li>
-    <li><button class="ev-nav-salir" id="btn-salir-nav">Salir</button></li>
+    <li class="ev-nav-salir-mobile-li"><button class="ev-nav-salir" onclick="document.getElementById('btn-salir-nav').click()">Salir</button></li>
   </ul>
   <div class="ev-nav-right" id="ev-nav-right" style="display:none;">
     <span class="ev-nav-badge-rol" id="ev-nav-badge-rol"></span>
@@ -209,6 +207,7 @@
       <div class="ev-nav-avatar-circle" id="ev-nav-avatar-circle">?</div>
       <span id="ev-nav-user-nombre">Mi cuenta</span>
     </a>
+    <button class="ev-nav-salir" id="btn-salir-nav">Salir</button>
   </div>
   <div class="ev-nav-mobile">
     <button class="ev-nav-menu-btn" onclick="document.getElementById('ev-nav-links').classList.toggle('nav-open')">☰</button>
