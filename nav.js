@@ -100,6 +100,9 @@
     /* "Salir" dentro del menú: oculto en desktop (ya hay uno junto al avatar) */
     #ev-li-salir { display: none; }
 
+    /* "Mi cuenta" dentro del menú: oculto en desktop (ya hay uno a la derecha) */
+    #ev-li-micuenta-mobile { display: none; }
+
     /* Móvil */
     .ev-nav-mobile-right {
       display: none; align-items: center; gap: 8px;
@@ -148,6 +151,9 @@
 
       /* En móvil, el "Salir" del menú SÍ se muestra cuando hay sesión */
       #ev-li-salir.ev-li-salir-activo { display: block; }
+
+      /* En móvil, "Mi cuenta" del menú SÍ se muestra cuando NO hay sesión */
+      #ev-li-micuenta-mobile.ev-li-micuenta-activo { display: block; }
 
       /* Área derecha se oculta en desktop-modo */
       .ev-nav-right { display: none; }
@@ -239,10 +245,12 @@
 
     // ── SIN SESIÓN: link "Mi cuenta" → login ─────────────────────
     if (!session) {
+      // En móvil: mostrar "Mi cuenta" en el menú (CSS lo controla)
       if (liMiCuentaMobile) {
-        liMiCuentaMobile.style.display = '';
+        liMiCuentaMobile.classList.add('ev-li-micuenta-activo');
         liMiCuentaMobile.querySelector('a').setAttribute('href', 'login.html');
       }
+      // En desktop: "Mi cuenta" a la derecha
       if (rightEl) {
         rightEl.innerHTML = `<a href="login.html" class="ev-nav-micuenta">Mi cuenta</a>`;
       }
