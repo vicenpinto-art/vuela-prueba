@@ -86,6 +86,32 @@
       font-size: 10px; font-weight: 700; color: #ff4e68;
       text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;
     }
+
+    /* Avatar móvil con franja de rol que cruza por encima del círculo */
+    .ev-nav-avatar-mobile {
+      position: relative;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg,#a183ff,#ff4e68);
+      border: 2px solid rgba(255,255,255,0.9);
+      text-decoration: none; cursor: pointer; flex-shrink: 0;
+      overflow: visible;
+    }
+    .ev-nav-avatar-mobile-inicial {
+      font-size: 15px; font-weight: 700; color: #fff; line-height: 1;
+    }
+    .ev-nav-avatar-mobile-rol {
+      position: absolute; bottom: -7px; left: 50%;
+      transform: translateX(-50%);
+      background: #ff4e68;
+      color: #fff; font-size: 7px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.4px;
+      text-align: center; line-height: 1.4;
+      padding: 1px 5px; border-radius: 6px;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.85);
+    }
     .ev-nav-micuenta {
       font-size: 13px; color: #555; font-weight: 500; text-decoration: none;
       white-space: nowrap;
@@ -278,11 +304,12 @@
     if (liSalir) liSalir.classList.add('ev-li-salir-activo');
     if (liMiCuentaMobile) liMiCuentaMobile.classList.remove('ev-li-micuenta-activo');
 
+    const rolTexto = rol === 'admin'     ? 'Admin'
+                   : rol === 'profesora' ? 'Profesora'
+                   :                       'Alumna';
+
     // Desktop derecha: avatar (con rol debajo) + Salir
     if (rightEl) {
-      const rolTexto = rol === 'admin'     ? 'Admin'
-                     : rol === 'profesora' ? 'Profesora'
-                     :                       'Alumna';
       rightEl.innerHTML = `
         <a href="${href}" class="ev-nav-avatar-wrap" title="Ir a mi cuenta">
           <span class="ev-nav-avatar"><span>${inicial}</span></span>
@@ -293,11 +320,12 @@
       document.getElementById('btn-salir-desktop').addEventListener('click', _salir.bind(null, sb));
     }
 
-    // Móvil: avatar pequeño
+    // Móvil: avatar con franja de rol en la base del círculo
     if (mobileAvatarEl) {
       mobileAvatarEl.innerHTML = `
-        <a href="${href}" class="ev-nav-avatar" title="${nombre}" style="width:32px;height:32px;">
-          <span style="font-size:13px">${inicial}</span>
+        <a href="${href}" class="ev-nav-avatar-mobile" title="${nombre}">
+          <span class="ev-nav-avatar-mobile-inicial">${inicial}</span>
+          <span class="ev-nav-avatar-mobile-rol">${rolTexto}</span>
         </a>
       `;
     }
