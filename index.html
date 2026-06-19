@@ -45,29 +45,6 @@
     }
 
     /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; width: 100%; z-index: 100;
-      padding: 20px 40px;
-      display: flex; align-items: center; justify-content: space-between;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(0,0,0,0.08);
-    }
-    nav img { height: 44px; }
-    nav ul { list-style: none; display: flex; gap: 36px; align-items: center; }
-    nav ul a {
-      text-decoration: none; color: rgba(0,0,0,0.6);
-      font-size: 14px; font-weight: 500; letter-spacing: 0.5px;
-      transition: color .2s;
-    }
-    nav ul a:hover { color: var(--coral); }
-    .nav-cta {
-      background: var(--coral); color: #fff !important;
-      padding: 10px 22px; border-radius: 100px;
-      font-weight: 600 !important; color: white !important;
-      transition: transform .2s, box-shadow .2s !important;
-    }
-    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,78,104,.4) !important; color: white !important; }
 
     /* ── HERO ── */
     #inicio {
@@ -376,7 +353,6 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
-      nav ul { display: none; }
       .hero-grid { grid-template-columns: 1fr; }
       .hero-image { display: block !important; }
       .hero-photo { max-width: 100%; aspect-ratio: 4/3; }
@@ -385,7 +361,6 @@
       .contacto-inner { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
       section { padding: 70px 24px; }
-      nav { padding: 16px 24px; }
     }
 
     @media (max-width: 768px) {
@@ -393,10 +368,7 @@
   /* ── GLOBAL ── */
   html { font-size: 14px; }
   section { padding: 56px 16px !important; }
-  nav { padding: 14px 16px; }
-  #inicio { padding-top: 90px !important; }
-  nav ul { display: none !important; }
-  nav ul li:last-child { display: flex !important; } 
+  #inicio { padding-top: 90px !important; } 
 
   /* ── 1. HERO FOTO ── */
   .hero-image { display: block !important; width: 100%; }
@@ -535,69 +507,10 @@
 
 <!-- NAV -->
 <style>
-.nav-mobile-bar { display: none; }
 @media (max-width: 768px) {
-  nav { flex-wrap: wrap; }
-  nav > ul {
-    display: none !important;
-    flex-direction: column;
-    width: 100%; padding: 8px 0;
-    gap: 0; border-top: 1px solid rgba(0,0,0,.08);
-    margin-top: 8px; order: 3;
-  }
-  nav > ul.nav-open { display: flex !important; }
-  nav > ul li:not(:last-child) { display: block !important; }
-  nav > ul a {
-    display: block; padding: 12px 16px;
-    font-size: 15px; color: rgba(0,0,0,.7);
-    border-bottom: 1px solid rgba(0,0,0,.05);
-    text-align: center;
-  }
-  nav > ul li:last-child a { border-bottom: none; }
-  .nav-mobile-bar { display: flex; align-items: center; gap: 10px; }
-  .nav-mobile-bar a { text-decoration: none; }
-  nav > ul a, nav > ul .nav-cta {
-    font-size: 15px !important;
-    font-weight: 500 !important;
-    padding: 12px 16px !important;
-    background: none !important;
-    color: rgba(0,0,0,.7) !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    text-align: center !important;
-  }
   /* Ocultar Mi cuenta del menú sandwich */
-  nav > ul li#nav-cuenta-desktop { display: none !important; }
-  nav > ul li:last-child { display: none !important; }
-  .nav-menu-btn {
-    background: none;
-    border: 1.5px solid rgba(0,0,0,.15);
-    border-radius: 8px; padding: 6px 10px;
-    cursor: pointer; font-size: 18px;
-    color: #333; line-height: 1;
-  }
 }
 </style>
-<nav>
-  <img src="images/logo.png" alt="Espacio Vuela" onerror="this.style.display='none'; this.nextSibling.style.display='block'">
-  <span style="display:none; font-family:'Dancing Script',cursive; font-size:28px; color:var(--coral)">Vuela</span>
-  <ul>
-    <li><a href="#inicio">Inicio</a></li>
-    <li><a href="#nosotros">Nosotras</a></li>
-    <li><a href="#clases">Clases</a></li>
-    <li><a href="#planes">Planes</a></li>
-    <li><a href="#horarios">Horarios</a></li>
-    <li><a href="profes.html">Profes</a></li>
-    <li id="nav-cuenta-desktop"><a href="login.html">Mi cuenta</a></li>
-    <li><a href="javascript:void(0)" onclick="abrirIGVuela()" class="nav-cta">Súmate a Vuela</a></li>
-  </ul>
-  <div class="nav-mobile-bar">
-    <a href="login.html" id="mobile-avatar" title="Mi cuenta" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;min-width:36px;min-height:36px;border-radius:50%;overflow:hidden;background:#f0f0f3;border:2px solid rgba(0,0,0,0.1);text-decoration:none;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
-    <a href="javascript:void(0)" onclick="abrirIGVuela()" class="nav-cta" style="font-size:14px; padding:10px 20px;">Súmate a Vuela</a>
-    <button class="nav-menu-btn" onclick="document.querySelector('nav ul').classList.toggle('nav-open')">☰</button>
-  </div>
-</nav>
-
 <!-- HERO -->
 <section id="inicio">
   <div class="hero-bg"></div>
@@ -1386,13 +1299,11 @@ function pvSelCard(el){
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
   // Cerrar menú mobile al seleccionar un enlace
-  document.querySelectorAll('nav ul a').forEach(link => {
-    link.addEventListener('click', () => {
-      document.querySelector('nav ul').classList.remove('nav-open');
-    });
+  document.querySelectorAll(');
   });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="nav.js"></script>
 <script>
 (async () => {
   const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
@@ -1489,14 +1400,7 @@ function pvSelCard(el){
   });
 </script>
 
-<script>
-  function abrirIGVuela() {
-    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobile) {
-      var deepLink = 'instagram://user?username=espacio_vuela';
-      var webLink  = 'https://www.instagram.com/espacio_vuela/';
-      window.location = deepLink;
-      setTimeout(function() { window.location = webLink; }, 1500);
+<script>, 1500);
     } else {
       window.open('https://www.instagram.com/espacio_vuela/', '_blank');
     }
