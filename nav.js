@@ -38,6 +38,9 @@
       list-style: none; display: flex; align-items: center;
       gap: 10px; margin: 0; padding: 0; justify-content: flex-end;
     }
+    .ev-nav-cluster {
+      display: flex; align-items: center; gap: 18px;
+    }
     .ev-nav-links a {
       text-decoration: none; color: rgba(0,0,0,.6); font-size: 14px;
       font-weight: 500; padding: 6px 16px; border-radius: 8px;
@@ -111,6 +114,11 @@
       }
       .ev-nav-logo { height: 32px; }
 
+      /* El cluster se vuelve transparente en layout móvil */
+      .ev-nav-cluster {
+        display: contents;
+      }
+
       /* Links se ocultan, se muestran al abrir */
       .ev-nav-links {
         display: none; flex-direction: column; width: 100%;
@@ -151,19 +159,20 @@
       <span class="ev-nav-logo-txt">Espacio Vuela</span>
     </a>
 
-    <ul class="ev-nav-links" id="ev-nav-links">
-      <li><a href="index.html">Inicio</a></li>
-      <li><a href="index.html#clases">Clases</a></li>
-      <li><a href="profes.html">Profes</a></li>
-      <li><a href="planes.html" class="ev-nav-cta">Súmate a Vuela</a></li>
-      <li id="ev-li-micuenta-mobile" style="display:none"><a href="mi-cuenta.html">Mi cuenta</a></li>
-      <li id="ev-li-salir" style="display:none">
-        <button class="ev-nav-salir" id="btn-salir-nav">Salir</button>
-      </li>
-    </ul>
+    <div class="ev-nav-cluster">
+      <ul class="ev-nav-links" id="ev-nav-links">
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="index.html#clases">Clases</a></li>
+        <li><a href="profes.html">Profes</a></li>
+        <li><a href="planes.html" class="ev-nav-cta">Súmate a Vuela</a></li>
+        <li id="ev-li-micuenta-mobile" style="display:none"><a href="mi-cuenta.html">Mi cuenta</a></li>
+        <li id="ev-li-salir" style="display:none">
+          <button class="ev-nav-salir" id="btn-salir-nav">Salir</button>
+        </li>
+      </ul>
 
-    <!-- Desktop derecha: avatar + rol + "Mi cuenta" + Salir -->
-    <div class="ev-nav-right" id="ev-nav-right"></div>
+      <div class="ev-nav-right" id="ev-nav-right"></div>
+    </div>
 
     <!-- Móvil: avatar pequeño + hamburguesa -->
     <div class="ev-nav-mobile-right">
