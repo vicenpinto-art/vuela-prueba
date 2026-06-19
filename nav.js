@@ -97,6 +97,9 @@
     }
     .ev-nav-salir:hover { color: #ff4e68; }
 
+    /* "Salir" dentro del menú: oculto en desktop (ya hay uno junto al avatar) */
+    #ev-li-salir { display: none; }
+
     /* Móvil */
     .ev-nav-mobile-right {
       display: none; align-items: center; gap: 8px;
@@ -143,6 +146,9 @@
         text-align: left; width: 100%;
       }
 
+      /* En móvil, el "Salir" del menú SÍ se muestra cuando hay sesión */
+      #ev-li-salir.ev-li-salir-activo { display: block; }
+
       /* Área derecha se oculta en desktop-modo */
       .ev-nav-right { display: none; }
       .ev-nav-mobile-right { display: flex; }
@@ -166,7 +172,7 @@
         <li><a href="profes.html">Profes</a></li>
         <li><a href="planes.html" class="ev-nav-cta">Súmate a Vuela</a></li>
         <li id="ev-li-micuenta-mobile" style="display:none"><a href="mi-cuenta.html">Mi cuenta</a></li>
-        <li id="ev-li-salir" style="display:none">
+        <li id="ev-li-salir" class="ev-li-salir-hidden">
           <button class="ev-nav-salir" id="btn-salir-nav">Salir</button>
         </li>
       </ul>
@@ -260,8 +266,8 @@
                   : rol === 'profesora' ? 'mi-cuenta.html'
                   :                       'mi-cuenta.html';
 
-    // Mostrar "Salir" en el menú móvil; ocultar "Mi cuenta" de texto
-    if (liSalir) liSalir.style.display = '';
+    // "Salir" del menú: visible solo en móvil (CSS lo controla); ocultar "Mi cuenta" texto
+    if (liSalir) liSalir.classList.add('ev-li-salir-activo');
     if (liMiCuentaMobile) liMiCuentaMobile.style.display = 'none';
 
     // Desktop derecha: avatar (con rol debajo) + Salir
