@@ -36,7 +36,7 @@
     /* Links */
     .ev-nav-links {
       list-style: none; display: flex; align-items: center;
-      gap: 10px; margin: 0; padding: 0; flex: 1; justify-content: center;
+      gap: 10px; margin: 0; padding: 0; justify-content: flex-end;
     }
     .ev-nav-links a {
       text-decoration: none; color: rgba(0,0,0,.6); font-size: 14px;
@@ -60,7 +60,7 @@
 
     /* Área derecha */
     .ev-nav-right {
-      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
     }
     .ev-nav-rol {
       font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
@@ -75,6 +75,14 @@
       text-decoration: none; cursor: pointer; flex-shrink: 0;
     }
     .ev-nav-avatar span { font-size:15px; font-weight:700; color:#fff; line-height:1; }
+    .ev-nav-avatar-wrap {
+      display: inline-flex; flex-direction: column; align-items: center;
+      gap: 3px; text-decoration: none; cursor: pointer;
+    }
+    .ev-nav-rol-label {
+      font-size: 10px; font-weight: 700; color: #ff4e68;
+      text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;
+    }
     .ev-nav-micuenta {
       font-size: 13px; color: #555; font-weight: 500; text-decoration: none;
       white-space: nowrap;
@@ -247,18 +255,15 @@
     if (liSalir) liSalir.style.display = '';
     if (liMiCuentaMobile) liMiCuentaMobile.style.display = 'none';
 
-    const rolBadge = (rol === 'admin')
-      ? '<span class="ev-nav-rol">Admin</span>'
-      : (rol === 'profesora')
-        ? '<span class="ev-nav-rol">Profesora</span>'
-        : '';
-
-    // Desktop derecha: badge + avatar + Salir
+    // Desktop derecha: avatar (con rol debajo) + Salir
     if (rightEl) {
+      const rolTexto = rol === 'admin'     ? 'Admin'
+                     : rol === 'profesora' ? 'Profesora'
+                     :                       'Alumna';
       rightEl.innerHTML = `
-        ${rolBadge}
-        <a href="${href}" class="ev-nav-avatar" title="Ir a mi cuenta">
-          <span>${inicial}</span>
+        <a href="${href}" class="ev-nav-avatar-wrap" title="Ir a mi cuenta">
+          <span class="ev-nav-avatar"><span>${inicial}</span></span>
+          <span class="ev-nav-rol-label">${rolTexto}</span>
         </a>
         <button class="ev-nav-salir" id="btn-salir-desktop">Salir</button>
       `;
