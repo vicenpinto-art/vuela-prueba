@@ -6,7 +6,6 @@
   <title>Mis clases — Espacio Vuela</title>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app-nav.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--coral:#ff4e68;--magenta:#ff008d;--cyan:#00c8d4;--purple:#8b6aff;--yellow:#fecb29;--dark:#111;--gray:#555;--light:#f5f5f7;--border:rgba(0,0,0,.08)}
@@ -101,7 +100,28 @@
 </head>
 <body>
 
-
+<nav class="ev-nav">
+  <a href="index.html"><img src="images/logo.png" alt="Espacio Vuela" class="ev-nav-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="ev-nav-logo-txt">Espacio Vuela</span></a>
+  <ul class="ev-nav-links" id="ev-nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="index.html#clases">Clases</a></li>
+    <li><a href="index.html#planes">Planes</a></li>
+    <li><a href="profes.html">Profes</a></li>
+    <li><a href="mi-cuenta.html">Mi cuenta</a></li>
+    <li><a href="javascript:void(0)" onclick="abrirIGVuela()" class="ev-nav-cta">Súmate a Vuela</a></li>
+    <li><button class="ev-nav-salir" id="btn-salir-nav">Salir</button></li>
+  </ul>
+  <div class="ev-nav-mobile">
+    <button class="ev-nav-menu-btn" onclick="document.getElementById('ev-nav-links').classList.toggle('nav-open')">☰</button>
+  </div>
+</nav>
+<script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
+  else{window.open('https://ig.me/m/espacio_vuela','_blank');}
+}
+</script>
 
 <main>
   <div class="header">
@@ -156,16 +176,7 @@ let userId = null;
 let todasLasClases = [];
 let filtroActual = 'todas';
 
-
-      if (circle) {
-        circle.innerHTML = (u.nombre || '?')[0].toUpperCase();
-      }
-      if (nombre) nombre.textContent = (u.nombre || 'Mi cuenta').split(' ')[0];
-      right.style.display = 'flex';
-    } catch(e) {}
-  }
-
-  async function init() {
+async function init() {
   const {data:{session}} = await sb.auth.getSession();
   if (!session) {
     window.location.href = 'login.html';
@@ -267,6 +278,10 @@ function renderizar() {
 
 init();
 
+document.getElementById('btn-salir-nav').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  window.location.href = 'login.html';
+});
 </script>
 
 </body>

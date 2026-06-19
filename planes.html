@@ -6,7 +6,6 @@
   <title>Planes — Espacio Vuela</title>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app-nav.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -311,71 +310,37 @@
       .ev-nav-mobile { display:flex; }
       .ev-nav-logo { height:32px; }
     }
-  
-  /* ── BOOST BANNER ── */
-  .boost-banner {
-    display: none;
-    max-width: 960px; margin: 0 auto 16px; padding: 0 24px;
-  }
-  .boost-banner.visible { display: block; }
-  .boost-card {
-    background: linear-gradient(135deg, rgba(139,106,255,.08) 0%, rgba(255,78,104,.06) 100%);
-    border: 1.5px solid rgba(139,106,255,.25);
-    border-radius: 18px; padding: 18px 24px;
-    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-  }
-  .boost-icon { font-size: 28px; flex-shrink: 0; }
-  .boost-texto { flex: 1; min-width: 160px; }
-  .boost-titulo { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 3px; }
-  .boost-sub { font-size: 13px; color: var(--gray); }
-  .boost-sub strong { color: var(--coral); }
-  .btn-boost {
-    background: linear-gradient(135deg, var(--purple), #6b3fd4);
-    color: #fff; border: none; border-radius: 100px;
-    padding: 10px 22px; font-family: 'Outfit', sans-serif;
-    font-size: 13px; font-weight: 700; cursor: pointer;
-    transition: transform .15s, box-shadow .15s; white-space: nowrap; flex-shrink: 0;
-  }
-  .btn-boost:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139,106,255,.35); }
-
-  /* ── MODAL BOOST ── */
-  .boost-detalle {
-    background: var(--light); border-radius: 14px; padding: 16px 18px; margin-bottom: 20px;
-    display: flex; flex-direction: column; gap: 6px;
-  }
-  .boost-detalle .bd-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
-  .boost-detalle .bd-label { color: var(--gray); }
-  .boost-detalle .bd-val { font-weight: 700; }
-  .boost-detalle .bd-after { color: var(--purple); font-weight: 800; }
-  .boost-precio-total {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 14px 0; border-top: 1px solid var(--border); margin-bottom: 18px;
-    font-size: 16px; font-weight: 700;
-  }
-  .boost-precio-total span:last-child { font-size: 22px; color: var(--coral); }
-</style>
+  </style>
 </head>
 <body>
 
-
+<nav class="ev-nav">
+  <a href="index.html"><img src="images/logo.png" alt="Espacio Vuela" class="ev-nav-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="ev-nav-logo-txt">Espacio Vuela</span></a>
+  <ul class="ev-nav-links" id="ev-nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="index.html#clases">Clases</a></li>
+    <li><a href="index.html#planes">Planes</a></li>
+    <li><a href="profes.html">Profes</a></li>
+    <li><a href="mi-cuenta.html">Mi cuenta</a></li>
+    <li><a href="javascript:void(0)" onclick="abrirIGVuela()" class="ev-nav-cta">Súmate a Vuela</a></li>
+    <li><button class="ev-nav-salir" id="btn-salir-nav">Salir</button></li>
+  </ul>
+  <div class="ev-nav-mobile">
+    <button class="ev-nav-menu-btn" onclick="document.getElementById('ev-nav-links').classList.toggle('nav-open')">☰</button>
+  </div>
+</nav>
+<script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
+  else{window.open('https://ig.me/m/espacio_vuela','_blank');}
+}
+</script>
 
 <div class="hero">
   <div class="hero-eyebrow">Elige tu plan</div>
   <h1>Encuentra el plan <span>perfecto para ti</span></h1>
   <p>Todos los planes duran 31 días desde su activación. Las clases no usadas se pierden al vencer.</p>
-</div>
-
-
-<!-- BOOST BANNER (visible solo si hay plan activo) -->
-<div class="boost-banner" id="boost-banner">
-  <div class="boost-card">
-    <span class="boost-icon">⚡</span>
-    <div class="boost-texto">
-      <div class="boost-titulo">¿Necesitas 1 día más?</div>
-      <div class="boost-sub">Tu plan vence el <strong id="boost-vence-txt">—</strong> · Extiéndelo por un día extra</div>
-    </div>
-    <button class="btn-boost" onclick="abrirModalBoost()">Boost +1 día — $1.990</button>
-  </div>
 </div>
 
 <div class="tabs-wrap">
@@ -646,7 +611,7 @@
     const { data: planes, error } = await sb
       .from('planes')
       .select('*')
-      .not('tipo', 'in', '("matricula","addon_gym","boost")')
+      .not('tipo', 'in', '("matricula","addon_gym")')
       .order('precio', { ascending: true });
 
     if (error || !planes) {
@@ -708,7 +673,7 @@
       if (esIlimitado) {
         features.push({ texto: 'Clases ilimitadas por 31 días' });
       } else {
-        features.push({ texto: `${plan.cantidad_clases} clases para usar en 31 días` });
+        features.push({ texto: `${plan.clases} clases para usar en 31 días` });
       }
       features.push({ texto: 'Agenda online cuando quieras' });
       features.push({ texto: 'Acceso a la rutina del día' });
@@ -897,87 +862,11 @@
   });
 
   // ── SESIÓN ────────────────────────────────────────────────────
-  let planActivoBoost = null; // guardamos el plan activo para el boost
-
   async function verificarSesion() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) return;
-    document.getElementById('nav-login').style.display = 'none';
-    document.getElementById('nav-cuenta').style.display = 'block';
-
-    // Verificar plan activo para boost
-    const hoyStr = new Date().toISOString().split('T')[0];
-    const { data: compras } = await sb
-      .from('compras')
-      .select('id,fecha_fin,planes(nombre)')
-      .eq('alumna_id', session.user.id)
-      .in('estado', ['activo','congelado'])
-      .gte('fecha_fin', hoyStr)
-      .order('fecha_fin', { ascending: false })
-      .limit(1);
-
-    if (compras && compras.length > 0) {
-      planActivoBoost = compras[0];
-      const vence = new Date(compras[0].fecha_fin + 'T12:00:00')
-        .toLocaleDateString('es-CL', { day: '2-digit', month: 'long', year: 'numeric' });
-      document.getElementById('boost-vence-txt').textContent = vence;
-      document.getElementById('boost-banner').classList.add('visible');
-    }
-  }
-
-
-  // ── BOOST ─────────────────────────────────────────────────────
-  function abrirModalBoost() {
-    if (!planActivoBoost) return;
-    const venceDate = new Date(planActivoBoost.fecha_fin + 'T12:00:00');
-    const venceNuevo = new Date(venceDate);
-    venceNuevo.setDate(venceNuevo.getDate() + 1);
-    const fmt = d => d.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', year: 'numeric' });
-
-    document.getElementById('boost-plan-nombre').textContent   = planActivoBoost.planes?.nombre || 'Plan activo';
-    document.getElementById('boost-vence-actual').textContent  = fmt(venceDate);
-    document.getElementById('boost-vence-nuevo').textContent   = fmt(venceNuevo);
-    document.getElementById('boost-check-terminos').checked    = false;
-    document.getElementById('btn-boost-mp').disabled           = true;
-    document.getElementById('boost-error').classList.remove('visible');
-    abrirModal('modal-boost');
-  }
-
-  function validarBoostTerminos() {
-    document.getElementById('btn-boost-mp').disabled =
-      !document.getElementById('boost-check-terminos').checked;
-  }
-
-  async function pagarBoost() {
-    const btn = document.getElementById('btn-boost-mp');
-    const errEl = document.getElementById('boost-error');
-    btn.disabled = true;
-    btn.textContent = 'Preparando pago...';
-    errEl.classList.remove('visible');
-
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.href = 'login.html'; return; }
-    const { data: u } = await sb.from('usuarios').select('nombre,apellido').eq('id', session.user.id).single();
-
-    try {
-      const res = await fetch(`${SERVIDOR_URL}/crear-preferencia-boost`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          usuario_id:     session.user.id,
-          usuario_email:  session.user.email,
-          usuario_nombre: `${u?.nombre||''} ${u?.apellido||''}`.trim(),
-          compra_id:      planActivoBoost.id
-        })
-      });
-      const data = await res.json();
-      if (!res.ok || !data.checkout_url) throw new Error(data.error || 'Error en servidor de pagos');
-      window.location.href = data.checkout_url;
-    } catch(err) {
-      errEl.textContent = 'Error: ' + err.message;
-      errEl.classList.add('visible');
-      btn.disabled = false;
-      btn.innerHTML = '<span>💳</span> Pagar con MercadoPago';
+    if (session) {
+      document.getElementById('nav-login').style.display = 'none';
+      document.getElementById('nav-cuenta').style.display = 'block';
     }
   }
 
@@ -985,44 +874,6 @@
   verificarSesion();
   cargarPlanes();
 </script>
-
-
-<!-- MODAL BOOST -->
-<div class="modal-overlay" id="modal-boost">
-  <div class="modal">
-    <button class="modal-close" onclick="cerrarModal('modal-boost')">✕</button>
-    <h2>⚡ Boost — +1 día</h2>
-    <div class="modal-sub" style="margin-bottom:18px;font-size:14px;color:var(--gray)">Agrega un día extra a tu plan activo al instante.</div>
-    <div class="boost-detalle">
-      <div class="bd-row">
-        <span class="bd-label">Plan actual</span>
-        <span class="bd-val" id="boost-plan-nombre">—</span>
-      </div>
-      <div class="bd-row">
-        <span class="bd-label">Vence actualmente</span>
-        <span class="bd-val" id="boost-vence-actual">—</span>
-      </div>
-      <div class="bd-row" style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(0,0,0,.08)">
-        <span class="bd-label">Nuevo vencimiento</span>
-        <span class="bd-after" id="boost-vence-nuevo">—</span>
-      </div>
-    </div>
-    <div class="boost-precio-total">
-      <span>Total</span>
-      <span>$1.990</span>
-    </div>
-    <div style="margin-bottom:16px">
-      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--gray);line-height:1.4">
-        <input type="checkbox" id="boost-check-terminos" onchange="validarBoostTerminos()" style="width:16px;height:16px;accent-color:var(--coral);flex-shrink:0;margin-top:2px">
-        <span>He leído y acepto los <a href="terminos.html" target="_blank" style="color:var(--coral);font-weight:600">Términos y condiciones</a></span>
-      </label>
-    </div>
-    <button class="btn-mp" id="btn-boost-mp" onclick="pagarBoost()" disabled>
-      <span>💳</span> Pagar con MercadoPago
-    </button>
-    <div class="modal-error" id="boost-error"></div>
-  </div>
-</div>
 
 </body>
 </html>

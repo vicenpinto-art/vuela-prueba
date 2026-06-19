@@ -6,7 +6,6 @@
   <title>Agendar clases — Espacio Vuela</title>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app-nav.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -240,7 +239,28 @@
 </head>
 <body>
 
-
+<nav class="ev-nav">
+  <a href="index.html"><img src="images/logo.png" alt="Espacio Vuela" class="ev-nav-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="ev-nav-logo-txt">Espacio Vuela</span></a>
+  <ul class="ev-nav-links" id="ev-nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="index.html#clases">Clases</a></li>
+    <li><a href="index.html#planes">Planes</a></li>
+    <li><a href="profes.html">Profes</a></li>
+    <li><a href="mi-cuenta.html">Mi cuenta</a></li>
+    <li><a href="javascript:void(0)" onclick="abrirIGVuela()" class="ev-nav-cta">Súmate a Vuela</a></li>
+    <li><button class="ev-nav-salir" id="btn-salir-nav">Salir</button></li>
+  </ul>
+  <div class="ev-nav-mobile">
+    <button class="ev-nav-menu-btn" onclick="document.getElementById('ev-nav-links').classList.toggle('nav-open')">☰</button>
+  </div>
+</nav>
+<script>
+function abrirIGVuela(){
+  var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){window.location='instagram://user?username=espacio_vuela';setTimeout(()=>window.location='https://www.instagram.com/espacio_vuela/',1500);}
+  else{window.open('https://ig.me/m/espacio_vuela','_blank');}
+}
+</script>
 
 <div class="alerta-plan" id="alerta-plan">
   ⚠️ No tienes un plan activo. <a href="planes.html">Comprar plan →</a>
@@ -277,12 +297,6 @@
     <button class="modal-close" onclick="cerrarModal('modal-agendar')">✕</button>
     <h2>Confirmar agendamiento</h2>
     <div class="modal-clase-detalle" id="modal-detalle"></div>
-    <!-- Botón ver rutina (se muestra solo si hay rutina publicada) -->
-    <div id="rutina-preview" style="display:none; margin-bottom:16px;">
-      <button onclick="abrirRutina()" style="width:100%;padding:11px;border-radius:12px;border:1.5px solid rgba(161,131,255,.35);background:rgba(161,131,255,.06);color:#6b3fd4;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s;">
-        <span>📋</span> Ver rutina de la clase
-      </button>
-    </div>
     <div class="modal-btns">
       <button class="btn-confirmar" id="btn-confirmar-agendar" onclick="confirmarAgendar()">Confirmar →</button>
       <button class="btn-modal-sec" onclick="cerrarModal('modal-agendar')">Cancelar</button>
@@ -302,18 +316,6 @@
       <button class="btn-modal-sec" onclick="cerrarModal('modal-cancelar')">Volver</button>
     </div>
     <div class="modal-msg" id="modal-cancelar-msg"></div>
-  </div>
-</div>
-
-<!-- MODAL VER RUTINA -->
-<div class="modal-overlay" id="modal-rutina">
-  <div class="modal" style="max-width:520px; max-height:85vh; overflow-y:auto;">
-    <button class="modal-close" onclick="cerrarModal('modal-rutina')">✕</button>
-    <h2 style="display:flex;align-items:center;gap:8px;">📋 Rutina de la clase</h2>
-    <div id="modal-rutina-contenido" style="margin-top:4px;"></div>
-    <div class="modal-btns" style="margin-top:20px;">
-      <button class="btn-modal-sec" onclick="cerrarModal('modal-rutina')">Cerrar</button>
-    </div>
   </div>
 </div>
 
@@ -367,7 +369,6 @@
   }
 
   // ── INIT ──────────────────────────────────────────────────────
-
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'login.html'; return; }
@@ -375,44 +376,17 @@
     await Promise.all([verificarPlan(), cargarClases()]);
   }
 
-  let tipoPlanUsuario = null; // 'vuela' | 'muevete' | 'gym' | null
-
   async function verificarPlan() {
     const hoy = new Date().toISOString().split('T')[0];
-
-    // Query 1: verificar si hay plan activo (sin join para evitar errores FK)
-    const { data: compraData } = await sb
+    const { data } = await sb
       .from('compras')
-      .select('id, estado, plan_id')
+      .select('id')
       .eq('alumna_id', userId)
-      .in('estado', ['activo', 'congelado'])
+      .eq('estado', 'activo')
       .gte('fecha_fin', hoy)
-      .order('fecha_fin', { ascending: false })
       .limit(1);
-
-    tieneplanActivo = !!(compraData && compraData.length > 0 && compraData[0]?.estado === 'activo');
+    tieneplanActivo = !!(data && data.length > 0);
     if (!tieneplanActivo) document.getElementById('alerta-plan').classList.add('visible');
-
-    // Query 2: obtener tipo de plan por separado
-    const planId = compraData?.[0]?.plan_id;
-    if (planId) {
-      const { data: planInfo } = await sb
-        .from('planes')
-        .select('tipo')
-        .eq('id', planId)
-        .maybeSingle();
-      tipoPlanUsuario = planInfo?.tipo || null;
-    }
-  }
-
-  // ¿Puede esta alumna acceder a esta clase según su plan?
-  function puedeAccederClase(clase) {
-    if (!tieneplanActivo) return false;
-    const r = clase.restriccion_plan;
-    if (!r || r === 'libre') return true;         // sin restricción o libre → cualquier plan
-    if (!tipoPlanUsuario) return true;            // no se pudo leer el tipo → dejar pasar, la RPC valida
-    if (tipoPlanUsuario === 'vuela') return true; // vuela accede a todo
-    return r === tipoPlanUsuario;                 // muevete/gym solo su tipo
   }
 
   async function cargarClases() {
@@ -423,7 +397,6 @@
     const [{ data: clases }, { data: inscripciones }] = await Promise.all([
       sb.from('clases')
         .select('*')
-        .eq('cancelada', false)
         .gte('fecha_hora', ahora)
         .lte('fecha_hora', en14dias.toISOString())
         .order('fecha_hora', { ascending: true }),
@@ -498,8 +471,6 @@
       const fechaDisp = new Date(new Date(c.fecha_hora).getTime() - 144*60*60*1000);
       const diaDisp = fechaDisp.toLocaleDateString('es-CL', {weekday:'short', day:'numeric', month:'short'});
       accionHtml = `<button class="btn-sin-cupo" disabled title="Podrás agendar desde ${diaDisp}">Desde ${diaDisp}</button>`;
-    } else if (!puedeAccederClase(c)) {
-      accionHtml = `<button class="btn-sin-cupo" disabled title="Tu plan no incluye este tipo de clase">Plan no incluye</button>`;
     } else {
       accionHtml = `<button class="btn-agendar" onclick="abrirAgendar('${c.id}')">Agendar →</button>`;
     }
@@ -542,9 +513,7 @@
   });
 
   // ── MODAL AGENDAR ─────────────────────────────────────────────
-  let rutinaActual = null;
-
-  async function abrirAgendar(claseId) {
+  function abrirAgendar(claseId) {
     if (!tieneplanActivo) {
       window.location.href = 'planes.html';
       return;
@@ -564,23 +533,6 @@
     document.getElementById('modal-agendar-msg').className = 'modal-msg';
     document.getElementById('btn-confirmar-agendar').disabled = false;
     document.getElementById('btn-confirmar-agendar').textContent = 'Confirmar →';
-
-    // Consultar si hay rutina publicada para esta clase
-    rutinaActual = null;
-    document.getElementById('rutina-preview').style.display = 'none';
-    try {
-      const { data: rutina } = await sb
-        .from('rutinas')
-        .select('descripcion, objetivo, calentamiento, parte_principal, posturas, musica, enfriamiento, recomendaciones, nivel')
-        .eq('clase_id', claseSeleccionada.id)
-        .limit(1)
-        .maybeSingle();
-      if (rutina) {
-        rutinaActual = rutina;
-        document.getElementById('rutina-preview').style.display = 'block';
-      }
-    } catch(e) {}
-
     abrirModal('modal-agendar');
   }
 
@@ -623,34 +575,6 @@
       cerrarModal('modal-agendar');
       renderClases();
     }, 1500);
-  }
-
-  // ── MODAL RUTINA ──────────────────────────────────────────────
-  function abrirRutina() {
-    if (!rutinaActual) return;
-    const r = rutinaActual;
-
-    function bloque(emoji, titulo, contenido) {
-      if (!contenido) return '';
-      return `<div style="margin-bottom:14px;">
-        <div style="font-size:12px;font-weight:700;color:#6b3fd4;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;">${emoji} ${titulo}</div>
-        <div style="font-size:14px;color:#444;line-height:1.65;background:rgba(161,131,255,.05);border-radius:10px;padding:10px 13px;">${contenido}</div>
-      </div>`;
-    }
-
-    let html = '';
-    if (r.nivel) html += `<div style="margin-bottom:14px;"><span style="font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;background:rgba(161,131,255,.15);color:#6b3fd4;">Nivel: ${r.nivel}</span></div>`;
-    html += bloque('🎯', 'Objetivo', r.objetivo);
-    html += bloque('📝', 'Descripción', r.descripcion);
-    html += bloque('🔥', 'Calentamiento', r.calentamiento);
-    html += bloque('💪', 'Parte principal', r.parte_principal);
-    html += bloque('🧘', 'Posturas / Movimientos', r.posturas);
-    html += bloque('🎵', 'Música', r.musica);
-    html += bloque('❄️', 'Enfriamiento', r.enfriamiento);
-    html += bloque('💡', 'Recomendaciones', r.recomendaciones);
-
-    document.getElementById('modal-rutina-contenido').innerHTML = html || '<p style="color:#888;font-size:14px;">Sin detalles adicionales.</p>';
-    abrirModal('modal-rutina');
   }
 
   // ── MODAL CANCELAR ────────────────────────────────────────────
