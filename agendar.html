@@ -468,7 +468,7 @@ function abrirIGVuela(){
     const hoy = new Date().toISOString().split('T')[0];
     const { data } = await sb
       .from('compras')
-      .select('id, planes(tipo)')
+      .select('id, planes!plan_id(tipo)')
       .eq('alumna_id', userId)
       .in('estado', ['activo', 'congelado'])
       .gte('fecha_fin', hoy)
@@ -484,6 +484,7 @@ function abrirIGVuela(){
     if (!tieneplanActivo) return false;
     const r = clase.restriccion_plan;
     if (!r || r === 'libre') return true;         // sin restricción o libre → cualquier plan
+    if (!tipoPlanUsuario) return true;            // no se pudo leer el tipo → dejar pasar, la RPC valida
     if (tipoPlanUsuario === 'vuela') return true; // vuela accede a todo
     return r === tipoPlanUsuario;                 // muevete/gym solo su tipo
   }
