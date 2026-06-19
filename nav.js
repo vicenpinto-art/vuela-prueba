@@ -170,6 +170,8 @@
         margin: 8px 16px; display: block; text-align: center;
         border-radius: 100px !important;
       }
+      /* En móvil, "Súmate a Vuela" va al final del menú */
+      #ev-li-cta { order: 10; }
       .ev-nav-links button.ev-nav-salir {
         display: block; padding: 11px 16px; font-size: 14px;
         text-align: left; width: 100%;
@@ -202,7 +204,7 @@
         <li><a href="index.html">Inicio</a></li>
         <li><a href="index.html#clases">Clases</a></li>
         <li><a href="profes.html">Profes</a></li>
-        <li><a href="planes.html" class="ev-nav-cta">Súmate a Vuela</a></li>
+        <li id="ev-li-cta"><a href="planes.html" class="ev-nav-cta">Súmate a Vuela</a></li>
         <li id="ev-li-micuenta-mobile"><a href="mi-cuenta.html">Mi cuenta</a></li>
         <li id="ev-li-salir">
           <button class="ev-nav-salir" id="btn-salir-nav">Salir</button>
