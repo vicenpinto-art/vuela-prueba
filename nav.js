@@ -129,6 +129,9 @@
     /* "Mi cuenta" dentro del menú: oculto en desktop (ya hay uno a la derecha) */
     #ev-li-micuenta-mobile { display: none; }
 
+    /* CTA fijo de la barra móvil: oculto en desktop */
+    .ev-nav-cta-mobile { display: none; }
+
     /* Móvil */
     .ev-nav-mobile-right {
       display: none; align-items: center; gap: 8px;
@@ -145,6 +148,8 @@
         min-height: 56px; flex-wrap: wrap; gap: 0;
       }
       .ev-nav-logo { height: 32px; }
+      .ev-nav-logo-wrap { order: 1; }
+      .ev-nav-mobile-right { order: 3; }
 
       /* El cluster se vuelve transparente en layout móvil */
       .ev-nav-cluster {
@@ -156,7 +161,7 @@
         display: none; flex-direction: column; width: 100%;
         padding: 6px 0 8px; gap: 0;
         border-top: 1px solid rgba(0,0,0,.07);
-        margin-top: 4px; order: 3; justify-content: flex-start;
+        margin-top: 4px; order: 4; justify-content: flex-start;
       }
       .ev-nav-links.nav-open { display: flex !important; }
       .ev-nav-links li { display: block; width: 100%; }
@@ -170,11 +175,19 @@
         margin: 8px 16px; display: block; text-align: center;
         border-radius: 100px !important;
       }
-      /* En móvil, "Súmate a Vuela" va al final del menú */
-      #ev-li-cta { order: 10; }
+      /* En móvil el CTA del menú desplegable se oculta: ya está fijo en la barra */
+      #ev-li-cta { display: none; }
       .ev-nav-links button.ev-nav-salir {
         display: block; padding: 11px 16px; font-size: 14px;
         text-align: left; width: 100%;
+      }
+
+      /* CTA fijo en la barra móvil, al centro entre logo y avatar */
+      .ev-nav-cta-mobile {
+        display: inline-block; order: 2;
+        margin-left: auto; margin-right: auto;
+        padding: 8px 16px !important; font-size: 13px;
+        white-space: nowrap;
       }
 
       /* En móvil, el "Salir" del menú SÍ se muestra cuando hay sesión */
@@ -214,7 +227,8 @@
       <div class="ev-nav-right" id="ev-nav-right"></div>
     </div>
 
-    <!-- Móvil: avatar pequeño + hamburguesa -->
+    <!-- Móvil: CTA + avatar pequeño + hamburguesa -->
+    <a href="planes.html" class="ev-nav-cta ev-nav-cta-mobile">Súmate a Vuela</a>
     <div class="ev-nav-mobile-right">
       <div id="ev-nav-mobile-avatar"></div>
       <button class="ev-nav-menu-btn" id="ev-nav-hamburger">☰</button>
