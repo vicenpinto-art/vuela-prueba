@@ -20,13 +20,6 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body { font-family: 'Outfit', sans-serif; background: #fff; color: var(--dark); -webkit-font-smoothing: antialiased; }
-
-    nav {
-      position: fixed; top: 0; width: 100%; z-index: 100;
-      padding: 18px 40px; display: flex; align-items: center; justify-content: space-between;
-      background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(0,0,0,0.08);
-    }
     .nav-logo { font-family: 'Dancing Script', cursive; font-size: 26px; font-weight: 700; text-decoration: none; color: var(--coral); }
     .nav-back { font-size: 13px; color: var(--gray); text-decoration: none; display: flex; align-items: center; gap: 6px; font-weight: 500; transition: color .2s; }
     .nav-back:hover { color: var(--coral); }
@@ -48,17 +41,12 @@
     footer a { color: var(--coral); text-decoration: none; }
 
     @media (max-width: 600px) {
-      nav { padding: 14px 20px; }
       .doc-wrap { padding: 90px 20px 80px; }
     }
   </style>
+  <script src="nav.js"></script>
 </head>
 <body>
-
-<nav>
-  <a class="nav-logo" href="index.html">Espacio Vuela</a>
-  <a class="nav-back" href="index.html">← Volver al inicio</a>
-</nav>
 
 <div class="doc-wrap">
   <div class="doc-header">
