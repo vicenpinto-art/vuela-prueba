@@ -404,18 +404,6 @@ onAuthStateChanged(auth, async (user) => {
   });
 </script>
 
-<script>
-  function abrirIGVuela() {
-    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobile) {
-      var deepLink = 'instagram://user?username=espacio_vuela';
-      var webLink  = 'https://www.instagram.com/espacio_vuela/';
-      window.location = deepLink;
-      setTimeout(function() { window.location = webLink; }, 1500);
-    } else {
-      window.open('https://www.instagram.com/espacio_vuela/', '_blank');
-    }
-  }
-</script>
+
 </body>
 </html>
