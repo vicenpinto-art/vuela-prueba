@@ -311,14 +311,6 @@
   }
 
   // ── INIT ──────────────────────────────────────────────────────
-  
-      if (circle) {
-        circle.innerHTML = (u.nombre || '?')[0].toUpperCase();
-      }
-      if (nombre) nombre.textContent = (u.nombre || 'Mi cuenta').split(' ')[0];
-      right.style.display = 'flex';
-    } catch(e) {}
-  }
 
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
