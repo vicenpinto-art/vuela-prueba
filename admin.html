@@ -825,7 +825,7 @@ async function cargarResumen(){
   const [{count:cAlumnas},{count:cPlanes},{data:clasesHoy},{count:cInscritas},
          {data:activasData},{data:comprasHoyData},{data:planesProximos}] = await Promise.all([
     sb.from('usuarios').select('*',{count:'exact',head:true}).eq('rol','alumna'),
-    sb.from('compras').select('*',{count:'exact',head:true}).eq('estado','activo').gte('fecha_fin',hoy()),
+    sb.from('compras').select('*',{count:'exact',head:true}).in('estado',['activo','congelado']).gte('fecha_fin',hoy()),
     sb.from('clases').select('*').gte('fecha_hora',hoyI.toISOString()).lte('fecha_hora',hoyF.toISOString()).order('fecha_hora'),
     sb.from('inscripciones').select('*',{count:'exact',head:true}).gte('created_at',hoyI.toISOString()),
     sb.from('inscripciones').select('alumna_id').gte('created_at',hace30.toISOString()).eq('estado','confirmada'),
@@ -1276,7 +1276,7 @@ function renderAlumnas(lista){
           ${c&&c.estado==='activo'?`<button class="btn btn-purple btn-sm" onclick="congelarPlan('${c.id}')">Congelar</button>`:''}
           ${c&&c.estado==='congelado'?`<button class="btn btn-cyan btn-sm" onclick="descongelarPlan('${c.id}')">Descongelar</button>`:''}
           ${c?`<button class="btn btn-secondary btn-sm" onclick="abrirExtender('${c.id}','${a.nombre} ${a.apellido}')">Extender</button>`:''}
-          ${c&&c.estado==='activo'?`<button class="btn btn-boost-sm btn-sm" onclick="boostPlan('${c.id}','${(a.nombre+' '+(a.apellido||'')).trim()}')">⚡ +1d</button>`:''}
+          ${c&&['activo','congelado'].includes(c.estado)?`<button class="btn btn-boost-sm btn-sm" onclick="boostPlan('${c.id}','${(a.nombre+' '+(a.apellido||'')).trim()}')">⚡ +1d</button>`:''}
         </td>
       </tr>`;
     }).join('')}
