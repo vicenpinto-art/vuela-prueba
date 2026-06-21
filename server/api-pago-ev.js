@@ -200,7 +200,17 @@ app.post('/webhook', async (req, res) => {
 
   try {
     const paymentApi = new Payment(mp);
-    const pago = await paymentApi.get({ id: data.id });
+    let pago, lastErr;
+    for (let intento = 1; intento <= 4; intento++) {
+      try {
+        pago = await paymentApi.get({ id: data.id });
+        break;
+      } catch (e) {
+        lastErr = e;
+        if (intento < 4) await new Promise(r => setTimeout(r, intento * 1500));
+      }
+    }
+    if (!pago) throw lastErr;
 
     if (pago.status !== 'approved') {
       console.log(`Pago ${data.id} estado: ${pago.status} — ignorado`);
