@@ -268,6 +268,7 @@
   let todasLasClases    = [];
   let misInscripciones  = new Set(); // clase_id de inscripciones confirmadas
   let tieneplanActivo   = false;
+  let planCongelado     = false;
   let claseSeleccionada = null;
   let filtroActivo      = 'todas';
 
@@ -318,13 +319,21 @@
     const hoy = new Date().toISOString().split('T')[0];
     const { data } = await sb
       .from('compras')
-      .select('id')
+      .select('id,estado')
       .eq('alumna_id', userId)
-      .eq('estado', 'activo')
-      .gte('fecha_fin', hoy)
+      .or(`estado.eq.congelado,and(estado.eq.activo,fecha_fin.gte.${hoy})`)
       .limit(1);
-    tieneplanActivo = !!(data && data.length > 0);
-    if (!tieneplanActivo) document.getElementById('alerta-plan').classList.add('visible');
+    const plan = data?.[0];
+    tieneplanActivo = plan?.estado === 'activo';
+    planCongelado   = plan?.estado === 'congelado';
+    const alertaEl = document.getElementById('alerta-plan');
+    if(planCongelado){
+      alertaEl.innerHTML = '❄️ Tu plan está congelado. Contacta a Espacio Vuela para reactivarlo.';
+      alertaEl.classList.add('visible');
+    } else if(!tieneplanActivo){
+      alertaEl.innerHTML = '⚠️ No tienes un plan activo. <a href="planes.html">Comprar plan →</a>';
+      alertaEl.classList.add('visible');
+    }
   }
 
   async function cargarClases() {
@@ -452,6 +461,13 @@
 
   // ── MODAL AGENDAR ─────────────────────────────────────────────
   function abrirAgendar(claseId) {
+    if (planCongelado) {
+      const alertaEl = document.getElementById('alerta-plan');
+      alertaEl.innerHTML = '❄️ Tu plan está congelado. Contacta a Espacio Vuela para reactivarlo.';
+      alertaEl.classList.add('visible');
+      alertaEl.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
     if (!tieneplanActivo) {
       window.location.href = 'planes.html';
       return;

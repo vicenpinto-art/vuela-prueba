@@ -229,6 +229,7 @@ let anioActual  = new Date().getFullYear();
 let clasesDelMes = [];  // todas las clases del mes cargado
 let misInscripciones = new Set();
 let tieneplanActivo  = false;
+let planCongelado    = false;
 let diaSeleccionado  = null;
 let filtroProfe      = 'todas'; // 'todas' | 'mias'
 let filtroAdminProfe = '';      // nombre de profesora para admin
@@ -307,11 +308,16 @@ async function init(){
     await cargarDropdownProfesoras();
   }
 
-  // Verificar plan activo (solo alumnas)
+  // Verificar plan activo o congelado (solo alumnas)
   if(userRol==='alumna'){
-    const {data:compras} = await sb.from('compras').select('id')
-      .eq('alumna_id',userId).eq('estado','activo').gte('fecha_fin',isoFecha(new Date())).limit(1);
-    tieneplanActivo = !!(compras && compras.length>0);
+    const hoyStr = isoFecha(new Date());
+    const {data:compras} = await sb.from('compras').select('id,estado')
+      .eq('alumna_id',userId)
+      .or(`estado.eq.congelado,and(estado.eq.activo,fecha_fin.gte.${hoyStr})`)
+      .limit(1);
+    const plan = compras?.[0];
+    tieneplanActivo = plan?.estado === 'activo';
+    planCongelado   = plan?.estado === 'congelado';
   }
 
   // Cargar inscripciones (alumnas)
@@ -469,6 +475,8 @@ function renderClaseCard(c, esFeriado){
       </div>`;
     } else if(cupoDisp<=0){
       botonHtml=`<button class="btn-agendar-cal sin-cupo" disabled>Sin cupo</button>`;
+    } else if(planCongelado){
+      botonHtml=`<button class="btn-agendar-cal sin-cupo" disabled style="font-size:11px">❄️ Plan congelado</button>`;
     } else if(!tieneplanActivo){
       botonHtml=`<button class="btn-agendar-cal sin-plan" onclick="window.location.href='planes.html'">Agendar</button>`;
     } else {
