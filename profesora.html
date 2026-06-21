@@ -198,6 +198,30 @@
     .btn-rutina-card { font-size:11px; font-weight:700; padding:4px 10px; border-radius:6px; background:rgba(139,106,255,.1); color:var(--purple); border:none; cursor:pointer; margin-top:8px; }
     .btn-rutina-card:hover { background:rgba(139,106,255,.2); }
     .rutina-guardada { font-size:11px; color:#00a86b; font-weight:600; }
+
+    /* PERFIL */
+    #sec-perfil-prof { display:none; max-width:720px; margin:0 auto; padding:28px 24px 60px; }
+    .perfil-card-prof { background:#fff; border-radius:20px; padding:28px; border:1px solid var(--border); }
+    .perfil-avatar-prof {
+      width:88px; height:88px; border-radius:50%;
+      background:linear-gradient(135deg,var(--coral),var(--magenta));
+      display:flex; align-items:center; justify-content:center;
+      font-size:32px; font-weight:700; color:#fff;
+      cursor:pointer; flex-shrink:0; overflow:hidden; position:relative;
+      transition:opacity .2s;
+    }
+    .perfil-avatar-prof:hover { opacity:.85; }
+    .perfil-grid-prof { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .perfil-field-prof { display:flex; flex-direction:column; gap:5px; }
+    .perfil-label-prof { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--gray); }
+    .perfil-input-prof { padding:10px 13px; border:1.5px solid var(--border); border-radius:10px; font-family:'Outfit',sans-serif; font-size:14px; transition:border .2s; width:100%; }
+    .perfil-input-prof:focus { outline:none; border-color:var(--coral); }
+    .btn-guardar-prof { padding:11px 24px; background:linear-gradient(135deg,var(--coral),var(--magenta)); color:#fff; border:none; border-radius:10px; font-family:'Outfit',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:transform .2s,box-shadow .2s; }
+    .btn-guardar-prof:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(255,78,104,.3); }
+    .perfil-msg-prof { font-size:13px; font-weight:500; }
+    .perfil-msg-prof.ok { color:#007a82; }
+    .perfil-msg-prof.error { color:var(--coral); }
+    @media(max-width:600px) { .perfil-grid-prof { grid-template-columns:1fr; } #sec-perfil-prof { padding:20px 16px 80px; } }
 </style>
 </head>
 <body>
@@ -215,6 +239,7 @@
       <button class="tab active" data-tab="hoy">Hoy</button>
       <button class="tab" data-tab="semana">Esta semana</button>
       <button class="tab" data-tab="rutinas">📋 Rutinas</button>
+      <button class="tab" data-tab="perfil">👤 Perfil</button>
     </div>
     <div id="lista-clases">
       <div class="skeleton" style="height:80px; border-radius:14px; margin-bottom:10px;"></div>
@@ -251,6 +276,71 @@
     </div>
   </div>
 
+</div>
+
+<!-- PERFIL PROFESORA -->
+<div id="sec-perfil-prof">
+  <h2 style="font-family:'Dancing Script',cursive;font-size:26px;color:var(--coral);margin-bottom:6px">Mi Perfil</h2>
+  <p style="font-size:13px;color:var(--gray);margin-bottom:20px">Actualiza tu información personal y foto de perfil.</p>
+  <div class="perfil-card-prof">
+    <div style="display:flex;align-items:center;gap:20px;margin-bottom:28px;flex-wrap:wrap">
+      <div class="perfil-avatar-prof" id="perfil-avatar-prof" onclick="document.getElementById('perfil-foto-input-prof').click()" title="Cambiar foto">
+        <span id="perfil-inicial-prof">?</span>
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px">Foto de perfil</div>
+        <div style="font-size:13px;color:var(--gray);margin-bottom:10px">JPG, PNG o WebP · máx. 3 MB</div>
+        <button class="btn-guardar-prof" style="padding:8px 18px;font-size:13px" onclick="document.getElementById('perfil-foto-input-prof').click()">Cambiar foto</button>
+      </div>
+      <input type="file" id="perfil-foto-input-prof" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="subirFotoProf(this)">
+    </div>
+    <div class="perfil-grid-prof">
+      <div class="perfil-field-prof">
+        <label class="perfil-label-prof">Nombre</label>
+        <input class="perfil-input-prof" id="pp-nombre" type="text" placeholder="Tu nombre">
+      </div>
+      <div class="perfil-field-prof">
+        <label class="perfil-label-prof">Apellido</label>
+        <input class="perfil-input-prof" id="pp-apellido" type="text" placeholder="Tu apellido">
+      </div>
+      <div class="perfil-field-prof">
+        <label class="perfil-label-prof">RUT</label>
+        <input class="perfil-input-prof" id="pp-rut" type="text" placeholder="12.345.678-9">
+      </div>
+      <div class="perfil-field-prof">
+        <label class="perfil-label-prof">Fecha de nacimiento</label>
+        <input class="perfil-input-prof" id="pp-nacimiento" type="date">
+      </div>
+      <div class="perfil-field-prof">
+        <label class="perfil-label-prof">Correo principal</label>
+        <input class="perfil-input-prof" id="pp-email" type="email" readonly style="background:#f5f5f7;color:#888;cursor:not-allowed">
+      </div>
+      <div class="perfil-field-prof">
+        <label class="perfil-label-prof">Correo secundario</label>
+        <input class="perfil-input-prof" id="pp-email2" type="email" placeholder="correo@alternativo.com">
+      </div>
+      <div class="perfil-field-prof">
+        <label class="perfil-label-prof">Teléfono</label>
+        <input class="perfil-input-prof" id="pp-telefono" type="tel" placeholder="+56 9 XXXX XXXX">
+      </div>
+      <div class="perfil-field-prof">
+        <label class="perfil-label-prof">Teléfono de emergencia</label>
+        <input class="perfil-input-prof" id="pp-tel-emergencia" type="tel" placeholder="+56 9 XXXX XXXX">
+      </div>
+      <div class="perfil-field-prof" style="grid-column:1/-1">
+        <label class="perfil-label-prof">Dirección</label>
+        <input class="perfil-input-prof" id="pp-direccion" type="text" placeholder="Calle, número, ciudad">
+      </div>
+      <div class="perfil-field-prof" style="grid-column:1/-1">
+        <label class="perfil-label-prof">Antecedentes médicos</label>
+        <textarea class="perfil-input-prof" id="pp-medicos" rows="3" placeholder="Alergias, lesiones, condiciones relevantes..." style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div style="margin-top:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <button class="btn-guardar-prof" onclick="guardarPerfilProf()">Guardar cambios</button>
+      <span class="perfil-msg-prof" id="perfil-msg-prof"></span>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -411,11 +501,19 @@
       document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       tabActiva = btn.dataset.tab;
-      if (tabActiva === 'rutinas') {
-        renderRutinasProf();
+      if (tabActiva === 'perfil') {
+        document.querySelector('.layout').style.display = 'none';
+        document.getElementById('sec-perfil-prof').style.display = 'block';
+        cargarPerfilProf();
       } else {
-        renderClases();
-        marcarRutinasExistentes();
+        document.querySelector('.layout').style.display = '';
+        document.getElementById('sec-perfil-prof').style.display = 'none';
+        if (tabActiva === 'rutinas') {
+          renderRutinasProf();
+        } else {
+          renderClases();
+          marcarRutinasExistentes();
+        }
       }
     });
   });
@@ -739,6 +837,84 @@
       const badge = document.getElementById(`rutina-badge-${r.clase_id}`);
       if (badge) badge.style.display = 'inline';
     });
+  }
+
+  // ── PERFIL PROFESORA ──────────────────────────────────────────
+  function mostrarPerfilProf() {
+    document.querySelector('.layout').style.display = 'none';
+    document.getElementById('sec-perfil-prof').style.display = 'block';
+    cargarPerfilProf();
+  }
+
+  async function cargarPerfilProf() {
+    if (!userId) return;
+    const { data: u } = await sb.from('usuarios')
+      .select('nombre,apellido,email,email_secundario,telefono,rut,fecha_nacimiento,telefono_emergencia,direccion,antecedentes_medicos,foto_url')
+      .eq('id', userId).single();
+    if (!u) return;
+    document.getElementById('pp-nombre').value         = u.nombre || '';
+    document.getElementById('pp-apellido').value       = u.apellido || '';
+    document.getElementById('pp-rut').value            = u.rut || '';
+    document.getElementById('pp-nacimiento').value     = u.fecha_nacimiento || '';
+    document.getElementById('pp-email').value          = u.email || '';
+    document.getElementById('pp-email2').value         = u.email_secundario || '';
+    document.getElementById('pp-telefono').value       = u.telefono || '';
+    document.getElementById('pp-tel-emergencia').value = u.telefono_emergencia || '';
+    document.getElementById('pp-direccion').value      = u.direccion || '';
+    document.getElementById('pp-medicos').value        = u.antecedentes_medicos || '';
+    const inicial = (u.nombre || '?')[0].toUpperCase();
+    document.getElementById('perfil-inicial-prof').textContent = inicial;
+    if (u.foto_url) mostrarFotoPerfilProf(u.foto_url);
+  }
+
+  function mostrarFotoPerfilProf(url) {
+    const av = document.getElementById('perfil-avatar-prof');
+    if (!av) return;
+    av.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0;" alt="foto">`;
+    document.querySelectorAll('.ev-nav-avatar,.ev-nav-avatar-mobile').forEach(el => {
+      el.style.position = 'relative';
+      const img = el.querySelector('img');
+      if (img) { img.src = url; }
+      else {
+        el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0;" alt="foto">`;
+      }
+    });
+  }
+
+  async function guardarPerfilProf() {
+    const msg = document.getElementById('perfil-msg-prof');
+    msg.className = 'perfil-msg-prof'; msg.textContent = '';
+    const { error } = await sb.from('usuarios').update({
+      nombre:               document.getElementById('pp-nombre').value.trim(),
+      apellido:             document.getElementById('pp-apellido').value.trim(),
+      rut:                  document.getElementById('pp-rut').value.trim(),
+      fecha_nacimiento:     document.getElementById('pp-nacimiento').value || null,
+      email_secundario:     document.getElementById('pp-email2').value.trim() || null,
+      telefono:             document.getElementById('pp-telefono').value.trim() || null,
+      telefono_emergencia:  document.getElementById('pp-tel-emergencia').value.trim() || null,
+      direccion:            document.getElementById('pp-direccion').value.trim() || null,
+      antecedentes_medicos: document.getElementById('pp-medicos').value.trim() || null,
+    }).eq('id', userId);
+    if (error) { msg.className='perfil-msg-prof error'; msg.textContent='Error al guardar.'; return; }
+    msg.className='perfil-msg-prof ok'; msg.textContent='¡Guardado!';
+    setTimeout(()=>{ msg.textContent=''; }, 3000);
+  }
+
+  async function subirFotoProf(input) {
+    const file = input.files[0]; if (!file) return;
+    const tiposPermitidos = ['image/jpeg','image/png','image/webp'];
+    if (!tiposPermitidos.includes(file.type)) { mostrarToast('Solo se permiten imágenes JPG, PNG o WebP','error'); input.value=''; return; }
+    if (file.size > 3*1024*1024) { mostrarToast('La imagen no puede superar 3 MB','error'); input.value=''; return; }
+    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    const path = `${userId}/avatar.${ext}`;
+    const { error: upErr } = await sb.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
+    if (upErr) { mostrarToast('Error al subir la foto','error'); return; }
+    const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
+    const publicUrl = urlData.publicUrl + '?t=' + Date.now();
+    await sb.from('usuarios').update({ foto_url: publicUrl }).eq('id', userId);
+    mostrarFotoPerfilProf(publicUrl);
+    mostrarToast('Foto actualizada');
+    input.value = '';
   }
 
 </script>
