@@ -244,6 +244,7 @@
 
   let userId         = null;
   let compraIdActiva = null;
+  let precioBoost    = 1990;
 
   async function pagarBoost() {
     if (!compraIdActiva || !userId) return;
@@ -278,7 +279,7 @@
 
     } catch (err) {
       btn.disabled = false;
-      btn.textContent = '⚡ Boost 1 día — $1.990';
+      btn.textContent = `⚡ Boost 1 día — $${Number(precioBoost).toLocaleString('es-CL')}`;
       alert('No se pudo iniciar el pago: ' + err.message);
     }
   }
@@ -288,6 +289,14 @@
     if (!session) { window.location.href = 'login.html'; return; }
     userId = session.user.id;
     await initServerTime();
+
+    // Cargar precio del boost desde Supabase
+    const { data: boostPlanes } = await sb.from('planes').select('precio').eq('tipo','boost').eq('activo',true).limit(1);
+    if (boostPlanes?.[0]) {
+      precioBoost = boostPlanes[0].precio;
+      const btn = document.getElementById('btn-boost');
+      if (btn) btn.textContent = `⚡ Boost 1 día — $${Number(precioBoost).toLocaleString('es-CL')}`;
+    }
     // Cargar usuario primero para detectar rol
     await cargarUsuario(userId);
     // Solo cargar plan y clases si es alumna
