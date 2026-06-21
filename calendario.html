@@ -179,6 +179,19 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- MODAL VER RUTINA -->
+<div id="modal-rutina-ver" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:20px;display:none"
+     onclick="if(event.target===this)cerrarModalRutina()">
+  <div style="background:#fff;border-radius:20px;padding:32px;max-width:560px;width:100%;position:relative;max-height:85vh;display:flex;flex-direction:column">
+    <button onclick="cerrarModalRutina()" style="position:absolute;top:14px;right:14px;background:#f5f5f7;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center">✕</button>
+    <h2 id="rutina-ver-titulo" style="font-family:'Dancing Script',cursive;font-size:24px;color:#ff4e68;margin-bottom:20px;flex-shrink:0">Rutina</h2>
+    <div id="rutina-ver-body" style="overflow-y:auto;flex:1;padding-right:4px"></div>
+    <div style="margin-top:20px;flex-shrink:0">
+      <button onclick="cerrarModalRutina()" style="width:100%;padding:13px;border-radius:12px;border:none;background:#f5f5f7;color:#111;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
@@ -226,14 +239,15 @@ let userId      = null;
 let userRol     = 'alumna';
 let mesActual   = new Date().getMonth();
 let anioActual  = new Date().getFullYear();
-let clasesDelMes = [];  // todas las clases del mes cargado
+let clasesDelMes    = [];
 let misInscripciones = new Set();
+let clasesConRutina  = new Set();
 let tieneplanActivo  = false;
 let planCongelado    = false;
 let diaSeleccionado  = null;
-let filtroProfe      = 'todas'; // 'todas' | 'mias'
-let filtroAdminProfe = '';      // nombre de profesora para admin
-let nombreUsuario    = '';      // nombre completo del usuario logueado
+let filtroProfe      = 'todas';
+let filtroAdminProfe = '';
+let nombreUsuario    = '';
 
 // ── UTILS ─────────────────────────────────────────────────────
 function isoFecha(date){ return date.toISOString().split('T')[0]; }
@@ -347,6 +361,16 @@ async function cargarMes(anio, mes){
 
   const {data} = await query;
   clasesDelMes = data||[];
+
+  // Batch-fetch cuáles clases tienen rutina publicada
+  if (clasesDelMes.length > 0) {
+    const { data: rutinas } = await sb.from('rutinas').select('clase_id')
+      .in('clase_id', clasesDelMes.map(c => c.id));
+    clasesConRutina = new Set((rutinas || []).map(r => r.clase_id));
+  } else {
+    clasesConRutina = new Set();
+  }
+
   renderCalendario(anio, mes);
 }
 
@@ -494,6 +518,10 @@ function renderClaseCard(c, esFeriado){
     botonHtml=`<button class="btn-agendar-cal ver-lista" onclick="window.location.href='${userRol==='admin'?'admin.html':'profesora.html'}'">Ver lista</button>`;
   }
 
+  const rutinaHtml = clasesConRutina.has(c.id)
+    ? `<button onclick="verRutina('${c.id}')" style="margin-top:6px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;background:rgba(139,106,255,.1);color:#6b3fd4;border:none;cursor:pointer;font-family:'Outfit',sans-serif">📋 Ver rutina</button>`
+    : '';
+
   return `<div class="clase-item-cal" id="calcard-${c.id}">
     <div class="clase-hora-badge">${horaStr(c.fecha_hora)}</div>
     <div class="clase-info-cal">
@@ -502,6 +530,7 @@ function renderClaseCard(c, esFeriado){
       <div class="clase-cupo-cal ${cupoUrgente?'cupo-low':''}">
         ${cupoDisp<=0?'Clase llena':cupoUrgente?`¡Solo ${cupoDisp} lugar${cupoDisp>1?'es':''}!`:`${cupoDisp}/${cupoMax} lugares`}
       </div>
+      ${rutinaHtml}
     </div>
     ${botonHtml}
   </div>`;
@@ -511,6 +540,18 @@ function estaInscrita(claseId){ return misInscripciones.has(claseId); }
 
 // ── AGENDAR DESDE CALENDARIO ──────────────────────────────────
 async function agendarClase(claseId){
+  // Verificar límite 144h en el momento del click (no en el render)
+  const claseTarget = clasesDelMes.find(c => c.id === claseId);
+  if (claseTarget) {
+    const horasHasta = (new Date(claseTarget.fecha_hora) - serverNow()) / (1000 * 60 * 60);
+    if (horasHasta > 144) {
+      const fechaDisp = new Date(new Date(claseTarget.fecha_hora).getTime() - 144 * 60 * 60 * 1000);
+      const diaDisp = fechaDisp.toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' });
+      toast(`Solo puedes agendar esta clase desde el ${diaDisp}`, 'error');
+      mostrarDia(diaSeleccionado);
+      return;
+    }
+  }
   try {
     const {data,error} = await sb.rpc('agendar_clase',{p_clase_id:claseId,p_alumna_id:userId});
     const errores={
@@ -551,6 +592,53 @@ async function cancelarClase(claseId){
   toast('Inscripción cancelada');
   mostrarDia(diaSeleccionado);
   renderCalendario(anioActual,mesActual);
+}
+
+// ── VER RUTINA ────────────────────────────────────────────────
+const RUTINA_SECCIONES = [
+  {k:'descripcion',     e:'📝', l:'Descripción'},
+  {k:'objetivo',        e:'🎯', l:'Objetivo'},
+  {k:'nivel',           e:'⭐', l:'Nivel'},
+  {k:'calentamiento',   e:'🔥', l:'Calentamiento'},
+  {k:'parte_principal', e:'💪', l:'Parte principal'},
+  {k:'posturas',        e:'🤸', l:'Posturas / movimientos'},
+  {k:'musica',          e:'🎵', l:'Música'},
+  {k:'enfriamiento',    e:'❄️', l:'Enfriamiento'},
+  {k:'recomendaciones', e:'🧘', l:'Recomendaciones'},
+  {k:'referencia_visual',e:'📸',l:'Referencia visual'},
+];
+
+async function verRutina(claseId) {
+  const clase = clasesDelMes.find(c => c.id === claseId);
+  document.getElementById('rutina-ver-titulo').textContent = clase?.nombre || 'Rutina';
+  document.getElementById('rutina-ver-body').innerHTML =
+    '<p style="color:#555;font-size:13px;text-align:center;padding:20px 0">Cargando...</p>';
+  document.getElementById('modal-rutina-ver').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  const { data: r } = await sb.from('rutinas').select('*').eq('clase_id', claseId).maybeSingle();
+  if (!r) {
+    document.getElementById('rutina-ver-body').innerHTML =
+      '<p style="color:#555;font-size:13px">No hay rutina disponible.</p>';
+    return;
+  }
+
+  const html = RUTINA_SECCIONES.filter(s => r[s.k]).map(s => {
+    const val = r[s.k];
+    const esLink = typeof val === 'string' && (val.startsWith('http://') || val.startsWith('https://'));
+    return `<div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${s.e} ${s.l}</div>
+      <div style="font-size:14px;line-height:1.6;color:#111">${esLink ? `<a href="${val}" target="_blank" rel="noopener" style="color:#ff4e68">${val}</a>` : val}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('rutina-ver-body').innerHTML =
+    html || '<p style="color:#555;font-size:13px">Rutina sin contenido.</p>';
+}
+
+function cerrarModalRutina() {
+  document.getElementById('modal-rutina-ver').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 // ── NAVEGACIÓN MES ────────────────────────────────────────────

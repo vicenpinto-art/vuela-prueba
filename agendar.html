@@ -127,6 +127,13 @@
     }
     .btn-cancelar:hover { background: rgba(255,78,104,.08); color: var(--coral); }
 
+    .btn-rutina-ver {
+      font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px;
+      background: rgba(139,106,255,.1); color: var(--purple); border: none;
+      cursor: pointer; font-family: 'Outfit', sans-serif; margin-top: 8px; display: inline-block;
+    }
+    .btn-rutina-ver:hover { background: rgba(139,106,255,.2); }
+
     .inscrita-badge {
       font-size: 12px; font-weight: 700; color: #007a82;
       background: rgba(0,200,212,.1); padding: 6px 12px; border-radius: 8px;
@@ -243,6 +250,18 @@
   </div>
 </div>
 
+<!-- MODAL VER RUTINA -->
+<div class="modal-overlay" id="modal-rutina-ver">
+  <div class="modal" style="max-width:560px">
+    <button class="modal-close" onclick="cerrarModal('modal-rutina-ver')">✕</button>
+    <h2 id="rutina-ver-titulo" style="font-family:'Dancing Script',cursive;font-size:24px;color:var(--coral);margin-bottom:20px">Rutina</h2>
+    <div id="rutina-ver-body" style="max-height:60vh;overflow-y:auto;padding-right:4px"></div>
+    <div class="modal-btns" style="margin-top:20px">
+      <button class="btn-modal-sec" onclick="cerrarModal('modal-rutina-ver')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL CANCELAR INSCRIPCIÓN -->
 <div class="modal-overlay" id="modal-cancelar">
   <div class="modal">
@@ -266,7 +285,8 @@
   // ── ESTADO ────────────────────────────────────────────────────
   let userId       = null;
   let todasLasClases    = [];
-  let misInscripciones  = new Set(); // clase_id de inscripciones confirmadas
+  let misInscripciones  = new Set();
+  let clasesConRutina   = new Set();
   let tieneplanActivo   = false;
   let planCongelado     = false;
   let claseSeleccionada = null;
@@ -357,6 +377,13 @@
     todasLasClases = clases || [];
     misInscripciones = new Set((inscripciones || []).map(i => i.clase_id));
 
+    // Cuáles clases tienen rutina publicada
+    if (todasLasClases.length > 0) {
+      const { data: rutinas } = await sb.from('rutinas').select('clase_id')
+        .in('clase_id', todasLasClases.map(c => c.id));
+      clasesConRutina = new Set((rutinas || []).map(r => r.clase_id));
+    }
+
     document.getElementById('skeleton-wrap').style.display = 'none';
     document.getElementById('clases-wrap').style.display = 'block';
     renderClases();
@@ -437,6 +464,7 @@
           <div class="clase-meta">
             <span>👩‍🏫 ${c.profesora}</span>
           </div>
+          ${clasesConRutina.has(c.id) ? `<button class="btn-rutina-ver" onclick="verRutina('${c.id}')">📋 Ver rutina</button>` : ''}
           <div class="cupo-bar-wrap">
             <div class="cupo-text ${urgente ? 'urgente' : ''} ${sinCupo ? 'urgente' : ''}">
               ${sinCupo ? 'Clase llena' : urgente ? `¡Solo ${c.cupo_disponible} lugar${c.cupo_disponible > 1 ? 'es' : ''} disponible!` : `${c.cupo_disponible} de ${c.cupo_maximo || 15} lugares disponibles`}
@@ -586,6 +614,47 @@
       cerrarModal('modal-cancelar');
       renderClases();
     }, 1400);
+  }
+
+  // ── VER RUTINA ────────────────────────────────────────────────
+  const RUTINA_SECCIONES = [
+    {k:'descripcion',     e:'📝', l:'Descripción'},
+    {k:'objetivo',        e:'🎯', l:'Objetivo'},
+    {k:'nivel',           e:'⭐', l:'Nivel'},
+    {k:'calentamiento',   e:'🔥', l:'Calentamiento'},
+    {k:'parte_principal', e:'💪', l:'Parte principal'},
+    {k:'posturas',        e:'🤸', l:'Posturas / movimientos'},
+    {k:'musica',          e:'🎵', l:'Música'},
+    {k:'enfriamiento',    e:'❄️', l:'Enfriamiento'},
+    {k:'recomendaciones', e:'🧘', l:'Recomendaciones'},
+    {k:'referencia_visual',e:'📸',l:'Referencia visual'},
+  ];
+
+  async function verRutina(claseId) {
+    const clase = todasLasClases.find(c => c.id === claseId);
+    document.getElementById('rutina-ver-titulo').textContent = clase?.nombre || 'Rutina';
+    document.getElementById('rutina-ver-body').innerHTML =
+      '<p style="color:var(--gray);font-size:13px;text-align:center;padding:20px 0">Cargando...</p>';
+    abrirModal('modal-rutina-ver');
+
+    const { data: r } = await sb.from('rutinas').select('*').eq('clase_id', claseId).maybeSingle();
+    if (!r) {
+      document.getElementById('rutina-ver-body').innerHTML =
+        '<p style="color:var(--gray);font-size:13px">No hay rutina disponible.</p>';
+      return;
+    }
+
+    const html = RUTINA_SECCIONES.filter(s => r[s.k]).map(s => {
+      const val = r[s.k];
+      const esLink = typeof val === 'string' && (val.startsWith('http://') || val.startsWith('https://'));
+      return `<div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${s.e} ${s.l}</div>
+        <div style="font-size:14px;line-height:1.6;color:var(--dark)">${esLink ? `<a href="${val}" target="_blank" rel="noopener" style="color:var(--coral)">${val}</a>` : val}</div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('rutina-ver-body').innerHTML =
+      html || '<p style="color:var(--gray);font-size:13px">Rutina sin contenido.</p>';
   }
 
   // ── MODALES ───────────────────────────────────────────────────

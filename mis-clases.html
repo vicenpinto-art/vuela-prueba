@@ -129,29 +129,47 @@ async function init() {
 }
 
 async function cargarClases() {
-  // Traer todas las inscripciones (sin order en tabla relacionada — no soportado)
-  const {data: inscripciones, error: errInsc} = await sb
-    .from('inscripciones')
-    .select('*, clases(id, nombre, fecha_hora, profesora, tipo)')
-    .eq('alumna_id', userId);
+  const [{data: inscripciones}, {data: asistencias}] = await Promise.all([
+    sb.from('inscripciones')
+      .select('*, clases(id, nombre, fecha_hora, profesora, tipo)')
+      .eq('alumna_id', userId),
+    sb.from('asistencias')
+      .select('clase_id, presente, clases(id, nombre, fecha_hora, profesora, tipo)')
+      .eq('alumna_id', userId)
+      .eq('presente', true)
+  ]);
 
-  const {data: asistencias} = await sb
-    .from('asistencias')
-    .select('clase_id, presente')
-    .eq('alumna_id', userId);
-
+  // Mapa rápido de presencia por clase_id
   const asistenciaMap = {};
-  (asistencias || []).forEach(a => {
-    asistenciaMap[a.clase_id] = a.presente;
-  });
+  (asistencias || []).forEach(a => { asistenciaMap[a.clase_id] = true; });
 
-  // Filtrar solo las que tienen clase válida y ordenar por fecha desc en JS
-  todasLasClases = (inscripciones || [])
+  // Mapa unificado por clase_id para deduplicar
+  const clasesMap = {};
+
+  // 1) Volcamos inscripciones (incluye canceladas, futuras, etc.)
+  (inscripciones || [])
     .filter(i => i.clases && i.clases.fecha_hora)
-    .map(i => ({
-      ...i,
-      asistio: asistenciaMap[i.clase_id] !== undefined ? asistenciaMap[i.clase_id] : null
-    }))
+    .forEach(i => {
+      clasesMap[i.clase_id] = {
+        ...i,
+        asistio: asistenciaMap[i.clase_id] ?? null
+      };
+    });
+
+  // 2) Agregamos clases donde solo hay asistencia marcada (sin inscripcion previa)
+  (asistencias || [])
+    .filter(a => a.clases && a.clases.fecha_hora && !clasesMap[a.clase_id])
+    .forEach(a => {
+      clasesMap[a.clase_id] = {
+        clase_id: a.clase_id,
+        alumna_id: userId,
+        estado: 'confirmada',
+        clases: a.clases,
+        asistio: true
+      };
+    });
+
+  todasLasClases = Object.values(clasesMap)
     .sort((a, b) => new Date(b.clases.fecha_hora) - new Date(a.clases.fecha_hora));
 
   actualizarStats();
