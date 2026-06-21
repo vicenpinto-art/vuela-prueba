@@ -199,18 +199,11 @@ app.post('/webhook', async (req, res) => {
   if (!esNotificacionPago || !data?.id) return;
 
   try {
-    const paymentApi = new Payment(mp);
-    let pago, lastErr;
-    for (let intento = 1; intento <= 4; intento++) {
-      try {
-        pago = await paymentApi.get({ id: data.id });
-        break;
-      } catch (e) {
-        lastErr = e;
-        if (intento < 4) await new Promise(r => setTimeout(r, intento * 1500));
-      }
-    }
-    if (!pago) throw lastErr;
+    const resp = await fetch(`https://api.mercadopago.com/v1/payments/${data.id}`, {
+      headers: { Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}` }
+    });
+    if (!resp.ok) throw new Error(`MP API respondió ${resp.status}`);
+    const pago = await resp.json();
 
     if (pago.status !== 'approved') {
       console.log(`Pago ${data.id} estado: ${pago.status} — ignorado`);
