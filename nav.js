@@ -53,6 +53,7 @@
       background: #ff4e68; color: #fff !important; padding: 9px 20px !important;
       border-radius: 100px; font-weight: 600 !important;
       transition: transform .2s, box-shadow .2s; white-space: nowrap;
+      text-decoration: none;
     }
     .ev-nav-cta:hover {
       transform: translateY(-2px) !important;

@@ -1102,7 +1102,7 @@ function filtrarAlumnas(){
 function renderAlumnas(lista){
   const el = document.getElementById('tabla-alumnas');
   if(!lista||lista.length===0){el.innerHTML='<p style="font-size:14px;color:var(--gray);padding:8px 0">No se encontraron alumnas.</p>';return;}
-  el.innerHTML=`<table class="tabla">
+  el.innerHTML=`<div class="tabla-wrap"><table class="tabla">
     <thead><tr><th>Nombre</th><th>Email</th><th>Plan</th><th>Clases</th><th>Vence</th><th></th></tr></thead>
     <tbody>${lista.map(a=>{
       const c=a.compra;
@@ -1129,7 +1129,7 @@ function renderAlumnas(lista){
         </td>
       </tr>`;
     }).join('')}
-    </tbody></table>`;
+    </tbody></table></div>`;
 }
 let planesCache = [];
 let comprasAlumnaActual = [];
