@@ -184,6 +184,14 @@
 
       /* Admin-main-menu-btn */
       .admin-mobile-menu-btn{width:100%;justify-content:center;margin-bottom:12px}
+
+      /* Disciplinas: colapsar las 2 columnas a 1 en móvil */
+      #disc-grid{grid-template-columns:1fr !important}
+
+      /* Roles y Disciplinas: tabla con scroll horizontal propio */
+      #tabla-roles .tabla{min-width:420px}
+      #sec-disciplinas .disc-row{flex-wrap:wrap;gap:4px}
+      #sec-disciplinas .btn-sm{font-size:10px;padding:3px 7px}
     }
     @media(max-width:480px){
       .stats-grid{grid-template-columns:1fr 1fr;gap:8px}
@@ -1663,7 +1671,7 @@ function filtrarRoles(){
 function renderRoles(lista){
   const el=document.getElementById('tabla-roles');
   if(!lista||lista.length===0){el.innerHTML='<p style="font-size:14px;color:var(--gray);padding:8px 0">No se encontraron usuarias.</p>';return;}
-  el.innerHTML=`<table class="tabla">
+  el.innerHTML=`<div class="tabla-wrap"><table class="tabla">
     <thead><tr><th>Nombre</th><th>Email</th><th>Rol actual</th><th>Cambiar a</th></tr></thead>
     <tbody>${lista.map(u=>`
       <tr>
@@ -1676,7 +1684,7 @@ function renderRoles(lista){
           ${u.rol!=='admin'?`<button class="btn btn-danger btn-sm" onclick="cambiarRol('${u.id}','admin')">Admin</button>`:''}
         </td>
       </tr>`).join('')}
-    </tbody></table>`;
+    </tbody></table></div>`;
 }
 async function cambiarRol(usuarioId,nuevoRol){
   if(!confirm(`¿Cambiar rol a "${nuevoRol}"?`)) return;
