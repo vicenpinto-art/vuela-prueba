@@ -38,20 +38,14 @@ app.post('/crear-preferencia', async (req, res) => {
         return res.status(400).json({ error: 'No se encontró un plan activo para aplicar el boost' });
       }
 
-      // Obtener o crear el plan Boost en la tabla planes (auto-creación al primer uso)
-      let { data: boostPlan } = await sb.from('planes')
-        .select('id')
+      const { data: boostPlan } = await sb.from('planes')
+        .select('id, precio, nombre')
         .eq('tipo', 'boost')
-        .maybeSingle();
+        .eq('activo', true)
+        .single();
 
       if (!boostPlan) {
-        const { data: nuevo, error: planErr } = await sb.from('planes')
-          .insert({ nombre: 'Boost 1 día', tipo: 'boost', precio: 1990, ilimitado: false, clases: null })
-          .select('id')
-          .single();
-        if (planErr) console.error('Error creando plan boost:', planErr);
-        boostPlan = nuevo;
-        console.log(`✅ Plan Boost auto-creado con id: ${boostPlan?.id}`);
+        return res.status(500).json({ error: 'Plan boost no configurado en Supabase' });
       }
 
       const pref = new Preference(mp);
@@ -59,9 +53,9 @@ app.post('/crear-preferencia', async (req, res) => {
         body: {
           items: [{
             id:          'boost-1-dia',
-            title:       'Boost 1 día — Espacio Vuela',
+            title:       boostPlan.nombre,
             quantity:    1,
-            unit_price:  1990,
+            unit_price:  boostPlan.precio,
             currency_id: 'CLP'
           }],
           payer: { email: usuario_email, name: usuario_nombre || '' },
@@ -74,10 +68,10 @@ app.post('/crear-preferencia', async (req, res) => {
           notification_url: `${process.env.SERVER_URL}/webhook`,
           metadata: {
             tipo:        'boost',
-            plan_id:     boostPlan ? String(boostPlan.id) : null,
+            plan_id:     String(boostPlan.id),
             compra_id:   String(compra_id),
             usuario_id:  String(usuario_id),
-            monto_total: 1990
+            monto_total: boostPlan.precio
           }
         }
       });
