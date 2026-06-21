@@ -91,7 +91,7 @@ app.get('/descontar-proximas', async (req, res) => {
     res.json({ ok: true, clases_descontadas: count });
   } catch(err) {
     console.error('Error descontando:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ ok: false, clases_descontadas: 0, error: err.message });
   }
 });
 
@@ -114,7 +114,7 @@ app.get('/generar-automatico', async (req, res) => {
     res.json({ ok: true, total_clases_generadas: total, detalle });
   } catch (err) {
     console.error('Error en auto-generación:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ ok: false, total_clases_generadas: 0, detalle: [], error: err.message });
   }
 });
 

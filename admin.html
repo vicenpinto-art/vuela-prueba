@@ -616,6 +616,7 @@ const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 function horaStr(ts){ return new Date(ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',hour12:false}); }
 function fechaStr(ts){ return new Date(ts).toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short'}); }
 function hoy(){ return new Date().toISOString().split('T')[0]; }
+function esc(s){ return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function toast(msg,tipo='ok'){
   const t=document.getElementById('toast');
   t.textContent=msg; t.className=`toast ${tipo} visible`;
@@ -691,8 +692,8 @@ async function cargarResumen(){
   el.innerHTML=clasesHoy.map(c=>`
     <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
       <span style="font-size:13px;font-weight:700;color:var(--coral);min-width:50px">${horaStr(c.fecha_hora)}</span>
-      <span style="font-size:14px;font-weight:600;flex:1">${c.nombre}</span>
-      <span style="font-size:12px;color:var(--gray)">👩‍🏫 ${c.profesora}</span>
+      <span style="font-size:14px;font-weight:600;flex:1">${esc(c.nombre)}</span>
+      <span style="font-size:12px;color:var(--gray)">👩‍🏫 ${esc(c.profesora)}</span>
       <span style="font-size:12px;color:var(--gray)">👥 ${(c.cupo_maximo||15)-(c.cupo_disponible||0)}/${c.cupo_maximo||15}</span>
     </div>`).join('');
 }
@@ -742,8 +743,8 @@ function renderHorarios(){
   const filasTabla = (lista) => lista.map(h=>`
     <tr>
       <td style="font-weight:600">${h.hora?.slice(0,5)||'—'}</td>
-      <td>${h.nombre}</td>
-      <td style="color:var(--gray);font-size:12px">${h.profesora}</td>
+      <td>${esc(h.nombre)}</td>
+      <td style="color:var(--gray);font-size:12px">${esc(h.profesora)}</td>
       <td>${h.cupo_maximo}</td>
       <td><span class="badge badge-${h.restriccion_plan==='vuela'?'vuela':h.restriccion_plan==='muevete'?'muevete':'sin'}">${h.restriccion_plan==='vuela'?'Vuela':h.restriccion_plan==='muevete'?'Muévete':'Libre'}</span></td>
       <td><button class="toggle-activo ${h.activo?'on':'off'}" onclick="toggleHorario('${h.id}',${h.activo})"></button></td>
@@ -813,7 +814,8 @@ async function guardarHorario(){
 
   let horarioId = id;
   if(id){
-    await sb.from('horarios').update(datos).eq('id',id);
+    const {error:updError} = await sb.from('horarios').update(datos).eq('id',id);
+    if(updError){toast('Error al actualizar','error');return;}
     toast('Horario actualizado ✓');
   } else {
     const {data,error} = await sb.from('horarios').insert(datos).select().single();
@@ -908,8 +910,8 @@ function renderClases(){
   const filasClases = (lista) => lista.map(c=>`
     <tr style="${c.cancelada?'opacity:.5':''}">
       <td style="font-weight:600;color:var(--coral)">${horaStr(c.fecha_hora)}</td>
-      <td>${c.nombre}</td>
-      <td style="color:var(--gray);font-size:12px">${c.profesora}</td>
+      <td>${esc(c.nombre)}</td>
+      <td style="color:var(--gray);font-size:12px">${esc(c.profesora)}</td>
       <td>${(c.cupo_maximo||15)-(c.cupo_disponible||0)}/${c.cupo_maximo||15}</td>
       <td>${c.sobrecupo||0}</td>
       <td><span class="badge ${c.cancelada?'badge-vencido':'badge-activo'}">${c.cancelada?'Cancelada':'Activa'}</span></td>
@@ -939,7 +941,12 @@ async function guardarClase(){
   const id  = document.getElementById('c-id').value;
   const cupo = parseInt(document.getElementById('c-cupo').value);
   const sob  = parseInt(document.getElementById('c-sobrecupo').value);
-  const {error} = await sb.from('clases').update({cupo_maximo:cupo,cupo_disponible:cupo,sobrecupo:sob}).eq('id',id);
+  if(isNaN(cupo)||cupo<1){toast('Cupo inválido','error');return;}
+  if(isNaN(sob)||sob<0){toast('Sobrecupo inválido','error');return;}
+  const {count} = await sb.from('inscripciones').select('id',{count:'exact',head:true}).eq('clase_id',id);
+  const inscritas = count||0;
+  const cupo_disponible = Math.max(0, cupo - inscritas);
+  const {error} = await sb.from('clases').update({cupo_maximo:cupo,cupo_disponible,sobrecupo:sob}).eq('id',id);
   if(error){toast('Error al guardar','error');return;}
   toast('Clase actualizada ✓');
   cerrarModal('modal-clase');
