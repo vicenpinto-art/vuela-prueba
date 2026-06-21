@@ -148,6 +148,60 @@
       .accion-icon { font-size: 20px; }
       .accion-label { font-size: 11px; }
     }
+
+    /* ── PERFIL ── */
+    .perfil-card { margin-top: 20px; }
+    .perfil-foto-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 28px; }
+    .perfil-avatar {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: linear-gradient(135deg, #a183ff, #ff4e68);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; font-weight: 700; color: #fff;
+      cursor: pointer; position: relative; overflow: hidden;
+      border: 3px solid rgba(255,255,255,0.9);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      transition: opacity .2s;
+    }
+    .perfil-avatar:hover { opacity: 0.85; }
+    .perfil-avatar img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .perfil-avatar-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.35);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .2s; font-size: 22px; z-index: 1;
+    }
+    .perfil-avatar:hover .perfil-avatar-overlay { opacity: 1; }
+    .perfil-foto-hint { font-size: 12px; color: var(--gray); margin-top: 10px; text-align: center; }
+    .perfil-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .perfil-field { display: flex; flex-direction: column; gap: 6px; }
+    .perfil-field.full { grid-column: 1 / -1; }
+    .perfil-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); }
+    .perfil-input {
+      padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--dark);
+      background: #fff; transition: border-color .2s; outline: none; width: 100%;
+    }
+    .perfil-input:focus { border-color: var(--coral); }
+    .perfil-input[readonly] { background: var(--light); color: var(--gray); cursor: default; }
+    .perfil-input[readonly]:focus { border-color: var(--border); }
+    textarea.perfil-input { resize: vertical; }
+    .perfil-divider { grid-column: 1 / -1; border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+    .perfil-section-label { grid-column: 1 / -1; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--coral); padding-top: 4px; }
+    .btn-guardar-perfil {
+      margin-top: 20px; padding: 13px; width: 100%;
+      background: linear-gradient(135deg, var(--coral), var(--magenta));
+      color: #fff; border: none; border-radius: 12px;
+      font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: opacity .2s;
+    }
+    .btn-guardar-perfil:hover { opacity: 0.9; }
+    .btn-guardar-perfil:disabled { opacity: 0.6; cursor: default; }
+    .perfil-msg { font-size: 13px; text-align: center; margin-top: 10px; min-height: 18px; }
+    .perfil-msg.ok { color: #007a82; }
+    .perfil-msg.err { color: var(--coral); }
+    @media (max-width: 600px) {
+      .perfil-grid { grid-template-columns: 1fr; }
+      .perfil-field.full, .perfil-divider, .perfil-section-label { grid-column: 1; }
+    }
 </style>
 </head>
 <body>
@@ -220,6 +274,70 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- PERFIL -->
+  <div class="card perfil-card" id="card-perfil" style="display:none;">
+    <div class="card-header" style="margin-bottom:24px;">
+      <div class="card-titulo">Mi Perfil</div>
+    </div>
+
+    <div class="perfil-foto-wrap">
+      <div class="perfil-avatar" id="perfil-avatar" onclick="document.getElementById('input-foto').click()">
+        <span id="perfil-inicial">?</span>
+        <div class="perfil-avatar-overlay">📷</div>
+      </div>
+      <span class="perfil-foto-hint">Toca para cambiar foto · JPG, PNG o WebP · máx. 3 MB</span>
+      <input type="file" id="input-foto" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="subirFoto(this)">
+    </div>
+
+    <div class="perfil-grid">
+      <div class="perfil-section-label">Datos personales</div>
+      <div class="perfil-field">
+        <label class="perfil-label">RUT</label>
+        <input class="perfil-input" id="perfil-rut" type="text" placeholder="12.345.678-9">
+      </div>
+      <div class="perfil-field">
+        <label class="perfil-label">Fecha de nacimiento</label>
+        <input class="perfil-input" id="perfil-nacimiento" type="date">
+      </div>
+
+      <hr class="perfil-divider">
+      <div class="perfil-section-label">Contacto</div>
+      <div class="perfil-field">
+        <label class="perfil-label">Correo principal</label>
+        <input class="perfil-input" id="perfil-email" type="email" readonly>
+      </div>
+      <div class="perfil-field">
+        <label class="perfil-label">Correo alternativo</label>
+        <input class="perfil-input" id="perfil-email2" type="email" placeholder="opcional">
+      </div>
+      <div class="perfil-field">
+        <label class="perfil-label">Teléfono</label>
+        <input class="perfil-input" id="perfil-tel" type="tel" placeholder="+56 9 1234 5678">
+      </div>
+      <div class="perfil-field">
+        <label class="perfil-label">Teléfono de emergencia</label>
+        <input class="perfil-input" id="perfil-tel-emerg" type="tel" placeholder="+56 9 1234 5678">
+      </div>
+
+      <hr class="perfil-divider">
+      <div class="perfil-section-label">Dirección</div>
+      <div class="perfil-field full">
+        <label class="perfil-label">Dirección</label>
+        <input class="perfil-input" id="perfil-dir" type="text" placeholder="Calle, número, ciudad">
+      </div>
+
+      <hr class="perfil-divider">
+      <div class="perfil-section-label">Salud</div>
+      <div class="perfil-field full">
+        <label class="perfil-label">Antecedentes médicos relevantes</label>
+        <textarea class="perfil-input" id="perfil-medico" rows="3" placeholder="Lesiones, alergias, condiciones a considerar..."></textarea>
+      </div>
+    </div>
+
+    <button class="btn-guardar-perfil" id="btn-guardar-perfil" onclick="guardarPerfil()">Guardar cambios</button>
+    <p class="perfil-msg" id="perfil-msg"></p>
   </div>
 </main>
 
@@ -295,6 +413,8 @@
     if (boostPlanes?.[0]) precioBoost = boostPlanes[0].precio;
     // Cargar usuario primero para detectar rol
     await cargarUsuario(userId);
+    // Cargar perfil (visible para todos los roles)
+    cargarPerfil(userId);
     // Solo cargar plan y clases si es alumna
     const { data: rolCheck } = await sb.from('usuarios').select('rol,nombre,apellido').eq('id', userId).single();
     if (rolCheck?.rol === 'alumna' || !rolCheck?.rol) {
@@ -303,6 +423,99 @@
       const nombreCompleto = ((rolCheck.nombre||'') + ' ' + (rolCheck.apellido||'')).trim();
       await Promise.all([cargarClasesProfesora(nombreCompleto), cargarRutinasProfesora(nombreCompleto)]);
     }
+  }
+
+  async function cargarPerfil(uid) {
+    const { data: { session } } = await sb.auth.getSession();
+    const { data: u } = await sb.from('usuarios')
+      .select('nombre, apellido, email_secundario, telefono, rut, fecha_nacimiento, telefono_emergencia, direccion, antecedentes_medicos, foto_url')
+      .eq('id', uid).single();
+    if (!u) return;
+
+    document.getElementById('perfil-email').value      = session?.user?.email || '';
+    document.getElementById('perfil-email2').value     = u.email_secundario || '';
+    document.getElementById('perfil-tel').value        = u.telefono || '';
+    document.getElementById('perfil-rut').value        = u.rut || '';
+    document.getElementById('perfil-nacimiento').value = u.fecha_nacimiento || '';
+    document.getElementById('perfil-tel-emerg').value  = u.telefono_emergencia || '';
+    document.getElementById('perfil-dir').value        = u.direccion || '';
+    document.getElementById('perfil-medico').value     = u.antecedentes_medicos || '';
+
+    const inicial = ((u.nombre||'?')[0]).toUpperCase();
+    document.getElementById('perfil-inicial').textContent = inicial;
+    if (u.foto_url) mostrarFotoPerfil(u.foto_url);
+
+    document.getElementById('card-perfil').style.display = 'block';
+  }
+
+  function mostrarFotoPerfil(url) {
+    const wrap = document.getElementById('perfil-avatar');
+    const inicialEl = document.getElementById('perfil-inicial');
+    if (inicialEl) inicialEl.style.display = 'none';
+    let img = wrap.querySelector('img');
+    if (!img) { img = document.createElement('img'); img.alt = 'Foto de perfil'; wrap.prepend(img); }
+    img.src = url;
+    // Actualizar también avatares del nav
+    document.querySelectorAll('.ev-nav-avatar span, .ev-nav-avatar-mobile-inicial').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.ev-nav-avatar, .ev-nav-avatar-mobile').forEach(el => {
+      if (!el.querySelector('img.nav-foto')) {
+        const ni = document.createElement('img');
+        ni.className = 'nav-foto';
+        ni.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0;';
+        el.style.position = 'relative';
+        el.prepend(ni);
+      }
+      el.querySelector('img.nav-foto').src = url;
+    });
+  }
+
+  async function guardarPerfil() {
+    const btn = document.getElementById('btn-guardar-perfil');
+    const msg = document.getElementById('perfil-msg');
+    btn.disabled = true; btn.textContent = 'Guardando…';
+    msg.textContent = ''; msg.className = 'perfil-msg';
+
+    const { error } = await sb.from('usuarios').update({
+      email_secundario:     document.getElementById('perfil-email2').value.trim() || null,
+      telefono:             document.getElementById('perfil-tel').value.trim() || null,
+      rut:                  document.getElementById('perfil-rut').value.trim() || null,
+      fecha_nacimiento:     document.getElementById('perfil-nacimiento').value || null,
+      telefono_emergencia:  document.getElementById('perfil-tel-emerg').value.trim() || null,
+      direccion:            document.getElementById('perfil-dir').value.trim() || null,
+      antecedentes_medicos: document.getElementById('perfil-medico').value.trim() || null,
+    }).eq('id', userId);
+
+    btn.disabled = false; btn.textContent = 'Guardar cambios';
+    if (error) {
+      msg.textContent = 'Error al guardar. Intenta de nuevo.'; msg.className = 'perfil-msg err';
+    } else {
+      msg.textContent = '✓ Cambios guardados'; msg.className = 'perfil-msg ok';
+      setTimeout(() => { msg.textContent = ''; }, 3000);
+    }
+  }
+
+  async function subirFoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const tipos = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!tipos.includes(file.type)) { alert('Solo JPG, PNG o WebP.'); input.value = ''; return; }
+    if (file.size > 3 * 1024 * 1024) { alert('La imagen no puede pesar más de 3 MB.'); input.value = ''; return; }
+
+    const btn = document.getElementById('btn-guardar-perfil');
+    btn.disabled = true; btn.textContent = 'Subiendo foto…';
+
+    const ext  = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    const path = `${userId}/avatar.${ext}`;
+    const { error: upErr } = await sb.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
+    if (upErr) { alert('Error al subir: ' + upErr.message); btn.disabled = false; btn.textContent = 'Guardar cambios'; return; }
+
+    const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
+    const url = urlData.publicUrl + '?t=' + Date.now();
+    await sb.from('usuarios').update({ foto_url: urlData.publicUrl }).eq('id', userId);
+    mostrarFotoPerfil(url);
+
+    btn.disabled = false; btn.textContent = 'Guardar cambios';
+    input.value = '';
   }
 
   async function cargarUsuario(userId) {

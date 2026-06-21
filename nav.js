@@ -305,15 +305,19 @@
     let u = null;
     try {
       const res = await sb.from('usuarios')
-        .select('nombre, rol')
+        .select('nombre, rol, foto_url')
         .eq('id', session.user.id)
         .single();
       u = res.data;
     } catch (e) {}
 
-    const nombre  = (u && u.nombre) ? u.nombre : '';
-    const rol     = (u && u.rol)    ? u.rol    : 'alumna';
-    const inicial = (nombre[0] || '?').toUpperCase();
+    const nombre   = (u && u.nombre)   ? u.nombre   : '';
+    const rol      = (u && u.rol)      ? u.rol      : 'alumna';
+    const fotoUrl  = (u && u.foto_url) ? u.foto_url : null;
+    const inicial  = (nombre[0] || '?').toUpperCase();
+    const avatarInner = fotoUrl
+      ? `<img src="${fotoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0;" alt="foto">`
+      : `<span>${inicial}</span>`;
     const href    = rol === 'admin'     ? 'admin.html'
                   : rol === 'profesora' ? 'mi-cuenta.html'
                   :                       'mi-cuenta.html';
@@ -330,7 +334,7 @@
     if (rightEl) {
       rightEl.innerHTML = `
         <a href="${href}" class="ev-nav-avatar-wrap" title="Ir a mi cuenta">
-          <span class="ev-nav-avatar"><span>${inicial}</span></span>
+          <span class="ev-nav-avatar" style="position:relative;">${avatarInner}</span>
           <span class="ev-nav-rol-label">${rolTexto}</span>
         </a>
         <button class="ev-nav-salir" id="btn-salir-desktop">Salir</button>
@@ -342,7 +346,9 @@
     if (mobileAvatarEl) {
       mobileAvatarEl.innerHTML = `
         <a href="${href}" class="ev-nav-avatar-mobile" title="${nombre}">
-          <span class="ev-nav-avatar-mobile-inicial">${inicial}</span>
+          ${fotoUrl
+            ? `<img src="${fotoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0;" alt="foto">`
+            : `<span class="ev-nav-avatar-mobile-inicial">${inicial}</span>`}
           <span class="ev-nav-avatar-mobile-rol">${rolTexto}</span>
         </a>
       `;
