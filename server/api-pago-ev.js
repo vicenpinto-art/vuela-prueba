@@ -38,11 +38,12 @@ app.post('/crear-preferencia', async (req, res) => {
         return res.status(400).json({ error: 'No se encontró un plan activo para aplicar el boost' });
       }
 
-      const { data: boostPlan } = await sb.from('planes')
+      const { data: boostPlanes } = await sb.from('planes')
         .select('id, precio, nombre')
         .eq('tipo', 'boost')
         .eq('activo', true)
-        .single();
+        .limit(1);
+      const boostPlan = boostPlanes?.[0] ?? null;
 
       if (!boostPlan) {
         return res.status(500).json({ error: 'Plan boost no configurado en Supabase' });
