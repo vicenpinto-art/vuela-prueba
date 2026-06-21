@@ -340,7 +340,15 @@
     const { data: authData, error: authError } = await sb.auth.signUp({
       email,
       password,
-      options: { data: { nombre, apellido } }
+      options: {
+        data: {
+          nombre,
+          apellido,
+          telefono:             telefono || null,
+          telefono_emergencia:  telEmergencia || null,
+          antecedentes_medicos: antecedentes || null,
+        }
+      }
     });
 
     if (authError) {
@@ -352,38 +360,15 @@
       return;
     }
 
-    const { error: dbError } = await sb.from('usuarios').insert({
-      id:                   authData.user.id,
-      email,
-      nombre,
-      apellido,
-      telefono:             telefono || null,
-      telefono_emergencia:  telEmergencia || null,
-      antecedentes_medicos: antecedentes || null,
-      rol:                  'alumna',
-      matricula_pagada:     false,
-      clase_prueba_tomada:  false
-    });
-
-    if (dbError) {
-      mostrar('Error al guardar tus datos: ' + dbError.message, 'error');
-      btn.disabled = false;
-      btn.textContent = 'Crear cuenta →';
-      return;
-    }
-
-    // Si Supabase tiene "Confirm email" activado, identityData viene vacío hasta confirmar
-    const necesitaConfirmar = !authData.session;
-    if (necesitaConfirmar) {
-      mostrar(`¡Cuenta creada! Te enviamos un correo a ${email} para confirmar tu dirección. Revisa tu bandeja de entrada (y el spam).`, 'success');
+    // El insert en `usuarios` lo hace el trigger de BD cuando el email se confirma.
+    // Si no hay sesión es porque Supabase requiere confirmación de email.
+    if (!authData.session) {
+      mostrar(`¡Casi listo! Te enviamos un correo a ${email}. Confírmalo para activar tu cuenta.`, 'success');
       btn.textContent = 'Ir a iniciar sesión →';
       btn.disabled = false;
       btn.onclick = () => window.location.href = 'login.html';
     } else {
       mostrar('¡Cuenta creada! Redirigiendo...', 'success');
-      btn.textContent = 'Ir a iniciar sesión →';
-      btn.disabled = false;
-      btn.onclick = () => window.location.href = 'login.html';
       setTimeout(() => window.location.href = 'login.html', 2000);
     }
   });
