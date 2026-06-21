@@ -292,11 +292,7 @@
 
     // Cargar precio del boost desde Supabase
     const { data: boostPlanes } = await sb.from('planes').select('precio').eq('tipo','boost').eq('activo',true).limit(1);
-    if (boostPlanes?.[0]) {
-      precioBoost = boostPlanes[0].precio;
-      const btn = document.getElementById('btn-boost');
-      if (btn) btn.textContent = `⚡ Boost 1 día — $${Number(precioBoost).toLocaleString('es-CL')}`;
-    }
+    if (boostPlanes?.[0]) precioBoost = boostPlanes[0].precio;
     // Cargar usuario primero para detectar rol
     await cargarUsuario(userId);
     // Solo cargar plan y clases si es alumna
@@ -411,7 +407,7 @@
                  background:linear-gradient(135deg,#fecb29,#ff8c00);color:#fff;
                  font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;
                  cursor:pointer;letter-spacing:.3px;transition:opacity .2s">
-          ⚡ Boost 1 día — $1.990
+          ⚡ Boost 1 día — $${Number(precioBoost).toLocaleString('es-CL')}
         </button>` : ''}
     `;
   }
