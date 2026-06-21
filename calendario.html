@@ -470,7 +470,7 @@ function renderClaseCard(c, esFeriado){
     } else if(cupoDisp<=0){
       botonHtml=`<button class="btn-agendar-cal sin-cupo" disabled>Sin cupo</button>`;
     } else if(!tieneplanActivo){
-      botonHtml=`<button class="btn-agendar-cal sin-plan" onclick="window.location.href='planes.html'">Agendar →</button>`;
+      botonHtml=`<button class="btn-agendar-cal sin-plan" onclick="window.location.href='planes.html'">Agendar</button>`;
     } else {
       const horasHastaClase = (new Date(c.fecha_hora) - new Date()) / (1000*60*60);
       if(horasHastaClase > 144){

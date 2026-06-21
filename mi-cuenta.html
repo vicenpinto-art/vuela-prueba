@@ -282,6 +282,18 @@
     if (!compras || compras.length === 0) { mostrarSinPlan(contenedor, badge); return; }
 
     const c = compras[0];
+
+    // Vencimiento inmediato: clases agotadas O fecha expirada → lo primero que ocurra
+    if (c.estado === 'activo') {
+      const clasesAgotadas = !c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles <= 0;
+      const vencidoPorFecha = c.fecha_fin < hoy;
+      if (clasesAgotadas || vencidoPorFecha) {
+        await sb.from('compras').update({ estado: 'vencido' }).eq('id', c.id);
+        mostrarSinPlan(contenedor, badge);
+        return;
+      }
+    }
+
     const dias = diasHasta(c.fecha_fin);
     const urgente = dias <= 5;
 
@@ -294,16 +306,11 @@
 
     // Alertas
     if (c.estado === 'congelado') {
-      // Plan congelado: mostrar alerta especial
       const alertaCongelado = document.getElementById('alerta-sin-plan');
       alertaCongelado.className = 'alerta congelado';
       alertaCongelado.innerHTML = '❄️ Tu plan está congelado. Contacta a Espacio Vuela para reactivarlo.';
       alertaCongelado.style.display = 'flex';
-    } else if (!c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles <= 0) {
-      // #4: clases agotadas pero días restantes — plan sigue activo hasta fecha_fin
-      document.getElementById('alerta-pocas').style.display = 'flex';
-      document.getElementById('alerta-pocas').innerHTML = '⚠️ Has usado todas las clases de tu plan. Vence el ' + formatFecha(c.fecha_fin) + '.';
-    } else if (!c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles <= 2) {
+    } else if (!c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles > 0 && c.clases_disponibles <= 2) {
       document.getElementById('alerta-pocas').style.display = 'flex';
     }
 

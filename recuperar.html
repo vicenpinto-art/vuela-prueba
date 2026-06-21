@@ -93,7 +93,7 @@ async function enviarEmail() {
   btn.textContent = 'Enviando...';
 
   const { error } = await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://vuela-prueba.vicenpinto.workers.dev/recuperar.html'
+    redirectTo: window.location.origin + '/recuperar.html'
   });
 
   if (error) {

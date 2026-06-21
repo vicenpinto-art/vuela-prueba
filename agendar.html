@@ -505,6 +505,8 @@
     const clase = todasLasClases.find(c => c.id === claseSeleccionada.id);
     if (clase) clase.cupo_disponible = Math.max(0, (clase.cupo_disponible || 1) - 1);
 
+    await verificarPlan(); // Re-verifica si el plan se agotó con esta reserva
+
     msg.textContent = '¡Listo! Quedaste inscrita en la clase. 🎉';
     msg.className = 'modal-msg success';
     btn.textContent = '✓ Inscrita';
