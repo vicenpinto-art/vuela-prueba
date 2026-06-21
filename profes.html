@@ -209,15 +209,38 @@
     }
     @media (max-width: 768px) {
       .page-hero { padding: 120px 20px 60px; }
-      .fundadoras-section { padding: 60px 20px 40px; }
-      .fundadoras-grid { grid-template-columns: 1fr; }
-      .fundadora-foto { height: 300px; }
-      .foto-placeholder { height: 300px; }
-      .equipo-section { padding: 60px 20px; }
-      .equipo-grid { grid-template-columns: 1fr 1fr; }
+
+      /* Fundadoras: 2 columnas compactas */
+      .fundadoras-section { padding: 48px 16px 32px; }
+      .fundadoras-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+      .fundadora-foto { height: 200px; }
+      .foto-placeholder { height: 200px; }
+      .fundadora-info { padding: 14px 14px 18px; }
+      .fundadora-nombre { font-size: 30px; }
+      .fundadora-badge { font-size: 10px; padding: 3px 10px; }
+      .fundadora-desc { font-size: 13px; }
+
+      /* Equipo: 2 columnas compactas */
+      .equipo-section { padding: 48px 16px; }
+      .equipo-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .profe-foto { height: 180px; }
+      .profe-foto-placeholder { height: 180px; }
+      .profe-info { padding: 12px 12px 16px; }
+      .profe-nombre { font-size: 28px; }
+      .profe-desc { font-size: 13px; }
+      .tag { font-size: 10px; padding: 3px 8px; }
     }
     @media (max-width: 480px) {
-      .equipo-grid { grid-template-columns: 1fr; }
+      /* Mantener 2 columnas, solo reducir un poco más */
+      .fundadoras-grid { gap: 10px; }
+      .fundadora-foto { height: 170px; }
+      .foto-placeholder { height: 170px; }
+      .fundadora-nombre { font-size: 26px; }
+      .equipo-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .profe-foto { height: 150px; }
+      .profe-foto-placeholder { height: 150px; }
+      .profe-nombre { font-size: 24px; }
+      .profe-info { padding: 10px 10px 14px; }
     }
   </style>
   <script>window.EV_GA = 'G-YN4CVRVX4C';</script>
