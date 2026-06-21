@@ -157,7 +157,7 @@ app.post('/webhook', async (req, res) => {
     const hoy = new Date();
     const fecha_inicio = hoy.toISOString().split('T')[0];
     const fin = new Date(hoy);
-    fin.setDate(fin.getDate() + 30);
+    fin.setDate(fin.getDate() + 29);
     const fecha_fin = fin.toISOString().split('T')[0];
 
     // Insertar compra con el esquema real de la tabla

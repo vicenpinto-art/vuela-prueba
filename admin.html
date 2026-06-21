@@ -615,7 +615,10 @@ let compraExtenderActiva = null;
 const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 function horaStr(ts){ return new Date(ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',hour12:false}); }
 function fechaStr(ts){ return new Date(ts).toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short'}); }
-function hoy(){ return new Date().toISOString().split('T')[0]; }
+function hoy(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
 function esc(s){ return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function toast(msg,tipo='ok'){
   const t=document.getElementById('toast');
@@ -1078,7 +1081,8 @@ function renderAlumnas(lista){
       let clasesTxt='—', venceTxt='—';
       if(c){
         const est=c.estado==='congelado'?'badge-congelado':'badge-activo';
-        planBadge=`<span class="badge ${est}">${c.planes?.nombre||'Plan activo'}</span>`;
+        const prefijo=c.estado==='congelado'?'❄️ ':'';
+        planBadge=`<span class="badge ${est}">${prefijo}${c.planes?.nombre||'Plan activo'}</span>`;
         clasesTxt=c.ilimitado?'∞':(c.clases_disponibles??'—');
         venceTxt=c.fecha_fin?new Date(c.fecha_fin+'T12:00:00').toLocaleDateString('es-CL',{day:'2-digit',month:'short'}):'—';
       }
@@ -1236,8 +1240,8 @@ async function confirmarAsignarPlan(){
       if(addon) monto += 13000;
     }
   }
-  const inicio = new Date(fechaInicio+'T00:00:00');
-  const fin    = new Date(inicio); fin.setDate(fin.getDate()+30);
+  const inicio = new Date(fechaInicio+'T12:00:00');
+  const fin    = new Date(inicio); fin.setDate(fin.getDate()+29);
   const fechaFin = fin.toISOString().split('T')[0];
 
   // Determinar clases según nombre del plan
