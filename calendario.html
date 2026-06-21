@@ -111,17 +111,25 @@
   .filtro-profe-wrap select:focus { border-color:var(--coral); }
 
     @media(max-width:480px){
-      .cal-wrap{padding:12px 8px 8px}
-      .cal-mes-anio{font-size:16px}
-      .cal-nav{font-size:20px;padding:4px 8px}
-      .cal-dia-lbl{font-size:10px}
-      .cal-dia{font-size:12px;min-height:36px;padding:4px 2px}
-      .cal-dia-num{font-size:11px}
-      .day-panel{padding:16px}
-      .day-panel-fecha{font-size:20px}
-      .clase-card-cal{padding:12px 14px}
-      .clase-nombre-cal{font-size:14px}
-      .hora-cal{font-size:16px;min-width:40px}
+      .cal-wrap{padding:10px 8px 8px}
+      .cal-mes-anio{font-size:14px}
+      .cal-nav{font-size:18px;width:30px;height:30px}
+      .cal-dia-lbl{font-size:9px;letter-spacing:0}
+      .cal-cell{border-radius:7px}
+      .cal-num{font-size:11px;margin-bottom:2px}
+      .cal-cell.hoy .cal-num{width:22px;height:22px;font-size:11px}
+      .cal-dots{max-width:22px}
+      .dot{width:4px;height:4px}
+      .cal-legend{gap:8px;margin-top:10px;padding-top:10px}
+      .legend-item{font-size:10px}
+      .day-panel-empty{height:auto;min-height:180px;padding:32px 16px}
+      .day-panel-header{padding:14px 16px}
+      .day-fecha{font-size:20px}
+      .clase-item-cal{padding:12px 14px;gap:10px}
+      .clase-hora-badge{font-size:13px;min-width:44px}
+      .clase-nombre-cal{font-size:13px}
+      .btn-agendar-cal{padding:7px 12px;font-size:11px}
+      .sin-clases-dia{padding:24px 16px}
     }
 </style>
 </head>

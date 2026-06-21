@@ -161,6 +161,24 @@
       .nav-nombre { display: none; }
     }
 
+    @media (max-width: 480px) {
+      .layout { padding: 16px 12px 80px; }
+      .panel-header h2 { font-size: 16px; }
+      .tab { font-size: 12px; padding: 7px; }
+      .clase-item { padding: 12px 14px; }
+      .alumna-row { grid-template-columns: 1fr auto; padding: 12px 14px; gap: 8px; }
+      .lista-header { padding: 16px 16px 14px; }
+      .lista-clase-nombre { font-size: 17px; }
+      .lista-clase-meta { gap: 8px; font-size: 12px; }
+      .lista-stats { gap: 8px; }
+      .stat-mini { padding: 6px 10px; }
+      .stat-mini-val { font-size: 16px; }
+      .panel-vacio { padding: 40px 20px; }
+      .modal-rutina { padding: 20px 16px; }
+      .modal-rutina h2 { font-size: 22px; }
+      .toggle-btn { padding: 7px 10px; font-size: 11px; }
+    }
+
     /* MODAL RUTINA */
     .modal-rutina-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:200; align-items:center; justify-content:center; padding:16px; }
     .modal-rutina-overlay.open { display:flex; }

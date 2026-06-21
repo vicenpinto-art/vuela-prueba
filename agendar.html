@@ -198,9 +198,26 @@
       .header { padding: 28px 20px 0; }
       .header h1 { font-size: 30px; }
       .filtros-wrap { padding: 20px 20px 0; }
+      .alerta-plan { padding: 12px 20px; font-size: 13px; }
       main { padding: 20px 16px 48px; }
       .clase-card { flex-wrap: wrap; }
       .clase-accion { width: 100%; flex-direction: row; justify-content: flex-end; }
+    }
+
+    @media (max-width: 480px) {
+      .header h1 { font-size: 26px; }
+      .header p { font-size: 14px; }
+      .filtros { flex-wrap: wrap; width: 100%; }
+      .filtro { flex: 1; text-align: center; padding: 8px 10px; font-size: 12px; }
+      .clase-card { padding: 14px 16px; gap: 12px; }
+      .clase-hora-box { min-width: 50px; padding: 8px 6px; }
+      .clase-hora { font-size: 15px; }
+      .clase-nombre { font-size: 14px; }
+      .btn-agendar { padding: 9px 14px; font-size: 12px; }
+      .modal { padding: 24px 16px; border-radius: 20px; }
+      .modal h2 { font-size: 18px; margin-bottom: 16px; }
+      .modal-clase-detalle { padding: 12px 14px; }
+      .btn-confirmar, .btn-modal-sec { padding: 12px; font-size: 14px; }
     }
 </style>
 </head>
