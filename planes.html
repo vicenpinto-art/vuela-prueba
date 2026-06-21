@@ -762,7 +762,8 @@
       if (esIlimitado) {
         features.push({ texto: 'Clases ilimitadas por 30 días' });
       } else {
-        features.push({ texto: `${plan.clases} clases para usar en 30 días` });
+        const n = plan.clases ?? (plan.nombre?.match(/(\d+)/)?.[1] ?? '?');
+        features.push({ texto: `${n} clases para usar en 30 días` });
       }
       features.push({ texto: 'Agenda online cuando quieras' });
       features.push({ texto: 'Acceso a las rutinas de clase' });
