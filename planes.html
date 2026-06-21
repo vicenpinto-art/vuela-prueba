@@ -334,13 +334,16 @@
 
   <!-- WIDGET ¿QUÉ INCLUYE CADA PLAN? -->
   <div style="margin-top:40px">
-    <h2 style="font-family:'Dancing Script',cursive;font-size:32px;text-align:center;margin-bottom:24px;color:var(--dark)">¿Qué incluye cada plan?</h2>
 
     <style>
-    .pv{font-family:'Outfit',sans-serif;}
-    .outer-box{border:3px solid #00f9ff;border-radius:24px;padding:1.5rem;background:#fff;max-width:860px;margin:0 auto;}
+    .pv{font-family:'Outfit',sans-serif;padding:1.5rem;}
+    .outer-box{border:3px solid #00f9ff;border-radius:24px;padding:1.5rem;background:#fff;max-width:900px;margin:0 auto;}
+    .pv-title{font-family:'Dancing Script',cursive;font-size:42px;font-weight:700;text-align:center;color:#111;margin:0 0 16px;}
     .info-bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
-    .info-chip{border-radius:16px;padding:8px 16px;font-size:13px;font-weight:700;text-align:center;border:none;background:#00ffcc;color:#000;}
+    .info-chip{border-radius:16px;padding:8px 16px;font-size:13px;font-weight:700;text-align:center;border:none;}
+    .chip-matricula{background:#00ffcc;color:#000;}
+    .chip-prueba{background:#00ffcc;color:#000;}
+    .chip-suelta{background:#00ffcc;color:#000;}
     .info-chip em{font-style:normal;font-weight:800;display:block;font-size:14px;}
     .pill-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
     .pv-pill{padding:10px 26px;border-radius:100px;font-size:15px;font-weight:800;cursor:pointer;border:none;transition:all .2s;opacity:0.55;letter-spacing:0.5px;}
@@ -351,45 +354,23 @@
     .pv-pill.active{opacity:1;transform:scale(1.08);box-shadow:0 6px 18px rgba(0,0,0,0.15);border:2px solid #000 !important;}
     .pv-panel2{display:none;}
     .pv-panel2.visible{display:block;}
-    /* Tarjetas de precio por cantidad de clases */
     .pv-cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:10px;margin-bottom:10px;}
     .pv-plan-card{border-radius:18px;padding:14px 8px;text-align:center;}
     .pv-v{background:#a183ff;}
     .pv-m{background:#fecb29;}
-    .pv-plan-card .pv-clases{font-size:13px;font-weight:700;margin-bottom:4px;opacity:.85;letter-spacing:.5px;text-transform:uppercase;}
+    .pv-g{background:#ff4e68;}
+    .pv-plan-card .pv-clases{font-size:13px;font-weight:700;margin-bottom:4px;opacity:0.85;letter-spacing:0.5px;text-transform:uppercase;}
     .pv-v .pv-clases{color:#fff;}
     .pv-m .pv-clases{color:#5a4000;}
+    .pv-g .pv-clases{color:#fff;}
     .pv-plan-card .pv-precio{font-size:20px;font-weight:800;}
     .pv-v .pv-precio{color:#fff;}
     .pv-m .pv-precio{color:#3d2a00;}
+    .pv-g .pv-precio{color:#fff;}
+    .pv-plan-card .pv-extra{font-size:10px;margin-top:4px;opacity:0.75;}
+    .pv-v .pv-extra{color:#eedeff;}
+    .pv-m .pv-extra{color:#7a5500;}
     .pv-note{font-size:12px;color:#666;text-align:center;margin:6px 0 14px;font-style:italic;}
-    /* Ilimitados */
-    .pv-ilim-grid{display:flex;gap:12px;margin-bottom:12px;justify-content:center;flex-wrap:wrap;}
-    .pv-ilim-card{border-radius:18px;padding:1.2rem;width:200px;text-align:center;}
-    .pv-ilim-v{background:#a183ff;}
-    .pv-ilim-m{background:#fecb29;}
-    .pv-ilim-card .pv-ilim-name{font-size:13px;font-weight:800;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;}
-    .pv-ilim-v .pv-ilim-name{color:#fff;}
-    .pv-ilim-m .pv-ilim-name{color:#3d2a00;}
-    .pv-ilim-card .pv-ilim-price{font-size:28px;font-weight:800;}
-    .pv-ilim-v .pv-ilim-price{color:#fff;}
-    .pv-ilim-m .pv-ilim-price{color:#3d2a00;}
-    .pv-ilim-card .pv-ilim-gym{font-size:11px;margin-top:2px;font-weight:600;}
-    .pv-ilim-v .pv-ilim-gym{color:#eedeff;}
-    .pv-ilim-m .pv-ilim-gym{color:#8a6400;}
-    /* Gym */
-    .pv-gym-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;}
-    .pv-gym-plan{border-radius:18px;padding:14px 10px;text-align:center;}
-    .pv-gc1{background:#ff4e68;}
-    .pv-gym-plan .pv-gtipo{font-size:11px;font-weight:700;color:#fff;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;opacity:.9;}
-    .pv-gym-plan .pv-gval{font-size:20px;font-weight:800;color:#fff;}
-    .pv-gym-note{font-size:12px;color:#666;text-align:center;margin-top:8px;font-style:italic;}
-    /* Asesoría */
-    .pv-asesoria{background:#fff0f7;border:2px solid #ff9bc3;border-radius:16px;padding:1rem 1.25rem;margin-top:12px;}
-    .pv-asesoria h4{font-size:13px;font-weight:800;color:#cc2255;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;}
-    .pv-asesoria-row{display:flex;gap:14px;flex-wrap:wrap;}
-    .pv-asesoria-item{font-size:13px;color:#994466;font-weight:600;}
-    /* Caja de disciplinas */
     .pv-clases-box{border-radius:18px;padding:1rem 1.25rem;border:3px solid;}
     .pv-box-v{background:#f0eaff;border-color:#a183ff;}
     .pv-box-m{background:#fffbec;border-color:#fecb29;}
@@ -402,20 +383,75 @@
     .pv-tag{font-size:12px;padding:5px 13px;border-radius:100px;font-weight:700;}
     .pv-tag-v{background:#a183ff;color:#fff;}
     .pv-tag-m{background:#fecb29;color:#5a4000;}
+    .pv-ilim-grid{display:flex;gap:12px;margin-bottom:12px;justify-content:center;flex-wrap:wrap;}
+    .pv-ilim-card{border-radius:18px;padding:1.2rem;width:200px;text-align:center;}
+    .pv-ilim-v{background:#a183ff;}
+    .pv-ilim-m{background:#fecb29;}
+    .pv-ilim-card .pv-ilim-name{font-size:13px;font-weight:800;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
+    .pv-ilim-v .pv-ilim-name{color:#fff;}
+    .pv-ilim-m .pv-ilim-name{color:#3d2a00;}
+    .pv-ilim-card .pv-ilim-price{font-size:28px;font-weight:800;}
+    .pv-ilim-v .pv-ilim-price{color:#fff;}
+    .pv-ilim-m .pv-ilim-price{color:#3d2a00;}
+    .pv-ilim-card .pv-ilim-gym{font-size:11px;margin-top:2px;font-weight:600;}
+    .pv-ilim-v .pv-ilim-gym{color:#eedeff;}
+    .pv-ilim-m .pv-ilim-gym{color:#8a6400;}
+    .pv-gym-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;}
+    .pv-gym-plan{border-radius:18px;padding:14px 10px;text-align:center;}
+    .pv-gc1{background:#ff4e68;}
+    .pv-gc2{background:#ff9bc3;}
+    .pv-gc3{background:#ff4e68;}
+    .pv-gc4{background:#ff008d;}
+    .pv-gym-plan .pv-gtipo{font-size:11px;font-weight:700;color:#fff;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;opacity:0.9;}
+    .pv-gym-plan .pv-gval{font-size:20px;font-weight:800;color:#fff;}
+    .pv-asesoria{background:#fff0f7;border:2px solid #ff9bc3;border-radius:16px;padding:1rem 1.25rem;margin-top:12px;}
+    .pv-asesoria h4{font-size:13px;font-weight:800;color:#cc2255;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;}
+    .pv-asesoria-row{display:flex;gap:14px;flex-wrap:wrap;}
+    .pv-asesoria-item{font-size:13px;color:#994466;font-weight:600;}
+    .pv-gym-note{font-size:12px;color:#666;text-align:center;margin-top:8px;font-style:italic;}
+
     @media(max-width:768px){
-      .pv-gym-grid{display:flex!important;flex-wrap:wrap;justify-content:center;gap:10px;}
-      .pv-gym-plan{flex:0 0 calc(33.33% - 8px)!important;min-width:90px;}
-      .pv-ilim-card{width:auto;flex:1;}
+      .outer-box{padding:12px 10px !important;}
+      .pv-title{font-size:28px !important;margin-bottom:10px !important;}
+      .info-bar{gap:5px !important;margin-bottom:12px !important;}
+      .info-chip{padding:5px 8px !important;font-size:10px !important;border-radius:10px !important;}
+      .info-chip em{font-size:10px !important;}
+      .pill-row{gap:6px !important;margin-bottom:12px !important;}
+      .pv-pill{padding:7px 12px !important;font-size:12px !important;border:2px solid transparent !important;}
+      .pv-pill.active{border:2px solid #000 !important;}
+      .pv-cards-grid{grid-template-columns:repeat(4,1fr) !important;gap:6px !important;margin-bottom:6px !important;}
+      .pv-plan-card{padding:10px 4px !important;border-radius:12px !important;}
+      .pv-plan-card .pv-clases{font-size:9px !important;margin-bottom:2px !important;}
+      .pv-plan-card .pv-precio{font-size:13px !important;}
+      .pv-note{font-size:10px !important;margin:4px 0 10px !important;}
+      .pv-clases-box{padding:10px !important;border-radius:12px !important;}
+      .pv-clases-box h4{font-size:11px !important;margin-bottom:6px !important;}
+      .pv-tag{font-size:10px !important;padding:3px 8px !important;}
+      .pv-ilim-grid{flex-direction:row !important;gap:8px !important;justify-content:center !important;}
+      .pv-ilim-card{width:auto !important;flex:1 !important;padding:12px 8px !important;border-radius:14px !important;}
+      .pv-ilim-card .pv-ilim-name{font-size:10px !important;}
+      .pv-ilim-card .pv-ilim-price{font-size:20px !important;}
+      .pv-ilim-card .pv-ilim-gym{font-size:9px !important;}
+      .pv-gym-grid{display:flex !important;flex-wrap:wrap;justify-content:center;gap:10px;}
+      .pv-gym-plan{flex:0 0 calc(33.33% - 8px) !important;min-width:90px;padding:10px 6px !important;border-radius:12px !important;}
+      .pv-gym-plan .pv-gtipo{font-size:9px !important;}
+      .pv-gym-plan .pv-gval{font-size:15px !important;}
+      .pv-asesoria{padding:10px !important;margin-top:8px !important;}
+      .pv-asesoria h4{font-size:11px !important;}
+      .pv-asesoria-item{font-size:11px !important;}
     }
     </style>
 
     <div class="pv">
     <div class="outer-box">
+      <p class="pv-title">Planes y valores</p>
+
       <div class="info-bar">
-        <div class="info-chip"><em>Matrícula (una vez)</em>$12.000</div>
-        <div class="info-chip"><em>Clase de prueba</em>Vuela $7.000 · Muévete $5.000</div>
-        <div class="info-chip"><em>Clase suelta</em>Vuela $12.000 · Muévete $9.000</div>
+        <div class="info-chip chip-matricula"><em>Matrícula (una vez)</em>$12.000</div>
+        <div class="info-chip chip-prueba"><em>Clase de prueba</em>Vuela $7.000 · Muévete $5.000</div>
+        <div class="info-chip chip-suelta"><em>Clase suelta</em>Vuela $12.000 · Muévete $9.000</div>
       </div>
+
       <div class="pill-row">
         <button class="pv-pill pv-pill-vuela active" id="pp2-vuela" onclick="pvShow2('vuela')">Vuela</button>
         <button class="pv-pill pv-pill-muevete" id="pp2-muevete" onclick="pvShow2('muevete')">Muévete</button>
@@ -434,7 +470,23 @@
         <p class="pv-note">+ $13.000 agrega acceso al gym durante el mes</p>
         <div class="pv-clases-box pv-box-v">
           <h4>Clases incluidas</h4>
-          <div class="pv-tags" id="tags-vuela"></div>
+          <div class="pv-tags" id="tags-vuela">
+            <span class="pv-tag pv-tag-v">Pole Sport</span>
+            <span class="pv-tag pv-tag-v">Aerial Yoga</span>
+            <span class="pv-tag pv-tag-v">Lira</span>
+            <span class="pv-tag pv-tag-v">E. Funcional</span>
+            <span class="pv-tag pv-tag-v">Pilates Zen</span>
+            <span class="pv-tag pv-tag-v">Flexibilidad</span>
+            <span class="pv-tag pv-tag-v">Handstand y Contorsión</span>
+            <span class="pv-tag pv-tag-v">Tabata</span>
+            <span class="pv-tag pv-tag-v">K-POP</span>
+            <span class="pv-tag pv-tag-v">Reggaetón Extended</span>
+            <span class="pv-tag pv-tag-v">Reggaetón Fem</span>
+            <span class="pv-tag pv-tag-v">Hip-Hop</span>
+            <span class="pv-tag pv-tag-v">Heels</span>
+            <span class="pv-tag pv-tag-v">Girly</span>
+            <span class="pv-tag pv-tag-v">Dancehall</span>
+          </div>
         </div>
       </div>
 
@@ -449,7 +501,19 @@
         <p class="pv-note">+ $13.000 agrega acceso al gym durante el mes</p>
         <div class="pv-clases-box pv-box-m">
           <h4>Clases incluidas</h4>
-          <div class="pv-tags" id="tags-muevete"></div>
+          <div class="pv-tags" id="tags-muevete">
+            <span class="pv-tag pv-tag-m">K-POP</span>
+            <span class="pv-tag pv-tag-m">Reggaetón Extended</span>
+            <span class="pv-tag pv-tag-m">Reggaetón Fem</span>
+            <span class="pv-tag pv-tag-m">Hip Hop</span>
+            <span class="pv-tag pv-tag-m">Heels</span>
+            <span class="pv-tag pv-tag-m">Girly</span>
+            <span class="pv-tag pv-tag-m">Dancehall</span>
+            <span class="pv-tag pv-tag-m">Pilates Zen</span>
+            <span class="pv-tag pv-tag-m">Tabata</span>
+            <span class="pv-tag pv-tag-m">Flexibilidad</span>
+            <span class="pv-tag pv-tag-m">Handstand y Contorsión</span>
+          </div>
         </div>
       </div>
 
@@ -470,6 +534,7 @@
         <p class="pv-note">+ $13.000 agrega acceso al gym durante el mes de plan</p>
         <div class="pv-clases-box pv-box-all">
           <h4 style="text-align:center;">Todas las clases del plan elegido, sin límite</h4>
+          <div class="pv-tags"></div>
         </div>
       </div>
 
@@ -491,6 +556,7 @@
           </div>
         </div>
       </div>
+
     </div>
     </div>
 
@@ -501,16 +567,22 @@
       document.querySelectorAll('.pv-pill').forEach(p=>p.classList.remove('active'));
       document.getElementById('pp2-'+plan).classList.add('active');
     }
-
-    async function cargarWidgetDisciplinas(){
-      const {data} = await sb.from('disciplinas').select('nombre,plan').eq('activo',true).order('plan').order('orden');
-      const vuela   = data||[];
-      const muevete = (data||[]).filter(d=>d.plan==='muevete');
-      const mkTags = (lista,cls) => lista.map(d=>`<span class="pv-tag ${cls}">${d.nombre}</span>`).join('');
-      document.getElementById('tags-vuela').innerHTML   = mkTags(vuela,'pv-tag-v');
-      document.getElementById('tags-muevete').innerHTML = mkTags(muevete,'pv-tag-m');
+    function pvSelCard2(el){
+      el.closest('.pv-panel2').querySelectorAll('.pv-plan-card,.pv-ilim-card').forEach(c=>c.classList.remove('sel'));
+      el.classList.add('sel');
     }
-    cargarWidgetDisciplinas();
+    // Sobreescribe las tags estáticas con las disciplinas actuales de Supabase
+    (async function cargarWidgetDisciplinas(){
+      try {
+        const {data} = await sb.from('disciplinas').select('nombre,plan').eq('activo',true).order('plan').order('orden');
+        if(!data||!data.length) return;
+        const vuela   = data;
+        const muevete = data.filter(d=>d.plan==='muevete');
+        const mkTags  = (lista,cls) => lista.map(d=>`<span class="pv-tag ${cls}">${d.nombre}</span>`).join('');
+        document.getElementById('tags-vuela').innerHTML   = mkTags(vuela,'pv-tag-v');
+        document.getElementById('tags-muevete').innerHTML = mkTags(muevete,'pv-tag-m');
+      } catch(e){}
+    })();
     </script>
   </div>
 </main>
