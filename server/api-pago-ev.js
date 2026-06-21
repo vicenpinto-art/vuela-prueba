@@ -94,16 +94,22 @@ app.post('/crear-preferencia', async (req, res) => {
     return res.status(400).json({ error: 'Faltan datos requeridos' });
   }
 
-  // Obtener plan desde Supabase — nunca confiar en precios del cliente
-  const { data: plan, error: planError } = await sb
+  // Obtener plan principal + precios de matricula y addon desde Supabase
+  const { data: planesDB, error: planError } = await sb
     .from('planes')
     .select('*')
-    .eq('id', plan_id)
-    .single();
+    .in('tipo', ['vuela', 'muevete', 'gym', 'clase_suelta', 'clase_prueba', 'asesoria', 'boost', 'matricula', 'addon_gym'])
+    .eq('activo', true);
 
-  if (planError || !plan) {
-    return res.status(404).json({ error: 'Plan no encontrado' });
+  if (planError || !planesDB) {
+    return res.status(500).json({ error: 'Error al obtener planes' });
   }
+
+  const plan = planesDB.find(p => p.id === plan_id);
+  if (!plan) return res.status(404).json({ error: 'Plan no encontrado' });
+
+  const planMatricula = planesDB.find(p => p.tipo === 'matricula');
+  const planAddon     = planesDB.find(p => p.tipo === 'addon_gym');
 
   // Calcular monto total en el servidor
   let monto_total = plan.precio;
@@ -111,14 +117,14 @@ app.post('/crear-preferencia', async (req, res) => {
     { id: String(plan.id), title: plan.nombre, quantity: 1, unit_price: plan.precio, currency_id: 'CLP' }
   ];
 
-  if (incluye_matricula) {
-    items.push({ id: 'matricula', title: 'Matrícula Espacio Vuela', quantity: 1, unit_price: 12000, currency_id: 'CLP' });
-    monto_total += 12000;
+  if (incluye_matricula && planMatricula) {
+    items.push({ id: 'matricula', title: planMatricula.nombre, quantity: 1, unit_price: planMatricula.precio, currency_id: 'CLP' });
+    monto_total += planMatricula.precio;
   }
 
-  if (incluye_addon) {
-    items.push({ id: 'addon_gym', title: 'Addon Gym — acceso al gimnasio', quantity: 1, unit_price: 13000, currency_id: 'CLP' });
-    monto_total += 13000;
+  if (incluye_addon && planAddon) {
+    items.push({ id: 'addon_gym', title: planAddon.nombre, quantity: 1, unit_price: planAddon.precio, currency_id: 'CLP' });
+    monto_total += planAddon.precio;
   }
 
   try {
