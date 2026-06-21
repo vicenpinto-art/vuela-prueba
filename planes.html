@@ -547,7 +547,7 @@
     const { data: planes, error } = await sb
       .from('planes')
       .select('*')
-      .not('tipo', 'in', '("matricula","addon_gym")')
+      .not('tipo', 'in', '("matricula","addon_gym","boost")')
       .order('precio', { ascending: true });
 
     if (error || !planes) {

@@ -1149,7 +1149,7 @@ async function abrirAsignarPlan(alumnaId, nombre){
   // Cargar planes si no están en caché
   if(planesCache.length === 0){
     const {data} = await sb.from('planes').select('id,nombre,tipo,precio')
-      .not('tipo','in','("matricula","addon_gym","asesoria")')
+      .not('tipo','in','("matricula","addon_gym","asesoria","boost")')
       .order('tipo').order('precio');
     planesCache = data||[];
   }

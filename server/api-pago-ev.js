@@ -16,8 +16,80 @@ app.get('/health', (req, res) => res.json({ ok: true, servicio: 'Espacio Vuela P
 
 // ── CREAR PREFERENCIA ─────────────────────────────────────────
 app.post('/crear-preferencia', async (req, res) => {
-  const { plan_id, usuario_id, usuario_email, usuario_nombre, incluye_matricula, incluye_addon } = req.body;
+  const { plan_id, usuario_id, usuario_email, usuario_nombre,
+          incluye_matricula, incluye_addon, boost, compra_id } = req.body;
 
+  // ── BOOST FLOW ────────────────────────────────────────────────
+  if (boost) {
+    if (!usuario_id || !usuario_email || !compra_id) {
+      return res.status(400).json({ error: 'Faltan datos para el boost' });
+    }
+    try {
+      // Validar que la compra exista, pertenezca al usuario y esté activa
+      const { data: compra } = await sb
+        .from('compras')
+        .select('id, fecha_fin, estado')
+        .eq('id', compra_id)
+        .eq('alumna_id', usuario_id)
+        .eq('estado', 'activo')
+        .maybeSingle();
+
+      if (!compra) {
+        return res.status(400).json({ error: 'No se encontró un plan activo para aplicar el boost' });
+      }
+
+      // Obtener o crear el plan Boost en la tabla planes (auto-creación al primer uso)
+      let { data: boostPlan } = await sb.from('planes')
+        .select('id')
+        .eq('tipo', 'boost')
+        .maybeSingle();
+
+      if (!boostPlan) {
+        const { data: nuevo, error: planErr } = await sb.from('planes')
+          .insert({ nombre: 'Boost 1 día', tipo: 'boost', precio: 1990, ilimitado: false, clases: null })
+          .select('id')
+          .single();
+        if (planErr) console.error('Error creando plan boost:', planErr);
+        boostPlan = nuevo;
+        console.log(`✅ Plan Boost auto-creado con id: ${boostPlan?.id}`);
+      }
+
+      const pref = new Preference(mp);
+      const result = await pref.create({
+        body: {
+          items: [{
+            id:          'boost-1-dia',
+            title:       'Boost 1 día — Espacio Vuela',
+            quantity:    1,
+            unit_price:  1990,
+            currency_id: 'CLP'
+          }],
+          payer: { email: usuario_email, name: usuario_nombre || '' },
+          back_urls: {
+            success: `${process.env.CLIENT_URL}/pago-exitoso.html`,
+            pending: `${process.env.CLIENT_URL}/pago-pendiente.html`,
+            failure: `${process.env.CLIENT_URL}/pago-fallido.html`
+          },
+          auto_return: 'approved',
+          notification_url: `${process.env.SERVER_URL}/webhook`,
+          metadata: {
+            tipo:        'boost',
+            plan_id:     boostPlan ? String(boostPlan.id) : null,
+            compra_id:   String(compra_id),
+            usuario_id:  String(usuario_id),
+            monto_total: 1990
+          }
+        }
+      });
+
+      return res.json({ checkout_url: result.init_point });
+    } catch (err) {
+      console.error('Error creando preferencia boost:', err);
+      return res.status(500).json({ error: 'Error al crear preferencia de pago' });
+    }
+  }
+
+  // ── PLAN NORMAL ───────────────────────────────────────────────
   if (!plan_id || !usuario_id || !usuario_email) {
     return res.status(400).json({ error: 'Faltan datos requeridos' });
   }
@@ -136,12 +208,14 @@ app.post('/webhook', async (req, res) => {
     }
 
     const meta = pago.metadata;
-    if (!meta?.plan_id || !meta?.usuario_id) {
+    const esBoost = meta?.tipo === 'boost';
+
+    if ((!meta?.plan_id && !esBoost) || !meta?.usuario_id) {
       console.error('Webhook sin metadata válida:', meta);
       return;
     }
 
-    // Evitar duplicados
+    // Evitar duplicados (cubre plans normales Y boosts via fila de tracking)
     const { data: existente } = await sb
       .from('compras')
       .select('id')
@@ -153,7 +227,70 @@ app.post('/webhook', async (req, res) => {
       return;
     }
 
-    // Calcular fechas
+    // ── BOOST: extender fecha_fin + 1 día ─────────────────────────
+    if (esBoost) {
+      if (!meta.compra_id) {
+        console.error('Boost webhook sin compra_id:', meta);
+        return;
+      }
+
+      const { data: compra, error: compraErr } = await sb
+        .from('compras')
+        .select('id, fecha_fin, estado')
+        .eq('id', meta.compra_id)
+        .eq('alumna_id', meta.usuario_id)
+        .maybeSingle();
+
+      if (compraErr || !compra) {
+        console.error(`Boost: compra ${meta.compra_id} no encontrada para alumna ${meta.usuario_id}`);
+        return;
+      }
+
+      // Calcular nueva fecha_fin (+1 día)
+      const finActual = new Date(compra.fecha_fin + 'T12:00:00');
+      finActual.setDate(finActual.getDate() + 1);
+      const nuevaFechaFin = finActual.toISOString().split('T')[0];
+
+      // Aplicar extensión
+      const { error: updateErr } = await sb
+        .from('compras')
+        .update({ fecha_fin: nuevaFechaFin })
+        .eq('id', meta.compra_id)
+        .eq('alumna_id', meta.usuario_id);
+
+      if (updateErr) {
+        console.error('Boost: error actualizando fecha_fin:', updateErr);
+        return;
+      }
+
+      // Fila de tracking para dedup en reintentos (estado='boost', invisible al cliente)
+      const hoyStr = new Date().toISOString().split('T')[0];
+      const { error: trackErr } = await sb.from('compras').insert({
+        alumna_id:          meta.usuario_id,
+        plan_id:            meta.plan_id || null,
+        fecha_inicio:       hoyStr,
+        fecha_fin:          nuevaFechaFin,
+        estado:             'boost',
+        clases_disponibles: null,
+        clases_usadas:      0,
+        ilimitado:          false,
+        incluye_gym:        false,
+        addon_gym:          false,
+        congelado_desde:    null,
+        dias_congelados:    0,
+        monto_pagado:       1990,
+        matricula_pagada:   false,
+        clase_prueba:       false,
+        mp_payment_id:      String(pago.id)
+      });
+
+      if (trackErr) console.warn('Boost: fila de tracking no insertada:', trackErr.message);
+
+      console.log(`✅ Boost aplicado — alumna: ${meta.usuario_id} | compra: ${meta.compra_id} | fecha_fin: ${compra.fecha_fin} → ${nuevaFechaFin} | pago MP: ${pago.id}`);
+      return;
+    }
+
+    // ── PLAN NORMAL: calcular fechas
     const hoy = new Date();
     const fecha_inicio = hoy.toISOString().split('T')[0];
     const fin = new Date(hoy);

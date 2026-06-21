@@ -209,8 +209,9 @@
 </main>
 
 <script>
-  const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+  const SUPABASE_URL  = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
+  const SUPABASE_KEY  = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+  const SERVIDOR_URL  = 'https://espacio-vuela-pagos.onrender.com';
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -226,7 +227,46 @@
   function dia(date)        { return new Date(date).getDate(); }
   function horaMinutos(date){ return new Date(date).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false }); }
 
-  let userId = null;
+  let userId         = null;
+  let compraIdActiva = null;
+
+  async function pagarBoost() {
+    if (!compraIdActiva || !userId) return;
+    const btn = document.getElementById('btn-boost');
+    btn.disabled = true;
+    btn.textContent = 'Procesando…';
+
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = 'login.html'; return; }
+
+      const { data: u } = await sb.from('usuarios')
+        .select('nombre, apellido')
+        .eq('id', userId)
+        .single();
+
+      const res = await fetch(`${SERVIDOR_URL}/crear-preferencia`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          boost:          true,
+          compra_id:      compraIdActiva,
+          usuario_id:     userId,
+          usuario_email:  session.user.email,
+          usuario_nombre: `${u?.nombre || ''} ${u?.apellido || ''}`.trim()
+        })
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.checkout_url) throw new Error(json.error || 'Error al generar el pago');
+      window.location.href = json.checkout_url;
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = '⚡ Boost 1 día — $1.990';
+      alert('No se pudo iniciar el pago: ' + err.message);
+    }
+  }
 
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
@@ -283,6 +323,7 @@
     if (!compras || compras.length === 0) { mostrarSinPlan(contenedor, badge); return; }
 
     const c = compras[0];
+    compraIdActiva = c.id;
 
     // Vencimiento inmediato: clases agotadas O fecha expirada → lo primero que ocurra
     if (c.estado === 'activo') {
@@ -338,6 +379,16 @@
         ${c.estado === 'congelado' ? ' · <strong>Plan congelado</strong>' : ''}
       </div>
       ${(c.addon_gym || c.incluye_gym) ? '<div class="plan-addon">🏋️ Addon Gym incluido</div>' : ''}
+      ${c.estado === 'activo' ? `
+        <button
+          id="btn-boost"
+          onclick="pagarBoost()"
+          style="margin-top:14px;width:100%;padding:11px;border:none;border-radius:12px;
+                 background:linear-gradient(135deg,#fecb29,#ff8c00);color:#fff;
+                 font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;
+                 cursor:pointer;letter-spacing:.3px;transition:opacity .2s">
+          ⚡ Boost 1 día — $1.990
+        </button>` : ''}
     `;
   }
 
