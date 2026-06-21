@@ -138,7 +138,7 @@ app.post('/crear-preferencia', async (req, res) => {
           plan_id:           String(plan_id),
           usuario_id:        String(usuario_id),
           plan_tipo:         plan.tipo        || '',
-          plan_clases:       plan.clases      ?? null,
+          plan_clases:       plan.cantidad_clases ?? null,
           plan_ilimitado:    plan.ilimitado   ?? false,
           incluye_matricula: !!incluye_matricula,
           incluye_addon:     !!incluye_addon,

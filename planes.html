@@ -723,7 +723,7 @@
     }
 
     grid.innerHTML = planes.map((plan, i) => {
-      const esPopular = (plan.tipo === 'vuela' || plan.tipo === 'muevete') && plan.clases === 8;
+      const esPopular = (plan.tipo === 'vuela' || plan.tipo === 'muevete') && plan.cantidad_clases === 8;
       const esPrueba  = plan.tipo === 'clase_prueba';
       const esIlimitado = plan.nombre?.toLowerCase().includes('ilimitado');
 
@@ -762,7 +762,7 @@
       if (esIlimitado) {
         features.push({ texto: 'Clases ilimitadas por 30 días' });
       } else {
-        const n = plan.clases ?? (plan.nombre?.match(/(\d+)/)?.[1] ?? '?');
+        const n = plan.cantidad_clases ?? (plan.nombre?.match(/(\d+)/)?.[1] ?? '?');
         features.push({ texto: `${n} clases para usar en 30 días` });
       }
       features.push({ texto: 'Agenda online cuando quieras' });
