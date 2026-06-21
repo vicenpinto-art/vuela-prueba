@@ -1057,7 +1057,7 @@ async function marcarAsisAdmin(alumnaId,claseId,presente){
 async function cargarAlumnas(){
   const hoyFecha = hoy();
   const {data:usuarios} = await sb.from('usuarios').select('id,nombre,apellido,email,rol,created_at').eq('rol','alumna').order('created_at',{ascending:false});
-  const {data:compras} = await sb.from('compras').select('alumna_id,id,estado,fecha_fin,clases_disponibles,ilimitado,congelado_desde,planes(nombre,tipo)').eq('estado','activo').gte('fecha_fin',hoyFecha);
+  const {data:compras} = await sb.from('compras').select('alumna_id,id,estado,fecha_fin,clases_disponibles,ilimitado,congelado_desde,planes(nombre,tipo)').or(`estado.eq.congelado,and(estado.eq.activo,fecha_fin.gte.${hoyFecha})`);
   const compraMap = new Map();
   (compras||[]).forEach(c=>{if(!compraMap.has(c.alumna_id))compraMap.set(c.alumna_id,c);});
   todasLasAlumnas = (usuarios||[]).map(u=>({...u,compra:compraMap.get(u.id)||null}));
@@ -1139,8 +1139,7 @@ async function abrirAsignarPlan(alumnaId, nombre){
   const {data:compras} = await sb.from('compras')
     .select('id,estado,fecha_fin,clases_disponibles,ilimitado,planes(nombre,tipo)')
     .eq('alumna_id', alumnaId)
-    .in('estado',['activo','congelado'])
-    .gte('fecha_fin', hoyFecha)
+    .or(`estado.eq.congelado,and(estado.eq.activo,fecha_fin.gte.${hoyFecha})`)
     .order('fecha_fin', {ascending:false});
 
   comprasAlumnaActual = compras||[];

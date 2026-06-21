@@ -492,6 +492,7 @@
         clase_no_encontrada:'No se encontró la clase.',
         plan_no_permite:    'Tu plan actual no incluye este tipo de clase.',
         fuera_de_plazo:     'Ya no puedes cancelar — faltan menos de 2 horas. Se descontará 1 clase de tu plan.',
+        sin_plan_activo:    'No tienes un plan activo con clases disponibles.',
       };
       msg.textContent = errores[data?.error] || 'Error al agendar. Intenta de nuevo.';
       msg.className = 'modal-msg error';
