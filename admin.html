@@ -256,7 +256,7 @@
       <div class="section-title">Resumen</div>
       <div class="section-sub" id="resumen-fecha">Cargando...</div>
       <div class="stats-grid">
-        <div class="stat-card"><div class="val" id="st-alumnas">—</div><div class="lbl">Alumnas registradas</div></div>
+        <div class="stat-card"><div class="val" id="st-alumnas">—</div><div class="lbl">Alumnas activas</div></div>
         <div class="stat-card"><div class="val" id="st-planes">—</div><div class="lbl">Planes activos</div></div>
         <div class="stat-card"><div class="val" id="st-hoy">—</div><div class="lbl">Clases hoy</div></div>
         <div class="stat-card"><div class="val" id="st-inscritas">—</div><div class="lbl">Inscripciones hoy</div></div>
@@ -696,16 +696,24 @@ document.querySelectorAll('.sidebar-item').forEach(item=>{
 async function cargarResumen(){
   const hoyI = new Date(); hoyI.setHours(0,0,0,0);
   const hoyF = new Date(); hoyF.setHours(23,59,59,999);
+  const hoyStr = hoy();
 
-  const [{count:cAlumnas},{count:cPlanes},{data:clasesHoy},{count:cInscritas}] = await Promise.all([
-    sb.from('usuarios').select('*',{count:'exact',head:true}).eq('rol','alumna'),
-    sb.from('compras').select('*',{count:'exact',head:true}).eq('estado','activo').gte('fecha_fin',hoy()),
+  // Una sola query a compras da tanto alumnas activas (distinct) como planes activos (count)
+  const [{data:planesActivos},{data:clasesHoy},{count:cInscritas}] = await Promise.all([
+    sb.from('compras').select('alumna_id').eq('estado','activo').gte('fecha_fin',hoyStr),
     sb.from('clases').select('*').gte('fecha_hora',hoyI.toISOString()).lte('fecha_hora',hoyF.toISOString()).order('fecha_hora'),
     sb.from('inscripciones').select('*',{count:'exact',head:true}).gte('created_at',hoyI.toISOString())
   ]);
 
-  document.getElementById('st-alumnas').textContent  = cAlumnas||0;
-  document.getElementById('st-planes').textContent   = cPlanes||0;
+  // Alumnas activas = distinct alumna_ids con plan activo no congelado
+  const cAlumnas = new Set((planesActivos||[]).map(p=>p.alumna_id)).size;
+  // Planes activos = filas totales (puede haber >1 por alumna en casos edge)
+  const cPlanes  = (planesActivos||[]).length;
+
+  const fechaLabel = new Date().toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('resumen-fecha').textContent = fechaLabel.charAt(0).toUpperCase()+fechaLabel.slice(1);
+  document.getElementById('st-alumnas').textContent  = cAlumnas;
+  document.getElementById('st-planes').textContent   = cPlanes;
   document.getElementById('st-hoy').textContent      = (clasesHoy||[]).length;
   document.getElementById('st-inscritas').textContent= cInscritas||0;
 
@@ -1896,10 +1904,12 @@ async function cargarIngresos(){
     sb.from('compras')
       .select('id,monto_pagado,created_at,matricula_pagada,addon_gym,alumna_id,planes(nombre,tipo),usuarios!alumna_id(nombre,apellido)')
       .gte('created_at',inicio).lt('created_at',fin)
+      .gt('monto_pagado',0)
       .order('created_at',{ascending:false}),
     sb.from('compras')
       .select('monto_pagado')
       .gte('created_at',inicioAnt).lt('created_at',inicio)
+      .gt('monto_pagado',0)
   ]);
 
   const lista = compras||[];
