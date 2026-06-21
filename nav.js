@@ -378,3 +378,26 @@
   }
 
 })();
+
+// ── SERVER TIME ───────────────────────────────────────────────────────────────
+// Reemplaza new Date() en checks críticos de plan y ventana 144h.
+// Falla con gracia: si la RPC no existe usa tiempo del cliente como fallback.
+var _serverTimeOffset = 0;
+async function initServerTime() {
+  try {
+    const _sb = supabase.createClient(
+      'https://mcmdsntnbgsmdraeitgt.supabase.co',
+      'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq'
+    );
+    const t0 = Date.now();
+    const { data } = await _sb.rpc('get_server_time');
+    if (data && data.ts) {
+      _serverTimeOffset = data.ts - Math.round((t0 + Date.now()) / 2);
+    }
+  } catch(e) { /* fallback: client time */ }
+}
+function serverNow() { return new Date(Date.now() + _serverTimeOffset); }
+function serverDate() {
+  const d = serverNow();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}

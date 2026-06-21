@@ -232,6 +232,7 @@
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'login.html'; return; }
     userId = session.user.id;
+    await initServerTime();
     // Cargar usuario primero para detectar rol
     await cargarUsuario(userId);
     // Solo cargar plan y clases si es alumna
@@ -268,7 +269,7 @@
   }
 
   async function cargarPlan(userId) {
-    const hoy = new Date().toISOString().split('T')[0];
+    const hoy = serverDate();
     const { data: compras } = await sb
       .from('compras')
       .select('*, planes(nombre, tipo)')
@@ -358,7 +359,7 @@
       .eq('alumna_id', userId)
       .eq('estado', 'confirmada');
 
-    const ahora = new Date();
+    const ahora = serverNow();
     const inscripciones = (todas || [])
       .filter(i => i.clases && new Date(i.clases.fecha_hora) >= ahora)
       .sort((a, b) => new Date(a.clases.fecha_hora) - new Date(b.clases.fecha_hora))
@@ -388,7 +389,7 @@
 
   async function cargarRutina() {
     const contenedor = document.getElementById('rutina-contenido');
-    const ahora = new Date();
+    const ahora = serverNow();
     const en144h = new Date(ahora.getTime() + 144*60*60*1000);
 
     // Obtener clases próximas 144h en que está inscrita la alumna
@@ -492,7 +493,7 @@
   }
 
   async function cargarClasesProfesora(nombreCompleto) {
-    const ahora = new Date();
+    const ahora = serverNow();
     const en7dias = new Date(); en7dias.setDate(en7dias.getDate() + 7);
     const { data: clases } = await sb
       .from('clases')
@@ -523,7 +524,7 @@
 
   async function cargarRutinasProfesora(nombreCompleto) {
     const contenedor = document.getElementById('rutina-contenido');
-    const ahora = new Date();
+    const ahora = serverNow();
     const en144h = new Date(ahora.getTime() + 144*60*60*1000);
 
     const { data: clasesHoy } = await sb

@@ -312,11 +312,12 @@
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'login.html'; return; }
     userId = session.user.id;
+    await initServerTime();
     await Promise.all([verificarPlan(), cargarClases()]);
   }
 
   async function verificarPlan() {
-    const hoy = new Date().toISOString().split('T')[0];
+    const hoy = serverDate();
     const { data } = await sb
       .from('compras')
       .select('id,estado')
@@ -397,7 +398,7 @@
     const ocupados      = (c.cupo_maximo || 15) - (c.cupo_disponible ?? 15);
     const pct           = Math.round((ocupados / (c.cupo_maximo || 15)) * 100);
     const urgente       = !estaInscrita && c.cupo_disponible <= 3 && c.cupo_disponible > 0;
-    const horasHasta    = (new Date(c.fecha_hora) - new Date()) / (1000 * 60 * 60);
+    const horasHasta    = (new Date(c.fecha_hora) - serverNow()) / (1000 * 60 * 60);
     const cancelBloqueada = estaInscrita && horasHasta < 2;
     const badgeHtml     = tipoBadge(c.tipo);
 

@@ -286,6 +286,7 @@ async function init(){
   const {data:{session}} = await sb.auth.getSession();
   if(!session){window.location.href='login.html';return;}
   userId = session.user.id;
+  await initServerTime();
 
   const {data:u} = await sb.from('usuarios').select('rol,nombre,apellido').eq('id',userId).single();
   userRol = u?.rol || 'alumna';
@@ -310,7 +311,7 @@ async function init(){
 
   // Verificar plan activo o congelado (solo alumnas)
   if(userRol==='alumna'){
-    const hoyStr = isoFecha(new Date());
+    const hoyStr = serverDate();
     const {data:compras} = await sb.from('compras').select('id,estado')
       .eq('alumna_id',userId)
       .or(`estado.eq.congelado,and(estado.eq.activo,fecha_fin.gte.${hoyStr})`)
@@ -464,7 +465,7 @@ function renderClaseCard(c, esFeriado){
   let botonHtml = '';
   if(userRol==='alumna'){
     if(estaInscrita(c.id)){
-      const horasHasta = (new Date(c.fecha_hora) - new Date()) / (1000*60*60);
+      const horasHasta = (new Date(c.fecha_hora) - serverNow()) / (1000*60*60);
       const cancelBloq = horasHasta < 2;
       botonHtml=`<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
         <button class="btn-agendar-cal inscrita">✓ Inscrita</button>
@@ -480,7 +481,7 @@ function renderClaseCard(c, esFeriado){
     } else if(!tieneplanActivo){
       botonHtml=`<button class="btn-agendar-cal sin-plan" onclick="window.location.href='planes.html'">Agendar</button>`;
     } else {
-      const horasHastaClase = (new Date(c.fecha_hora) - new Date()) / (1000*60*60);
+      const horasHastaClase = (new Date(c.fecha_hora) - serverNow()) / (1000*60*60);
       if(horasHastaClase > 144){
         const fechaDisp = new Date(new Date(c.fecha_hora).getTime() - 144*60*60*1000);
         const diaDisp = fechaDisp.toLocaleDateString('es-CL', {weekday:'short', day:'numeric', month:'short'});
