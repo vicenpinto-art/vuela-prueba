@@ -222,6 +222,10 @@
     .admin-mobile-nav-item.active{color:#ff4e68;background:rgba(255,78,104,.05);border-left-color:#ff4e68;font-weight:600}
 
     /* PERFIL */
+    .phone-wrap{display:flex}
+    .phone-code{padding:10px 8px;border:1.5px solid var(--border);border-right:none;border-radius:10px 0 0 10px;font-family:'Outfit',sans-serif;font-size:12px;background:#f9f9f9;cursor:pointer;outline:none;flex-shrink:0;color:var(--dark);transition:border-color .2s}
+    .phone-code:focus{border-color:var(--coral)}
+    .phone-local{border-radius:0 10px 10px 0 !important;flex:1;min-width:0}
     .perfil-card{background:#fff;border-radius:20px;padding:28px;border:1px solid var(--border)}
     .perfil-avatar{
       width:88px;height:88px;border-radius:50%;
@@ -539,11 +543,21 @@
           </div>
           <div class="perfil-field">
             <label class="perfil-label">Teléfono</label>
-            <input class="perfil-input" id="pa-telefono" type="tel" placeholder="+56 9 XXXX XXXX">
+            <div class="phone-wrap">
+              <select class="phone-code" id="pa-tel-code">
+                <option value="+56">🇨🇱 +56</option><option value="+54">🇦🇷 +54</option><option value="+591">🇧🇴 +591</option><option value="+55">🇧🇷 +55</option><option value="+57">🇨🇴 +57</option><option value="+506">🇨🇷 +506</option><option value="+53">🇨🇺 +53</option><option value="+593">🇪🇨 +593</option><option value="+503">🇸🇻 +503</option><option value="+34">🇪🇸 +34</option><option value="+502">🇬🇹 +502</option><option value="+504">🇭🇳 +504</option><option value="+52">🇲🇽 +52</option><option value="+505">🇳🇮 +505</option><option value="+507">🇵🇦 +507</option><option value="+595">🇵🇾 +595</option><option value="+51">🇵🇪 +51</option><option value="+1809">🇩🇴 +1809</option><option value="+598">🇺🇾 +598</option><option value="+1">🇺🇸 +1</option><option value="+58">🇻🇪 +58</option>
+              </select>
+              <input class="perfil-input phone-local" id="pa-telefono" type="tel" placeholder="9 7384 1513">
+            </div>
           </div>
           <div class="perfil-field">
             <label class="perfil-label">Teléfono de emergencia</label>
-            <input class="perfil-input" id="pa-tel-emergencia" type="tel" placeholder="+56 9 XXXX XXXX">
+            <div class="phone-wrap">
+              <select class="phone-code" id="pa-tel-emerg-code">
+                <option value="+56">🇨🇱 +56</option><option value="+54">🇦🇷 +54</option><option value="+591">🇧🇴 +591</option><option value="+55">🇧🇷 +55</option><option value="+57">🇨🇴 +57</option><option value="+506">🇨🇷 +506</option><option value="+53">🇨🇺 +53</option><option value="+593">🇪🇨 +593</option><option value="+503">🇸🇻 +503</option><option value="+34">🇪🇸 +34</option><option value="+502">🇬🇹 +502</option><option value="+504">🇭🇳 +504</option><option value="+52">🇲🇽 +52</option><option value="+505">🇳🇮 +505</option><option value="+507">🇵🇦 +507</option><option value="+595">🇵🇾 +595</option><option value="+51">🇵🇪 +51</option><option value="+1809">🇩🇴 +1809</option><option value="+598">🇺🇾 +598</option><option value="+1">🇺🇸 +1</option><option value="+58">🇻🇪 +58</option>
+              </select>
+              <input class="perfil-input phone-local" id="pa-tel-emergencia" type="tel" placeholder="9 7384 1513">
+            </div>
           </div>
           <div class="perfil-field" style="grid-column:1/-1">
             <label class="perfil-label">Dirección</label>
@@ -792,6 +806,13 @@ document.querySelectorAll('.sidebar-item').forEach(item=>{
 });
 
 // ── PERFIL ADMIN ──────────────────────────────────────────────
+function parsePhone(full) {
+  if (!full) return { code: '+56', local: '' };
+  const codes = ['+1809','+593','+591','+595','+598','+506','+503','+502','+504','+505','+507','+54','+55','+56','+57','+51','+52','+53','+58','+34','+1'];
+  for (const c of codes) { if (full.startsWith(c)) return { code: c, local: full.slice(c.length) }; }
+  return { code: '+56', local: full };
+}
+
 async function cargarPerfilAdmin() {
   if (!userId) return;
   const { data: u } = await sb.from('usuarios')
@@ -804,8 +825,12 @@ async function cargarPerfilAdmin() {
   document.getElementById('pa-nacimiento').value   = u.fecha_nacimiento || '';
   document.getElementById('pa-email').value        = u.email || '';
   document.getElementById('pa-email2').value       = u.email_secundario || '';
-  document.getElementById('pa-telefono').value     = u.telefono || '';
-  document.getElementById('pa-tel-emergencia').value = u.telefono_emergencia || '';
+  const phTel = parsePhone(u.telefono);
+  document.getElementById('pa-tel-code').value  = phTel.code;
+  document.getElementById('pa-telefono').value  = phTel.local;
+  const phEmerg = parsePhone(u.telefono_emergencia);
+  document.getElementById('pa-tel-emerg-code').value = phEmerg.code;
+  document.getElementById('pa-tel-emergencia').value = phEmerg.local;
   document.getElementById('pa-direccion').value    = u.direccion || '';
   document.getElementById('pa-medicos').value      = u.antecedentes_medicos || '';
   const inicial = (u.nombre || '?')[0].toUpperCase();
@@ -836,8 +861,8 @@ async function guardarPerfilAdmin() {
     rut:                  document.getElementById('pa-rut').value.trim(),
     fecha_nacimiento:     document.getElementById('pa-nacimiento').value || null,
     email_secundario:     document.getElementById('pa-email2').value.trim() || null,
-    telefono:             document.getElementById('pa-telefono').value.trim() || null,
-    telefono_emergencia:  document.getElementById('pa-tel-emergencia').value.trim() || null,
+    telefono:             (() => { const c=document.getElementById('pa-tel-code').value; const l=document.getElementById('pa-telefono').value.replace(/\D/g,''); return l ? c+l : null; })(),
+    telefono_emergencia:  (() => { const c=document.getElementById('pa-tel-emerg-code').value; const l=document.getElementById('pa-tel-emergencia').value.replace(/\D/g,''); return l ? c+l : null; })(),
     direccion:            document.getElementById('pa-direccion').value.trim() || null,
     antecedentes_medicos: document.getElementById('pa-medicos').value.trim() || null,
   }).eq('id', userId);
