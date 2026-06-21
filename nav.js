@@ -217,6 +217,7 @@
       <ul class="ev-nav-links" id="ev-nav-links">
         <li><a href="index.html">Inicio</a></li>
         <li><a href="index.html#clases">Clases</a></li>
+        <li><a href="index.html#horarios">Horarios</a></li>
         <li><a href="profes.html">Profes</a></li>
         <li id="ev-li-cta"><a href="planes.html" class="ev-nav-cta">Súmate a Vuela</a></li>
         <li id="ev-li-micuenta-mobile"><a href="mi-cuenta.html">Mi cuenta</a></li>
