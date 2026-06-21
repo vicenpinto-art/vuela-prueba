@@ -372,11 +372,20 @@
       return;
     }
 
-    mostrar('¡Cuenta creada! Redirigiendo...', 'success');
-    btn.textContent = 'Ir a iniciar sesión →';
-    btn.disabled = false;
-    btn.onclick = () => window.location.href = 'login.html';
-    setTimeout(() => window.location.href = 'login.html', 2000);
+    // Si Supabase tiene "Confirm email" activado, identityData viene vacío hasta confirmar
+    const necesitaConfirmar = !authData.session;
+    if (necesitaConfirmar) {
+      mostrar(`¡Cuenta creada! Te enviamos un correo a ${email} para confirmar tu dirección. Revisa tu bandeja de entrada (y el spam).`, 'success');
+      btn.textContent = 'Ir a iniciar sesión →';
+      btn.disabled = false;
+      btn.onclick = () => window.location.href = 'login.html';
+    } else {
+      mostrar('¡Cuenta creada! Redirigiendo...', 'success');
+      btn.textContent = 'Ir a iniciar sesión →';
+      btn.disabled = false;
+      btn.onclick = () => window.location.href = 'login.html';
+      setTimeout(() => window.location.href = 'login.html', 2000);
+    }
   });
 </script>
 

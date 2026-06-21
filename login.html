@@ -275,7 +275,7 @@
       if (msg.includes('Invalid login') || msg.includes('invalid_credentials')) {
         mostrar('Correo o contraseña incorrectos.', 'error');
       } else if (msg.includes('Email not confirmed')) {
-        mostrar('Confirma tu email antes de iniciar sesión.', 'error');
+        mostrar('Debes confirmar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada (y el spam).', 'error');
       } else {
         mostrar('Error al iniciar sesión: ' + msg, 'error');
       }
