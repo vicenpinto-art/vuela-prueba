@@ -754,8 +754,8 @@ let compraExtenderActiva = null;
 
 // ── UTILS ─────────────────────────────────────────────────────
 const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-function horaStr(ts){ return new Date(ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',hour12:false}); }
-function fechaStr(ts){ return new Date(ts).toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short'}); }
+function horaStr(ts){ return new Date(ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/Santiago'}); }
+function fechaStr(ts){ return new Date(ts).toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',timeZone:'America/Santiago'}); }
 function hoy(){
   const d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -1143,7 +1143,7 @@ function renderClases(){
   } else {
     const porDia = {};
     regular.forEach(c => {
-      const key = new Date(c.fecha_hora).toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
+      const key = new Date(c.fecha_hora).toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long',timeZone:'America/Santiago'});
       if(!porDia[key]) porDia[key]=[];
       porDia[key].push(c);
     });
@@ -1174,7 +1174,7 @@ function renderClases(){
   } else {
     const porDia = {};
     gym.forEach(c => {
-      const key = new Date(c.fecha_hora).toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
+      const key = new Date(c.fecha_hora).toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long',timeZone:'America/Santiago'});
       if(!porDia[key]) porDia[key]=[];
       porDia[key].push(c);
     });

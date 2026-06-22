@@ -333,13 +333,13 @@
 
   // ── UTILS ─────────────────────────────────────────────────────
   function horaStr(fechaHora) {
-    return new Date(fechaHora).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
+    return new Date(fechaHora).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Santiago' });
   }
   function fechaLegible(fechaHora) {
-    return new Date(fechaHora).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+    return new Date(fechaHora).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Santiago' });
   }
   function diaKey(fechaHora) {
-    return new Date(fechaHora).toISOString().split('T')[0];
+    return new Date(fechaHora).toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
   }
   function diaLabel(isoDate) {
     const d = new Date(isoDate + 'T12:00:00');
