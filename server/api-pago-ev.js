@@ -467,8 +467,13 @@ app.post('/webhook', async (req, res) => {
 // ── IMPORTACIÓN MASIVA ALUMNAS (CRM) ─────────────────────────
 app.post('/importar-alumnas', async (req, res) => {
   const userAuth = await verificarJWT(req);
-  if (!userAuth) return res.status(401).json({ error: 'No autenticado' });
+  console.log(`[importar-alumnas] JWT email: "${userAuth?.email}" | ADMIN_EMAIL: "${process.env.ADMIN_EMAIL}"`);
+  if (!userAuth) {
+    console.warn('[importar-alumnas] Rechazado: JWT inválido o ausente');
+    return res.status(401).json({ error: 'No autenticado' });
+  }
   if (!process.env.ADMIN_EMAIL || userAuth.email !== process.env.ADMIN_EMAIL) {
+    console.warn(`[importar-alumnas] Rechazado: email no coincide`);
     return res.status(403).json({ error: 'No autorizado' });
   }
 
