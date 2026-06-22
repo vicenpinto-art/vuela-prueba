@@ -175,6 +175,9 @@
         <div class="stat-box naranja"><div class="num" id="live-saltadas">0</div><div class="lbl">Ya existían</div></div>
         <div class="stat-box rojo"><div class="num" id="live-errores">0</div><div class="lbl">Errores</div></div>
       </div>
+      <div style="margin-top:20px">
+        <button class="btn btn-secondary" onclick="cancelarImportacion()" id="btn-cancelar">Detener importación</button>
+      </div>
     </div>
   </div>
 
@@ -217,6 +220,8 @@
   let alumnasParsed = [];
   let reporteTotal  = [];
   let jwtToken      = null;
+  let cancelado     = false;
+  let abortCtrl     = null;
 
   // ── AUTH ──────────────────────────────────────────────────────
   async function init() {
@@ -359,10 +364,13 @@
     document.getElementById('paso-progreso').style.display = 'block';
 
     reporteTotal = [];
+    cancelado    = false;
     let creadas = 0, saltadas = 0, errores = 0;
     const total = alumnasParsed.length;
 
     for (let i = 0; i < total; i += BATCH_SIZE) {
+      if (cancelado) break;
+
       const batch = alumnasParsed.slice(i, i + BATCH_SIZE);
       const pct   = Math.round((i / total) * 100);
 
@@ -370,11 +378,13 @@
       document.getElementById('progress-label').textContent =
         `${i.toLocaleString('es-CL')} de ${total.toLocaleString('es-CL')} procesadas… (${pct}%)`;
 
+      abortCtrl = new AbortController();
       try {
         const resp   = await fetch(`${SERVER_URL}/importar-alumnas`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
-          body:    JSON.stringify({ alumnas: batch })
+          body:    JSON.stringify({ alumnas: batch }),
+          signal:  abortCtrl.signal
         });
         const result = await resp.json();
 
@@ -391,6 +401,7 @@
           errores  += result.errores;
         }
       } catch (err) {
+        if (err.name === 'AbortError') break;
         batch.forEach(a => reporteTotal.push({
           nombre: a.nombre, email: a.email, contrasena: '',
           resultado: 'error', detalle: 'Error de red'
@@ -403,9 +414,17 @@
       document.getElementById('live-errores').textContent  = errores;
     }
 
-    document.getElementById('progress-fill').style.width   = '100%';
-    document.getElementById('progress-label').textContent  = 'Completado.';
+    document.getElementById('progress-fill').style.width  = cancelado ? document.getElementById('progress-fill').style.width : '100%';
+    document.getElementById('progress-label').textContent = cancelado ? 'Detenido.' : 'Completado.';
     mostrarResultados(creadas, saltadas, errores);
+  }
+
+  function cancelarImportacion() {
+    cancelado = true;
+    if (abortCtrl) abortCtrl.abort();
+    document.getElementById('btn-cancelar').disabled     = true;
+    document.getElementById('btn-cancelar').textContent  = 'Deteniendo…';
+    document.getElementById('progress-label').textContent = 'Deteniendo…';
   }
 
   // ── RESULTADOS ────────────────────────────────────────────────
