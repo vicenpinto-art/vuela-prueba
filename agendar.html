@@ -363,15 +363,20 @@
     const hoy = serverDate();
     const { data } = await sb
       .from('compras')
-      .select('id, estado, ilimitado, clases_disponibles, planes(nombre)')
+      .select('id, estado, ilimitado, clases_disponibles, fecha_fin, planes(nombre)')
       .eq('alumna_id', userId)
-      .or(`estado.eq.congelado,and(estado.eq.activo,fecha_fin.gte.${hoy})`)
+      .in('estado', ['activo', 'congelado'])
       .order('created_at', { ascending: false });
 
-    comprasActivas = (data || []).filter(c => c.estado === 'activo' && (c.ilimitado || (c.clases_disponibles ?? 1) > 0));
-    const plan = data?.[0];
-    tieneplanActivo = plan?.estado === 'activo';
-    planCongelado   = plan?.estado === 'congelado';
+    const todas = data || [];
+    comprasActivas = todas.filter(c =>
+      c.estado === 'activo' &&
+      c.fecha_fin >= hoy &&
+      (c.ilimitado || (c.clases_disponibles ?? 1) > 0)
+    );
+    tieneplanActivo = comprasActivas.length > 0;
+    planCongelado   = todas.some(c => c.estado === 'congelado');
+
     const alertaEl = document.getElementById('alerta-plan');
     if (planCongelado) {
       alertaEl.innerHTML = '❄️ Tu plan está congelado. Contacta a Espacio Vuela para reactivarlo.';
