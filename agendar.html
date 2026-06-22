@@ -154,6 +154,21 @@
     .sin-clases .icon { font-size: 48px; display: block; margin-bottom: 16px; }
     .sin-clases p { font-size: 15px; }
 
+    .gym-rutina-banner {
+      display: flex; align-items: center; gap: 14px;
+      background: linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
+      border-radius: 16px; padding: 16px 18px; margin-bottom: 24px;
+      cursor: pointer; user-select: none;
+      box-shadow: 0 4px 16px rgba(220,39,67,.3);
+      transition: transform .18s, box-shadow .18s;
+    }
+    .gym-rutina-banner:hover { transform: scale(1.02); box-shadow: 0 6px 24px rgba(220,39,67,.45); }
+    .gym-ig-icon { flex-shrink: 0; }
+    .gym-ig-texto { flex: 1; }
+    .gym-ig-titulo { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .gym-ig-sub { font-size: 12px; color: rgba(255,255,255,.88); line-height: 1.4; }
+    .gym-ig-arrow { font-size: 18px; color: rgba(255,255,255,.8); flex-shrink: 0; }
+
     /* SKELETON */
     .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
@@ -445,7 +460,32 @@
       </div>`;
     });
 
+    if (filtroActivo === 'gym') {
+      html = `<div class="gym-rutina-banner" onclick="abrirIGGym()">
+        <div class="gym-ig-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="white">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+          </svg>
+        </div>
+        <div class="gym-ig-texto">
+          <div class="gym-ig-titulo">¿Quieres armar tu rutina de gym?</div>
+          <div class="gym-ig-sub">Escríbenos al Direct y te respondemos en menos de 24 horas 💪</div>
+        </div>
+        <div class="gym-ig-arrow">→</div>
+      </div>` + html;
+    }
+
     wrap.innerHTML = html;
+  }
+
+  function abrirIGGym() {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      window.location = 'instagram://user?username=espacio_vuela';
+      setTimeout(() => { window.location = 'https://www.instagram.com/espacio_vuela/'; }, 1500);
+    } else {
+      window.open('https://ig.me/m/espacio_vuela', '_blank');
+    }
   }
 
   function renderCard(c) {

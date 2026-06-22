@@ -665,7 +665,7 @@
             ${c.estado === 'congelado' ? ' · <strong>Plan congelado</strong>' : ''}
           </div>
           ${(c.addon_gym || c.incluye_gym) ? '<div class="plan-addon">🏋️ Addon Gym incluido</div>' : ''}
-          ${esPpal && c.estado === 'activo' ? `
+          ${esPpal && c.estado === 'activo' && !['gym','addon_gym'].includes(c.planes?.tipo) ? `
             <button id="btn-boost" onclick="pagarBoost()"
               style="margin-top:14px;width:100%;padding:11px;border:none;border-radius:12px;
                      background:linear-gradient(135deg,#fecb29,#ff8c00);color:#fff;
