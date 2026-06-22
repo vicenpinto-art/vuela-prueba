@@ -173,6 +173,8 @@
       /* Sección horarios tabla */
       #tabla-horarios .tabla{min-width:600px}
       #tabla-clases .tabla{min-width:500px}
+      .clases-dos-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+      @media(max-width:900px){.clases-dos-col{grid-template-columns:1fr}}
       #tabla-alumnas .tabla{min-width:400px}
 
       /* Ingresos */
@@ -321,8 +323,15 @@
     <div class="section" id="sec-clases">
       <div class="section-title">Clases</div>
       <div class="section-sub">Próximas clases generadas. Puedes ajustar cupo, agregar sobrecupo o cancelar.</div>
-      <div class="card">
-        <div id="tabla-clases"><div class="sk" style="height:60px;margin-bottom:8px"></div><div class="sk" style="height:60px"></div></div>
+      <div class="clases-dos-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Vuela · Muévete</div></div>
+          <div id="tabla-clases"><div class="sk" style="height:60px;margin-bottom:8px"></div><div class="sk" style="height:60px"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Gym</div></div>
+          <div id="tabla-gym"><div class="sk" style="height:60px;margin-bottom:8px"></div><div class="sk" style="height:60px"></div></div>
+        </div>
       </div>
     </div>
 
@@ -1124,36 +1133,76 @@ async function cargarClases(){
 }
 
 function renderClases(){
-  const el = document.getElementById('tabla-clases');
-  if(todasLasClases.length===0){
-    el.innerHTML='<p style="font-size:14px;color:var(--gray);padding:8px 0">No hay clases en las próximas 2 semanas. Genera clases desde Horarios.</p>';return;
-  }
-  // Agrupar por día
-  const porDia = {};
-  todasLasClases.forEach(c => {
-    const key = new Date(c.fecha_hora).toLocaleDateString('es-CL', {weekday:'long', day:'numeric', month:'long'});
-    if(!porDia[key]) porDia[key] = [];
-    porDia[key].push(c);
-  });
-  const filasClases = (lista) => lista.map(c=>`
-    <tr style="${c.cancelada?'opacity:.5':''}">
-      <td style="font-weight:600;color:var(--coral)">${horaStr(c.fecha_hora)}</td>
-      <td>${esc(c.nombre)}</td>
-      <td style="color:var(--gray);font-size:12px">${esc(c.profesora)}</td>
-      <td>${(c.cupo_maximo||15)-(c.cupo_disponible||0)}/${c.cupo_maximo||15}</td>
-      <td>${c.sobrecupo||0}</td>
-      <td><span class="badge ${c.cancelada?'badge-vencido':'badge-activo'}">${c.cancelada?'Cancelada':'Activa'}</span></td>
-      <td>${!c.cancelada?`<button class="btn btn-secondary btn-sm" onclick="abrirEditarClase('${c.id}')">Editar</button>`:''} <button class="btn btn-danger btn-sm" onclick="eliminarClase('${c.id}')">Eliminar</button></td>
-    </tr>`).join('');
+  const regular = todasLasClases.filter(c => !c.nombre?.startsWith('Gym '));
+  const gym     = todasLasClases.filter(c =>  c.nombre?.startsWith('Gym '));
 
-  el.innerHTML = Object.keys(porDia).map(dia => `
-    <div style="margin-bottom:16px">
-      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--coral);padding:8px 0 6px;border-bottom:2px solid var(--coral);margin-bottom:8px">${dia}</div>
-      <div class="tabla-wrap"><table class="tabla">
-        <thead><tr><th>Hora</th><th>Clase</th><th>Profesora</th><th>Cupo</th><th>Sobrecupo</th><th>Estado</th><th></th></tr></thead>
-        <tbody>${filasClases(porDia[dia])}</tbody>
-      </table></div>
-    </div>`).join('');
+  // ── Panel Vuela / Muévete ─────────────────────────────────
+  const elReg = document.getElementById('tabla-clases');
+  if(regular.length === 0){
+    elReg.innerHTML='<p style="font-size:14px;color:var(--gray);padding:8px 0">No hay clases en las próximas 2 semanas.</p>';
+  } else {
+    const porDia = {};
+    regular.forEach(c => {
+      const key = new Date(c.fecha_hora).toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
+      if(!porDia[key]) porDia[key]=[];
+      porDia[key].push(c);
+    });
+    const filasReg = lista => lista.map(c=>`
+      <tr style="${c.cancelada?'opacity:.5':''}">
+        <td style="font-weight:600;color:var(--coral)">${horaStr(c.fecha_hora)}</td>
+        <td>${esc(c.nombre)}</td>
+        <td style="color:var(--gray);font-size:12px">${esc(c.profesora)}</td>
+        <td>${(c.cupo_maximo||15)-(c.cupo_disponible||0)}/${c.cupo_maximo||15}</td>
+        <td>${c.sobrecupo||0}</td>
+        <td><span class="badge ${c.cancelada?'badge-vencido':'badge-activo'}">${c.cancelada?'Cancelada':'Activa'}</span></td>
+        <td>${!c.cancelada?`<button class="btn btn-secondary btn-sm" onclick="abrirEditarClase('${c.id}')">Editar</button>`:''} <button class="btn btn-danger btn-sm" onclick="eliminarClase('${c.id}')">Eliminar</button></td>
+      </tr>`).join('');
+    elReg.innerHTML = Object.keys(porDia).map(dia=>`
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--coral);padding:8px 0 6px;border-bottom:2px solid var(--coral);margin-bottom:8px">${dia}</div>
+        <div class="tabla-wrap"><table class="tabla">
+          <thead><tr><th>Hora</th><th>Clase</th><th>Profesora</th><th>Inscritas</th><th>Sobrecupo</th><th>Estado</th><th></th></tr></thead>
+          <tbody>${filasReg(porDia[dia])}</tbody>
+        </table></div>
+      </div>`).join('');
+  }
+
+  // ── Panel Gym ─────────────────────────────────────────────
+  const elGym = document.getElementById('tabla-gym');
+  if(gym.length === 0){
+    elGym.innerHTML='<p style="font-size:14px;color:var(--gray);padding:8px 0">No hay slots de gym generados.</p>';
+  } else {
+    const porDia = {};
+    gym.forEach(c => {
+      const key = new Date(c.fecha_hora).toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
+      if(!porDia[key]) porDia[key]=[];
+      porDia[key].push(c);
+    });
+    const filasGym = lista => lista.map(c => {
+      const inscritas = (c.cupo_maximo||15) - (c.cupo_disponible||0);
+      const pct = Math.round(inscritas / (c.cupo_maximo||15) * 100);
+      const lleno = inscritas >= (c.cupo_maximo||15);
+      return `<tr style="${c.cancelada?'opacity:.5':''}">
+        <td style="font-weight:600;color:#007a82">${horaStr(c.fecha_hora)}</td>
+        <td>
+          <span style="font-weight:600">${inscritas}</span><span style="color:var(--gray);font-size:12px"> / ${c.cupo_maximo||15}</span>
+          <div style="margin-top:4px;height:4px;border-radius:4px;background:#e8f8f8;width:80px">
+            <div style="height:4px;border-radius:4px;width:${pct}%;background:${lleno?'#dc2743':'#00c8d4'}"></div>
+          </div>
+        </td>
+        <td><span class="badge ${c.cancelada?'badge-vencido':'badge-activo'}">${c.cancelada?'Cancelada':'Activa'}</span></td>
+        <td><button class="btn btn-danger btn-sm" onclick="eliminarClase('${c.id}')">Eliminar</button></td>
+      </tr>`;
+    }).join('');
+    elGym.innerHTML = Object.keys(porDia).map(dia=>`
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#007a82;padding:8px 0 6px;border-bottom:2px solid #00c8d4;margin-bottom:8px">${dia}</div>
+        <div class="tabla-wrap"><table class="tabla">
+          <thead><tr><th>Hora</th><th>Inscritas</th><th>Estado</th><th></th></tr></thead>
+          <tbody>${filasGym(porDia[dia])}</tbody>
+        </table></div>
+      </div>`).join('');
+  }
 }
 
 function abrirEditarClase(id){
