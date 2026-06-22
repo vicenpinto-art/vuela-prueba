@@ -552,6 +552,7 @@ app.post('/importar-alumnas', async (req, res) => {
         nombre:           primerNombre,
         apellido,
         email,
+        rol:              'alumna',
         rut:              rut       || null,
         telefono:         telefono  || null,
         fecha_nacimiento: a.fecha_nacimiento || null,
