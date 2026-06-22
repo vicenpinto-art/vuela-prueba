@@ -413,6 +413,21 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
+// ── MANEJO DE ERRORES GLOBAL ──────────────────────────────────
+app.use((err, req, res, next) => {
+  console.error('Error no controlado:', err);
+  res.status(500).json({ error: 'Error interno del servidor' });
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Promesa rechazada sin manejar:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Excepción no capturada:', err);
+  process.exit(1);
+});
+
 // ── SERVIDOR ──────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Espacio Vuela Pagos corriendo en puerto ${PORT}`));
