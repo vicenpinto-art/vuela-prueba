@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRM — Espacio Vuela</title>
+  <style>
+    :root {
+      --coral: #ff4e68;
+      --dark:  #111;
+      --gray:  #888;
+      --border: rgba(0,0,0,.1);
+      --bg:    #f7f7f9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; }
+
+    .topbar { background: #111; color: #fff; padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
+    .topbar h1 { font-size: 16px; font-weight: 600; }
+    .topbar a { color: rgba(255,255,255,.6); text-decoration: none; font-size: 13px; transition: color .15s; }
+    .topbar a:hover { color: #fff; }
+
+    .container { max-width: 920px; margin: 0 auto; padding: 32px 20px; }
+
+    .card { background: #fff; border-radius: 16px; padding: 28px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .card h2 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .card .subtitle { font-size: 13px; color: var(--gray); margin-bottom: 24px; line-height: 1.5; }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 52px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      user-select: none;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--coral); background: #fff5f6; }
+    .drop-zone .dz-icon  { font-size: 40px; margin-bottom: 12px; }
+    .drop-zone .dz-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .drop-zone .dz-hint  { font-size: 13px; color: var(--gray); }
+    #file-input { display: none; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .stat-box { background: var(--bg); border-radius: 10px; padding: 14px 16px; }
+    .stat-box .num { font-size: 26px; font-weight: 800; line-height: 1; }
+    .stat-box .lbl { font-size: 12px; color: var(--gray); margin-top: 4px; }
+    .verde   .num { color: #22c55e; }
+    .naranja .num { color: #f59e0b; }
+    .rojo    .num { color: var(--coral); }
+    .azul    .num { color: #3b82f6; }
+
+    /* Progress */
+    .progress-track { height: 10px; background: var(--bg); border-radius: 99px; overflow: hidden; margin: 16px 0 8px; }
+    .progress-fill  { height: 100%; background: linear-gradient(90deg, var(--coral), #ff8fa3); border-radius: 99px; width: 0%; transition: width .3s ease; }
+    .progress-label { font-size: 13px; color: var(--gray); }
+
+    /* Table */
+    .tabla-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 9px 12px; background: var(--bg); font-weight: 600; font-size: 11px; color: var(--gray); text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+    td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+
+    /* Badges */
+    .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .badge-activo        { background: #dcfce7; color: #16a34a; }
+    .badge-inactivo      { background: #f3f4f6; color: #6b7280; }
+    .badge-congelado     { background: #dbeafe; color: #2563eb; }
+    .badge-nuevo         { background: #fef9c3; color: #a16207; }
+    .badge-creada        { background: #dcfce7; color: #16a34a; }
+    .badge-saltada       { background: #fef9c3; color: #a16207; }
+    .badge-error         { background: #fee2e2; color: #dc2626; }
+    .badge-error_parcial { background: #ffedd5; color: #c2410c; }
+
+    /* Mono password */
+    .mono { font-family: 'Courier New', monospace; font-size: 12px; background: #f3f4f6; padding: 2px 7px; border-radius: 5px; letter-spacing: .5px; }
+
+    /* Alerts */
+    .alerta { padding: 12px 16px; border-radius: 10px; font-size: 13px; line-height: 1.5; margin-bottom: 16px; }
+    .alerta-info { background: #eff6ff; color: #1d4ed8; }
+    .alerta-warn { background: #fffbeb; color: #92400e; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: opacity .15s; text-decoration: none; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-primary   { background: linear-gradient(135deg, var(--coral), #ff8fa3); color: #fff; }
+    .btn-primary:hover:not(:disabled) { opacity: .88; }
+    .btn-secondary { background: var(--bg); color: var(--dark); border: 1.5px solid var(--border); }
+    .btn-secondary:hover:not(:disabled) { border-color: #999; }
+    .btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+    /* Steps */
+    #paso-preview, #paso-progreso, #paso-resultados { display: none; }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="admin.html">← Admin</a>
+  <h1>CRM · Importar Alumnas</h1>
+</div>
+
+<div class="container">
+
+  <!-- ── PASO 1: SUBIR ARCHIVO ── -->
+  <div id="paso-upload">
+    <div class="card">
+      <h2>Importar desde BoxMagic</h2>
+      <p class="subtitle">
+        Sube el CSV exportado de BoxMagic. Se crearán cuentas en Supabase para todas las alumnas.<br>
+        Las contraseñas se generan automáticamente y quedan visibles en el reporte final.
+      </p>
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <div class="dz-icon">📂</div>
+        <div class="dz-title">Arrastra el CSV aquí</div>
+        <div class="dz-hint">o haz clic para seleccionar archivo · separador punto y coma (;)</div>
+      </div>
+      <input type="file" id="file-input" accept=".csv,.txt">
+    </div>
+  </div>
+
+  <!-- ── PASO 2: VISTA PREVIA ── -->
+  <div id="paso-preview">
+    <div class="card">
+      <h2>Vista previa</h2>
+      <p class="subtitle">Revisa los datos antes de confirmar la importación.</p>
+
+      <div class="stats-grid" id="stats-preview"></div>
+
+      <div class="alerta alerta-info">
+        💡 <strong>Contraseña:</strong> <span class="mono">Vuela</span> + últimos 4 dígitos del teléfono.
+        Ejemplo: teléfono <span class="mono">56998259968</span> → contraseña <span class="mono">Vuela9968</span>.
+        Sin teléfono: código de 4 dígitos aleatorio.
+      </div>
+
+      <div class="tabla-wrap" style="margin-bottom:16px">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Estado</th></tr>
+          </thead>
+          <tbody id="preview-body"></tbody>
+        </table>
+      </div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:20px">
+        Mostrando 10 primeras de <strong id="total-txt">0</strong> alumnas con email válido.
+      </p>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-importar" onclick="iniciarImportacion()">
+          Importar <span id="btn-total">0</span> alumnas →
+        </button>
+        <button class="btn btn-secondary" onclick="reiniciar()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PASO 3: PROGRESO ── -->
+  <div id="paso-progreso">
+    <div class="card">
+      <h2>Importando…</h2>
+      <p class="subtitle">No cierres esta pestaña hasta que termine.</p>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-label" id="progress-label">Iniciando…</div>
+      <div class="stats-grid" style="margin-top:20px">
+        <div class="stat-box verde"><div class="num" id="live-creadas">0</div><div class="lbl">Creadas</div></div>
+        <div class="stat-box naranja"><div class="num" id="live-saltadas">0</div><div class="lbl">Ya existían</div></div>
+        <div class="stat-box rojo"><div class="num" id="live-errores">0</div><div class="lbl">Errores</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PASO 4: RESULTADOS ── -->
+  <div id="paso-resultados">
+    <div class="card">
+      <h2>Importación completada</h2>
+      <div class="stats-grid" id="stats-final"></div>
+
+      <div class="btn-row" style="margin-bottom:20px">
+        <button class="btn btn-primary" onclick="descargarReporte()">Descargar reporte CSV</button>
+        <button class="btn btn-secondary" onclick="reiniciar()">Nueva importación</button>
+      </div>
+
+      <div class="alerta alerta-warn" id="alerta-errores" style="display:none"></div>
+
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr><th>Nombre</th><th>Email</th><th>Contraseña</th><th>Resultado</th><th>Detalle</th></tr>
+          </thead>
+          <tbody id="resultado-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+  const SERVER_URL   = 'https://vuela-api.up.railway.app'; // ajustar si cambia
+  const BATCH_SIZE   = 50;
+
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let alumnasParsed = [];
+  let reporteTotal  = [];
+  let jwtToken      = null;
+
+  // ── AUTH ──────────────────────────────────────────────────────
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    jwtToken = session.access_token;
+  }
+
+  // ── COLUMNAS CSV BOXMAGIC (por posición) ──────────────────────
+  const C = {
+    socio:    0,   // N° Socio
+    nombre:   1,   // Nombre
+    // 2: Inscripción (skip)
+    estado:   3,   // Estado
+    // 4-5: skip
+    email:    6,   // Email
+    rut:      7,   // RUT/DNI
+    fnac:     8,   // Fecha Nacimiento
+    // 9: Dirección (skip)
+    telefono: 10,  // Teléfono
+    // 11-12: skip
+    observ:   13,  // Observación
+  };
+
+  // ── PARSEO CSV ────────────────────────────────────────────────
+  function parseCSV(text) {
+    const lineas = text.split(/\r?\n/).filter(l => l.trim());
+    if (lineas.length < 2) throw new Error('El archivo está vacío.');
+
+    const header = lineas[0].split(';');
+    const tieneEmail = header.some(h => h.toLowerCase().includes('mail'));
+    if (!tieneEmail) throw new Error('No se detectó columna de email. ¿Es un CSV de BoxMagic con separador ";"?');
+
+    const sinEmail = [];
+    const alumnas  = [];
+
+    for (let i = 1; i < lineas.length; i++) {
+      const cols  = lineas[i].split(';');
+      if (cols.length < 7) continue;
+
+      const email = (cols[C.email] || '').trim().toLowerCase();
+      if (!email) { sinEmail.push(i + 1); continue; }
+
+      alumnas.push({
+        socio_boxmagic:   (cols[C.socio]   || '').trim(),
+        nombre:           (cols[C.nombre]  || '').trim(),
+        estado:           (cols[C.estado]  || '').trim(),
+        email,
+        rut:              (cols[C.rut]     || '').replace(/\./g, '').trim(),
+        fecha_nacimiento: (cols[C.fnac]    || '').trim() || null,
+        telefono:         (cols[C.telefono]|| '').trim(),
+        observacion:      (cols[C.observ]  || '').trim() || null,
+      });
+    }
+
+    return { alumnas, sinEmail: sinEmail.length, total: lineas.length - 1 };
+  }
+
+  // ── DRAG & DROP ───────────────────────────────────────────────
+  function setupDropZone() {
+    const zone  = document.getElementById('drop-zone');
+    const input = document.getElementById('file-input');
+
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', ()  => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      handleFile(e.dataTransfer.files[0]);
+    });
+    input.addEventListener('change', () => handleFile(input.files[0]));
+  }
+
+  function handleFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const { alumnas, sinEmail, total } = parseCSV(e.target.result);
+        alumnasParsed = alumnas;
+        mostrarPreview(sinEmail, total);
+      } catch (err) {
+        alert('Error al leer el archivo:\n' + err.message);
+      }
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  // ── VISTA PREVIA ──────────────────────────────────────────────
+  function badgeEstado(e) {
+    const mapa = { Activo: 'activo', Inactivo: 'inactivo', Congelado: 'congelado', Nuevo: 'nuevo' };
+    const cls  = mapa[e] || 'inactivo';
+    return `<span class="badge badge-${cls}">${e || '—'}</span>`;
+  }
+
+  function mostrarPreview(sinEmail, totalBruto) {
+    const total   = alumnasParsed.length;
+    const activas = alumnasParsed.filter(a => a.estado === 'Activo').length;
+
+    document.getElementById('stats-preview').innerHTML = `
+      <div class="stat-box azul">
+        <div class="num">${totalBruto.toLocaleString('es-CL')}</div>
+        <div class="lbl">Filas en CSV</div>
+      </div>
+      <div class="stat-box">
+        <div class="num">${total.toLocaleString('es-CL')}</div>
+        <div class="lbl">Con email válido</div>
+      </div>
+      <div class="stat-box verde">
+        <div class="num">${activas}</div>
+        <div class="lbl">Activas (BoxMagic)</div>
+      </div>
+      <div class="stat-box naranja">
+        <div class="num">${sinEmail}</div>
+        <div class="lbl">Sin email (omitidas)</div>
+      </div>
+    `;
+
+    document.getElementById('total-txt').textContent  = total.toLocaleString('es-CL');
+    document.getElementById('btn-total').textContent  = total.toLocaleString('es-CL');
+
+    document.getElementById('preview-body').innerHTML = alumnasParsed.slice(0, 10).map((a, i) => `
+      <tr>
+        <td style="color:var(--gray);font-size:12px">${i + 1}</td>
+        <td>${a.nombre || '—'}</td>
+        <td>${a.email}</td>
+        <td style="font-size:12px">${a.telefono || '—'}</td>
+        <td>${badgeEstado(a.estado)}</td>
+      </tr>
+    `).join('');
+
+    document.getElementById('paso-upload').style.display  = 'none';
+    document.getElementById('paso-preview').style.display = 'block';
+  }
+
+  // ── IMPORTACIÓN ───────────────────────────────────────────────
+  async function iniciarImportacion() {
+    document.getElementById('btn-importar').disabled = true;
+    document.getElementById('paso-preview').style.display  = 'none';
+    document.getElementById('paso-progreso').style.display = 'block';
+
+    reporteTotal = [];
+    let creadas = 0, saltadas = 0, errores = 0;
+    const total = alumnasParsed.length;
+
+    for (let i = 0; i < total; i += BATCH_SIZE) {
+      const batch = alumnasParsed.slice(i, i + BATCH_SIZE);
+      const pct   = Math.round((i / total) * 100);
+
+      document.getElementById('progress-fill').style.width = `${pct}%`;
+      document.getElementById('progress-label').textContent =
+        `${i.toLocaleString('es-CL')} de ${total.toLocaleString('es-CL')} procesadas… (${pct}%)`;
+
+      try {
+        const resp   = await fetch(`${SERVER_URL}/importar-alumnas`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
+          body:    JSON.stringify({ alumnas: batch })
+        });
+        const result = await resp.json();
+
+        if (!resp.ok) {
+          batch.forEach(a => reporteTotal.push({
+            nombre: a.nombre, email: a.email, contrasena: '',
+            resultado: 'error', detalle: result.error || `HTTP ${resp.status}`
+          }));
+          errores += batch.length;
+        } else {
+          reporteTotal.push(...result.reporte);
+          creadas  += result.creadas;
+          saltadas += result.saltadas;
+          errores  += result.errores;
+        }
+      } catch (err) {
+        batch.forEach(a => reporteTotal.push({
+          nombre: a.nombre, email: a.email, contrasena: '',
+          resultado: 'error', detalle: 'Error de red'
+        }));
+        errores += batch.length;
+      }
+
+      document.getElementById('live-creadas').textContent  = creadas;
+      document.getElementById('live-saltadas').textContent = saltadas;
+      document.getElementById('live-errores').textContent  = errores;
+    }
+
+    document.getElementById('progress-fill').style.width   = '100%';
+    document.getElementById('progress-label').textContent  = 'Completado.';
+    mostrarResultados(creadas, saltadas, errores);
+  }
+
+  // ── RESULTADOS ────────────────────────────────────────────────
+  function mostrarResultados(creadas, saltadas, errores) {
+    document.getElementById('paso-progreso').style.display   = 'none';
+    document.getElementById('paso-resultados').style.display = 'block';
+
+    document.getElementById('stats-final').innerHTML = `
+      <div class="stat-box verde"><div class="num">${creadas.toLocaleString('es-CL')}</div><div class="lbl">✅ Creadas</div></div>
+      <div class="stat-box naranja"><div class="num">${saltadas.toLocaleString('es-CL')}</div><div class="lbl">⚠️ Ya existían</div></div>
+      <div class="stat-box rojo"><div class="num">${errores.toLocaleString('es-CL')}</div><div class="lbl">❌ Errores</div></div>
+    `;
+
+    if (errores > 0) {
+      const el = document.getElementById('alerta-errores');
+      el.style.display = 'block';
+      el.textContent   = `⚠️ ${errores} alumnas tuvieron errores. Descarga el reporte para verlas y corregirlas manualmente si es necesario.`;
+    }
+
+    // Ordenar: creadas primero, luego error_parcial, saltadas, errores
+    const orden = { creada: 0, error_parcial: 1, saltada: 2, error: 3 };
+    const ordenado = [...reporteTotal].sort((a, b) => (orden[a.resultado] ?? 4) - (orden[b.resultado] ?? 4));
+
+    document.getElementById('resultado-body').innerHTML = ordenado.map(r => `
+      <tr>
+        <td>${r.nombre || '—'}</td>
+        <td style="font-size:12px">${r.email}</td>
+        <td>${r.contrasena ? `<span class="mono">${r.contrasena}</span>` : '—'}</td>
+        <td><span class="badge badge-${r.resultado}">${r.resultado}</span></td>
+        <td style="font-size:12px;color:var(--gray)">${r.detalle || ''}</td>
+      </tr>
+    `).join('');
+  }
+
+  // ── DESCARGAR REPORTE ─────────────────────────────────────────
+  function descargarReporte() {
+    const bom     = '﻿'; // BOM para compatibilidad con Excel
+    const headers = 'Nombre;Email;Contraseña;Resultado;Detalle\n';
+    const rows    = reporteTotal.map(r =>
+      [r.nombre, r.email, r.contrasena, r.resultado, r.detalle]
+        .map(v => `"${(v || '').replace(/"/g, '""')}"`)
+        .join(';')
+    ).join('\n');
+
+    const blob = new Blob([bom + headers + rows], { type: 'text/csv;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = Object.assign(document.createElement('a'), {
+      href:     url,
+      download: `importacion_${new Date().toISOString().split('T')[0]}.csv`
+    });
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── REINICIAR ─────────────────────────────────────────────────
+  function reiniciar() {
+    alumnasParsed = [];
+    reporteTotal  = [];
+    document.getElementById('file-input').value            = '';
+    document.getElementById('btn-importar').disabled       = false;
+    document.getElementById('paso-upload').style.display   = 'block';
+    document.getElementById('paso-preview').style.display  = 'none';
+    document.getElementById('paso-progreso').style.display = 'none';
+    document.getElementById('paso-resultados').style.display = 'none';
+    document.getElementById('alerta-errores').style.display  = 'none';
+  }
+
+  setupDropZone();
+  init();
+</script>
+</body>
+</html>

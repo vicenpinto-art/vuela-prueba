@@ -464,6 +464,94 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
+// ── IMPORTACIÓN MASIVA ALUMNAS (CRM) ─────────────────────────
+app.post('/importar-alumnas', async (req, res) => {
+  const userAuth = await verificarJWT(req);
+  if (!userAuth) return res.status(401).json({ error: 'No autenticado' });
+  if (!process.env.ADMIN_EMAIL || userAuth.email !== process.env.ADMIN_EMAIL) {
+    return res.status(403).json({ error: 'No autorizado' });
+  }
+
+  const { alumnas } = req.body;
+  if (!Array.isArray(alumnas) || alumnas.length === 0) {
+    return res.status(400).json({ error: 'Sin datos' });
+  }
+  if (alumnas.length > 100) {
+    return res.status(400).json({ error: 'Máximo 100 alumnas por batch' });
+  }
+
+  const reporte = [];
+  let creadas = 0, saltadas = 0, errores = 0;
+
+  for (const a of alumnas) {
+    const email  = (a.email  || '').trim().toLowerCase();
+    const nombre = (a.nombre || '').trim();
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      reporte.push({ nombre, email, contrasena: '', resultado: 'error', detalle: 'Email inválido' });
+      errores++;
+      continue;
+    }
+
+    const tel      = (a.telefono || '').replace(/\D/g, '');
+    const sufijo   = tel.length >= 4 ? tel.slice(-4) : String(Math.floor(1000 + Math.random() * 9000));
+    const contrasena = `Vuela${sufijo}`;
+    const telefono   = (a.telefono || '').replace(/\s+/g, '').trim();
+    const rut        = (a.rut     || '').replace(/\./g, '').trim();
+
+    try {
+      const { data: authData, error: authError } = await sb.auth.admin.createUser({
+        email,
+        password: contrasena,
+        email_confirm: true,
+        user_metadata: { nombre }
+      });
+
+      if (authError) {
+        const yaExiste = authError.message?.toLowerCase().includes('already') || authError.status === 422;
+        if (yaExiste) {
+          reporte.push({ nombre, email, contrasena: '', resultado: 'saltada', detalle: 'Email ya registrado' });
+          saltadas++;
+        } else {
+          reporte.push({ nombre, email, contrasena: '', resultado: 'error', detalle: authError.message });
+          errores++;
+        }
+        continue;
+      }
+
+      const { error: upsertError } = await sb.from('usuarios').upsert({
+        id:               authData.user.id,
+        nombre,
+        email,
+        rut:              rut       || null,
+        telefono:         telefono  || null,
+        fecha_nacimiento: a.fecha_nacimiento || null,
+        observacion:      a.observacion      || null,
+        socio_boxmagic:   a.socio_boxmagic   || null,
+        estado_boxmagic:  a.estado           || null,
+        matricula_pagada:    false,
+        clase_prueba_tomada: false
+      }, { onConflict: 'id' });
+
+      if (upsertError) {
+        console.error(`Error upsert usuario ${email}:`, upsertError.message);
+        reporte.push({ nombre, email, contrasena, resultado: 'error_parcial', detalle: `Auth OK · perfil falló: ${upsertError.message}` });
+        errores++;
+        continue;
+      }
+
+      reporte.push({ nombre, email, contrasena, resultado: 'creada', detalle: '' });
+      creadas++;
+
+    } catch (err) {
+      reporte.push({ nombre, email, contrasena: '', resultado: 'error', detalle: err.message });
+      errores++;
+    }
+  }
+
+  res.json({ creadas, saltadas, errores, reporte });
+});
+
 // ── MANEJO DE ERRORES GLOBAL ──────────────────────────────────
 app.use((err, req, res, next) => {
   console.error('Error no controlado:', err);
