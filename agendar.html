@@ -342,12 +342,13 @@
     return new Date(fechaHora).toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
   }
   function diaLabel(isoDate) {
+    const hoyStr    = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
+    const [hy, hm, hd] = hoyStr.split('-').map(Number);
+    const mananaStr = new Date(Date.UTC(hy, hm - 1, hd + 1)).toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
+    if (isoDate === hoyStr)    return 'Hoy';
+    if (isoDate === mananaStr) return 'Mañana';
     const d = new Date(isoDate + 'T12:00:00');
-    const hoy  = new Date(); hoy.setHours(0,0,0,0);
-    const manana = new Date(hoy); manana.setDate(manana.getDate() + 1);
-    if (d.toDateString() === hoy.toDateString())    return 'Hoy';
-    if (d.toDateString() === manana.toDateString()) return 'Mañana';
-    return d.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+    return d.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Santiago' });
   }
   function tipoBadge(tipo) {
     const t = (tipo || '').toLowerCase();

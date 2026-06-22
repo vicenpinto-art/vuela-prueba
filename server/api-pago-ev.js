@@ -236,7 +236,7 @@ app.post('/crear-preferencia', limiterPreferencia, async (req, res) => {
 // ── DESCONTAR CLASES PRÓXIMAS (cron cada hora) ───────────────
 app.get('/descontar-proximas', async (req, res) => {
   const token = req.headers['x-cron-token'] || req.query.token;
-  if (process.env.CRON_SECRET && token !== process.env.CRON_SECRET) {
+  if (!process.env.CRON_SECRET || token !== process.env.CRON_SECRET) {
     return res.status(401).json({ error: 'No autorizado' });
   }
   try {
@@ -252,7 +252,7 @@ app.get('/descontar-proximas', async (req, res) => {
 // ── AUTO-GENERACIÓN DE CLASES (para cron-job.org) ────────────
 app.get('/generar-automatico', async (req, res) => {
   const token = req.headers['x-cron-token'] || req.query.token;
-  if (process.env.CRON_SECRET && token !== process.env.CRON_SECRET) {
+  if (!process.env.CRON_SECRET || token !== process.env.CRON_SECRET) {
     return res.status(401).json({ error: 'No autorizado' });
   }
   try {
@@ -371,7 +371,7 @@ app.post('/webhook', async (req, res) => {
         addon_gym:          false,
         congelado_desde:    null,
         dias_congelados:    0,
-        monto_pagado:       1990,
+        monto_pagado:       pago.transaction_amount || 0,
         matricula_pagada:   false,
         clase_prueba:       false,
         mp_payment_id:      String(pago.id)
@@ -389,7 +389,7 @@ app.post('/webhook', async (req, res) => {
     const fecha_inicio  = fechaHoyChile;
     const [y, m, d]     = fechaHoyChile.split('-').map(Number);
 
-    const { data: planData } = await sb.from('planes').select('duracion_dias').eq('id', meta.plan_id).single();
+    const { data: planData } = await sb.from('planes').select('duracion_dias, cantidad_clases, ilimitado').eq('id', meta.plan_id).single();
     const duracion  = planData?.duracion_dias ?? 30;
     const fecha_fin = new Date(Date.UTC(y, m - 1, d + duracion - 1)).toISOString().split('T')[0];
 
@@ -400,9 +400,9 @@ app.post('/webhook', async (req, res) => {
       fecha_inicio,
       fecha_fin,
       estado:            'activo',
-      clases_disponibles: meta.plan_clases   ?? null,
+      clases_disponibles: planData?.cantidad_clases ?? null,
       clases_usadas:     0,
-      ilimitado:         !!meta.plan_ilimitado,
+      ilimitado:         planData?.ilimitado ?? false,
       incluye_gym:       !!meta.incluye_addon,
       addon_gym:         !!meta.incluye_addon,
       congelado_desde:   null,
