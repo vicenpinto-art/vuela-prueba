@@ -601,8 +601,8 @@
 
     if (validas.length === 0) { mostrarSinPlan(contenedor, badge); return; }
 
-    // compraIdActiva = plan principal (no clase_prueba), o el primero si solo hay prueba
-    const principal = validas.find(c => !c.clase_prueba) || validas[0];
+    // compraIdActiva = plan principal (no clase_prueba ni gym), o el primero si solo hay esos
+    const principal = validas.find(c => !c.clase_prueba && !['gym','addon_gym'].includes(c.planes?.tipo)) || validas[0];
     compraIdActiva = principal.id;
 
     // Badge global
@@ -627,6 +627,21 @@
       const nombre    = c.planes?.nombre || (c.clase_prueba ? 'Clase de prueba' : 'Plan activo');
       const separador = idx > 0 ? 'padding-top:16px;margin-top:16px;border-top:1px solid rgba(0,0,0,.07);' : '';
       const esPpal    = c.id === compraIdActiva;
+      const esGym     = ['gym','addon_gym'].includes(c.planes?.tipo);
+
+      if (esGym) {
+        return `
+          <div style="${separador}">
+            <div class="plan-nombre">${nombre}</div>
+            <div style="font-size:13px;color:#007a82;background:rgba(0,200,212,.08);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-weight:600">
+              🏋️ Acceso libre al gimnasio funcional
+            </div>
+            <div class="plan-vencimiento ${urgente ? 'urgente' : ''}">
+              ${urgente ? '⚠️' : '📅'} Vence el ${formatFecha(c.fecha_fin)}
+              ${c.estado === 'congelado' ? ' · <strong>Plan congelado</strong>' : ''}
+            </div>
+          </div>`;
+      }
 
       return `
         <div style="${separador}">

@@ -309,6 +309,7 @@
   let misInscripciones  = new Set();
   let clasesConRutina   = new Set();
   let tieneplanActivo     = false;
+  let tieneAccesoGym      = false;
   let planCongelado       = false;
   let claseSeleccionada   = null;
   let filtroActivo        = 'todas';
@@ -363,17 +364,15 @@
     const hoy = serverDate();
     const { data } = await sb
       .from('compras')
-      .select('id, estado, ilimitado, clases_disponibles, fecha_fin, planes(nombre)')
+      .select('id, estado, ilimitado, clases_disponibles, fecha_fin, planes(nombre, tipo)')
       .eq('alumna_id', userId)
       .in('estado', ['activo', 'congelado'])
       .order('created_at', { ascending: false });
 
     const todas = data || [];
-    comprasActivas = todas.filter(c =>
-      c.estado === 'activo' &&
-      c.fecha_fin >= hoy &&
-      (c.ilimitado || (c.clases_disponibles ?? 1) > 0)
-    );
+    const activas = todas.filter(c => c.estado === 'activo' && c.fecha_fin >= hoy);
+    comprasActivas  = activas.filter(c => (c.ilimitado || (c.clases_disponibles ?? 1) > 0) && !['gym','addon_gym'].includes(c.planes?.tipo));
+    tieneAccesoGym  = activas.some(c => ['gym','addon_gym'].includes(c.planes?.tipo));
     tieneplanActivo = comprasActivas.length > 0;
     planCongelado   = todas.some(c => c.estado === 'congelado');
 
@@ -381,7 +380,7 @@
     if (planCongelado) {
       alertaEl.innerHTML = '❄️ Tu plan está congelado. Contacta a Espacio Vuela para reactivarlo.';
       alertaEl.classList.add('visible');
-    } else if (!tieneplanActivo) {
+    } else if (!tieneplanActivo && !tieneAccesoGym) {
       alertaEl.innerHTML = '⚠️ No tienes un plan activo. <a href="planes.html">Comprar plan →</a>';
       alertaEl.classList.add('visible');
     }
@@ -492,7 +491,7 @@
             ${badgeHtml}
           </div>
           <div class="clase-meta">
-            <span>👩‍🏫 ${c.profesora}</span>
+            <span>${c.profesora ? `👩‍🏫 ${c.profesora}` : '🏋️ Acceso libre · cupo máx. 15'}</span>
           </div>
           ${clasesConRutina.has(c.id) ? `<button class="btn-rutina-ver" onclick="verRutina('${c.id}')">📋 Ver rutina</button>` : ''}
           <div class="cupo-bar-wrap">
@@ -520,26 +519,37 @@
 
   // ── MODAL AGENDAR ─────────────────────────────────────────────
   function abrirAgendar(claseId) {
-    if (planCongelado) {
+    claseSeleccionada = todasLasClases.find(c => c.id === claseId);
+    if (!claseSeleccionada) return;
+
+    const esGym = claseSeleccionada.nombre?.startsWith('Gym ');
+
+    if (planCongelado && !esGym) {
       const alertaEl = document.getElementById('alerta-plan');
       alertaEl.innerHTML = '❄️ Tu plan está congelado. Contacta a Espacio Vuela para reactivarlo.';
       alertaEl.classList.add('visible');
       alertaEl.scrollIntoView({behavior:'smooth', block:'center'});
       return;
     }
-    if (!tieneplanActivo) {
+    if (esGym && !tieneAccesoGym) {
       window.location.href = 'planes.html';
       return;
     }
-    claseSeleccionada = todasLasClases.find(c => c.id === claseId);
-    if (!claseSeleccionada) return;
+    if (!esGym && !tieneplanActivo) {
+      window.location.href = 'planes.html';
+      return;
+    }
+
+    const profMeta = claseSeleccionada.profesora
+      ? `<span>👩‍🏫 ${claseSeleccionada.profesora}</span>`
+      : `<span>🏋️ Acceso libre</span>`;
 
     document.getElementById('modal-detalle').innerHTML = `
       <div class="nombre">${claseSeleccionada.nombre}</div>
       <div class="meta">
         <span>📅 ${fechaLegible(claseSeleccionada.fecha_hora)}</span>
         <span>🕐 ${horaStr(claseSeleccionada.fecha_hora)} · ${claseSeleccionada.duracion_minutos || 60} min</span>
-        <span>👩‍🏫 ${claseSeleccionada.profesora}</span>
+        ${profMeta}
         <span>👥 ${claseSeleccionada.cupo_disponible} lugar${claseSeleccionada.cupo_disponible !== 1 ? 'es' : ''} disponible${claseSeleccionada.cupo_disponible !== 1 ? 's' : ''}</span>
       </div>`;
 
@@ -547,14 +557,14 @@
     document.getElementById('btn-confirmar-agendar').disabled = false;
     document.getElementById('btn-confirmar-agendar').textContent = 'Confirmar →';
 
-    // Selector de producto si hay más de uno activo
-    const selectorEl   = document.getElementById('selector-plan');
-    const opcionesEl   = document.getElementById('opciones-plan');
-    if (comprasActivas.length > 1) {
+    const selectorEl = document.getElementById('selector-plan');
+    const opcionesEl = document.getElementById('opciones-plan');
+
+    if (!esGym && comprasActivas.length > 1) {
       compraSeleccionadaId = comprasActivas[0].id;
       opcionesEl.innerHTML = comprasActivas.map((c, i) => {
-        const nombre    = c.planes?.nombre || 'Plan';
-        const disponib  = c.ilimitado ? 'Ilimitado' : `${c.clases_disponibles} clase${c.clases_disponibles !== 1 ? 's' : ''} disponible${c.clases_disponibles !== 1 ? 's' : ''}`;
+        const nombre   = c.planes?.nombre || 'Plan';
+        const disponib = c.ilimitado ? 'Ilimitado' : `${c.clases_disponibles} clase${c.clases_disponibles !== 1 ? 's' : ''} disponible${c.clases_disponibles !== 1 ? 's' : ''}`;
         return `<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;
                               border:1.5px solid ${i === 0 ? 'var(--coral)' : 'rgba(0,0,0,.1)'};
                               border-radius:10px;margin-bottom:6px;cursor:pointer;
@@ -569,7 +579,7 @@
       }).join('');
       selectorEl.style.display = 'block';
     } else {
-      compraSeleccionadaId = comprasActivas[0]?.id || null;
+      compraSeleccionadaId = esGym ? null : (comprasActivas[0]?.id || null);
       selectorEl.style.display = 'none';
     }
 
@@ -589,11 +599,21 @@
     btn.disabled = true;
     btn.textContent = 'Agendando...';
 
-    const { data, error } = await sb.rpc('agendar_clase', {
-      p_clase_id:   claseSeleccionada.id,
-      p_alumna_id:  userId,
-      p_compra_id:  compraSeleccionadaId || null
-    });
+    const esGym = claseSeleccionada.nombre?.startsWith('Gym ');
+    let data, error;
+
+    if (esGym) {
+      ({ data, error } = await sb.rpc('agendar_gym', {
+        p_clase_id:  claseSeleccionada.id,
+        p_alumna_id: userId
+      }));
+    } else {
+      ({ data, error } = await sb.rpc('agendar_clase', {
+        p_clase_id:   claseSeleccionada.id,
+        p_alumna_id:  userId,
+        p_compra_id:  compraSeleccionadaId || null
+      }));
+    }
 
     if (error || !data?.ok) {
       const errores = {
@@ -604,7 +624,7 @@
         fuera_de_plazo:     'Ya no puedes cancelar — faltan menos de 2 horas. Se descontará 1 clase de tu plan.',
         sin_plan_activo:    'No tienes un plan activo con clases disponibles.',
       };
-      msg.textContent = errores[data?.error] || 'Error al agendar. Intenta de nuevo.';
+      msg.textContent = errores[data?.error] || data?.error || 'Error al agendar. Intenta de nuevo.';
       msg.className = 'modal-msg error';
       btn.disabled = false;
       btn.textContent = 'Confirmar →';

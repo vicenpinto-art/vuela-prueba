@@ -264,7 +264,11 @@ app.get('/generar-automatico', async (req, res) => {
       total += count || 0;
       detalle.push({ horario: h.nombre, clases_nuevas: count || 0 });
     }
-    console.log(`✅ Auto-generación: ${total} clases nuevas`);
+    const { data: slotsGym } = await sb.rpc('generar_slots_gym', { p_dias: 42 });
+    const gymNuevos = slotsGym || 0;
+    total += gymNuevos;
+    detalle.push({ horario: 'Gym (slots fijos)', clases_nuevas: gymNuevos });
+    console.log(`✅ Auto-generación: ${total} clases nuevas (incluye ${gymNuevos} slots de gym)`);
     res.json({ ok: true, total_clases_generadas: total, detalle });
   } catch (err) {
     console.error('Error en auto-generación:', err);
@@ -380,11 +384,14 @@ app.post('/webhook', async (req, res) => {
     }
 
     // ── PLAN NORMAL: calcular fechas
-    const hoy = new Date();
-    const fecha_inicio = hoy.toISOString().split('T')[0];
-    const fin = new Date(hoy);
-    fin.setDate(fin.getDate() + 29);
-    const fecha_fin = fin.toISOString().split('T')[0];
+    // Fecha en zona Chile para evitar desfase UTC vs America/Santiago
+    const fechaHoyChile = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
+    const fecha_inicio  = fechaHoyChile;
+    const [y, m, d]     = fechaHoyChile.split('-').map(Number);
+
+    const { data: planData } = await sb.from('planes').select('duracion_dias').eq('id', meta.plan_id).single();
+    const duracion  = planData?.duracion_dias ?? 30;
+    const fecha_fin = new Date(Date.UTC(y, m - 1, d + duracion - 1)).toISOString().split('T')[0];
 
     // Insertar compra con el esquema real de la tabla
     const { error: compraError } = await sb.from('compras').insert({
@@ -409,6 +416,35 @@ app.post('/webhook', async (req, res) => {
     if (compraError) {
       console.error('Error al guardar compra:', compraError);
       return;
+    }
+
+    // Addon gym → compra separada con vencimiento de 30 días fijos
+    if (meta.incluye_addon) {
+      const { data: addonPlan } = await sb.from('planes').select('id, duracion_dias').eq('tipo', 'addon_gym').eq('activo', true).maybeSingle();
+      if (addonPlan) {
+        const addonDuracion   = addonPlan.duracion_dias ?? 30;
+        const addonFechaFin   = new Date(Date.UTC(y, m - 1, d + addonDuracion - 1)).toISOString().split('T')[0];
+        const { error: addonErr } = await sb.from('compras').insert({
+          alumna_id:          meta.usuario_id,
+          plan_id:            addonPlan.id,
+          fecha_inicio,
+          fecha_fin:          addonFechaFin,
+          estado:             'activo',
+          clases_disponibles: null,
+          clases_usadas:      0,
+          ilimitado:          true,
+          incluye_gym:        false,
+          addon_gym:          false,
+          congelado_desde:    null,
+          dias_congelados:    0,
+          monto_pagado:       0,
+          matricula_pagada:   false,
+          clase_prueba:       false,
+          mp_payment_id:      String(pago.id) + '_addon'
+        });
+        // MP ya recibió 200 — no es posible rollback. Log detallado para corrección manual si falla.
+        if (addonErr) console.error(`❌ ADDON GYM NO GUARDADO — pago ${pago.id} | alumna ${meta.usuario_id} | fecha_fin ${addonFechaFin} | error: ${addonErr.message}`);
+      }
     }
 
     // Si pagó matrícula → actualizar usuarios
