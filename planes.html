@@ -75,8 +75,26 @@
     main { max-width: 1100px; margin: 0 auto; padding: 0 24px 60px; }
     .planes-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 16px;
+    }
+    /* 4 planes: todos en una fila, centrados */
+    .planes-grid.grid-4 {
+      display: flex; flex-wrap: wrap; justify-content: center;
+    }
+    .planes-grid.grid-4 .plan-card { flex: 0 0 calc(25% - 12px); }
+    /* 5 planes: 3 arriba + 2 abajo centrados */
+    .planes-grid.grid-5 {
+      display: flex; flex-wrap: wrap; justify-content: center;
+    }
+    .planes-grid.grid-5 .plan-card { flex: 0 0 calc(33.333% - 11px); }
+    @media (max-width: 768px) {
+      .planes-grid.grid-4 .plan-card,
+      .planes-grid.grid-5 .plan-card { flex: 0 0 calc(50% - 8px); }
+    }
+    @media (max-width: 480px) {
+      .planes-grid.grid-4 .plan-card,
+      .planes-grid.grid-5 .plan-card { flex: 0 0 calc(50% - 4px); }
     }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -723,6 +741,10 @@
       grid.innerHTML = '<p style="color:var(--gray); font-size:14px; padding:20px 0;">No hay planes disponibles en este momento.</p>';
       return;
     }
+
+    grid.classList.remove('grid-4', 'grid-5');
+    if (planes.length === 4) grid.classList.add('grid-4');
+    else if (planes.length === 5) grid.classList.add('grid-5');
 
     grid.innerHTML = planes.map((plan, i) => {
       const esPopular = (plan.tipo === 'vuela' || plan.tipo === 'muevete') && plan.cantidad_clases === 8;
