@@ -909,7 +909,10 @@
     try {
       const res = await fetch(`${SERVIDOR_URL}/crear-preferencia`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sesionActiva.access_token}`
+        },
         body: JSON.stringify({
           plan_id: planSeleccionado.id,
           usuario_id: usuarioDatos.id,

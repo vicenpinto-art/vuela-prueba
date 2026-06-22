@@ -46,10 +46,29 @@ const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_K
 // ── HEALTH CHECK ──────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ ok: true, servicio: 'Espacio Vuela Pagos' }));
 
+// ── VERIFICAR JWT SUPABASE ────────────────────────────────────
+async function verificarJWT(req) {
+  const auth = req.headers['authorization'] || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (!token) return null;
+  const { data: { user }, error } = await sb.auth.getUser(token);
+  if (error || !user) return null;
+  return user;
+}
+
 // ── CREAR PREFERENCIA ─────────────────────────────────────────
 app.post('/crear-preferencia', async (req, res) => {
   const { plan_id, usuario_id, usuario_email, usuario_nombre,
           incluye_matricula, incluye_addon, boost, compra_id } = req.body;
+
+  // Verificar que el JWT pertenece al usuario que hace la solicitud
+  const userAuth = await verificarJWT(req);
+  if (!userAuth) {
+    return res.status(401).json({ error: 'No autenticado' });
+  }
+  if (userAuth.id !== usuario_id) {
+    return res.status(403).json({ error: 'No autorizado' });
+  }
 
   // ── BOOST FLOW ────────────────────────────────────────────────
   if (boost) {
@@ -57,13 +76,15 @@ app.post('/crear-preferencia', async (req, res) => {
       return res.status(400).json({ error: 'Faltan datos para el boost' });
     }
     try {
-      // Validar que la compra exista, pertenezca al usuario y esté activa
+      // Validar que la compra exista, pertenezca al usuario, esté activa y no haya vencido por fecha
+      const hoyStr = new Date().toISOString().split('T')[0];
       const { data: compra } = await sb
         .from('compras')
         .select('id, fecha_fin, estado')
         .eq('id', compra_id)
         .eq('alumna_id', usuario_id)
         .eq('estado', 'activo')
+        .gte('fecha_fin', hoyStr)
         .maybeSingle();
 
       if (!compra) {
