@@ -12,7 +12,6 @@
       font-family: 'Outfit', sans-serif; background: #f7f7f9;
       min-height: 100vh; display: flex; flex-direction: column;
     }
-    .logo { font-family: 'Dancing Script', cursive; font-size: 26px; color: var(--coral); text-decoration: none; }
     .page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
     .card {
       background: #fff; border-radius: 24px; padding: 52px 40px;
@@ -24,28 +23,51 @@
     h1 { font-family: 'Dancing Script', cursive; font-size: 38px; margin-bottom: 12px; }
     h1 span { background: linear-gradient(135deg, var(--coral), var(--magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     p { font-size: 16px; color: #555; line-height: 1.7; margin-bottom: 8px; }
+
     .info-box {
-      background: rgba(0,200,212,.06); border: 1px solid rgba(0,200,212,.2);
       border-radius: 12px; padding: 16px 20px; margin: 24px 0; text-align: left;
+    }
+    .info-box.esperando {
+      background: rgba(0,200,212,.06); border: 1px solid rgba(0,200,212,.2);
+    }
+    .info-box.listo {
+      background: rgba(80,200,100,.07); border: 1px solid rgba(80,200,100,.25);
+    }
+    .info-box.timeout {
+      background: rgba(255,180,0,.07); border: 1px solid rgba(255,180,0,.3);
     }
     .info-box div { font-size: 13px; color: #444; margin-bottom: 6px; }
     .info-box div:last-child { margin-bottom: 0; }
     .info-box strong { color: #111; }
+
+    /* Spinner */
+    .spinner-wrap { display: flex; align-items: center; gap: 10px; justify-content: center; margin: 8px 0 4px; }
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid rgba(0,200,212,.3);
+      border-top-color: var(--cyan); border-radius: 50%;
+      animation: spin .8s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner-txt { font-size: 13px; color: #555; }
+
     .btns { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
     .btn-primary {
       padding: 14px; background: linear-gradient(135deg, var(--coral), var(--magenta));
       color: #fff; border: none; border-radius: 12px;
       font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600;
       cursor: pointer; text-decoration: none; display: block;
-      transition: transform .2s, box-shadow .2s;
+      transition: transform .2s, box-shadow .2s, opacity .3s;
     }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,78,104,.3); }
+    .btn-primary.disabled { opacity: .45; pointer-events: none; }
     .btn-secondary {
       padding: 13px; background: #f5f5f7; color: #111; border: none;
       border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 15px;
       font-weight: 600; cursor: pointer; text-decoration: none; display: block;
+      transition: opacity .3s;
     }
     .btn-secondary:hover { background: #ebebee; }
+    .btn-secondary.disabled { opacity: .45; pointer-events: none; }
 
     @media (max-width: 600px) {
       .page { padding: 24px 16px; align-items: flex-start; padding-top: 40px; }
@@ -55,7 +77,7 @@
       p { font-size: 14px; }
       .info-box { padding: 14px 16px; }
     }
-</style>
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="nav.js"></script>
 </head>
@@ -63,20 +85,104 @@
 
 <div class="page">
   <div class="card">
-    <div class="icono">🎉</div>
-    <h1>¡Todo listo, <span>ya puedes volar!</span></h1>
-    <p>Tu pago fue procesado correctamente. Tu plan ya está activo.</p>
-    <div class="info-box">
-      <div>✅ <strong>Pago aprobado</strong> por MercadoPago</div>
-      <div>📅 <strong>Tu plan está activo</strong> por 30 días desde hoy</div>
-      <div>📧 Recibirás una confirmación en tu correo</div>
+    <div class="icono" id="icono">⏳</div>
+    <h1 id="titulo">Confirmando <span>tu pago…</span></h1>
+    <p id="subtitulo">Estamos verificando tu pago con MercadoPago.</p>
+
+    <div class="info-box esperando" id="info-box">
+      <div class="spinner-wrap">
+        <div class="spinner"></div>
+        <span class="spinner-txt" id="spinner-txt">Activando tu plan…</span>
+      </div>
+      <div style="margin-top:10px; font-size:12px; color:#888; text-align:center;">Esto puede tardar unos segundos</div>
     </div>
-    <p style="font-size:14px; color:#888;">¿Tardas en ver tu plan? Espera unos segundos y recarga tu cuenta.</p>
+
     <div class="btns">
-      <a href="mi-cuenta.html" class="btn-primary">Ir a mi cuenta →</a>
-      <a href="agendar.html" class="btn-secondary">Agendar mi primera clase</a>
+      <a href="mi-cuenta.html" class="btn-primary disabled" id="btn-cuenta">Ir a mi cuenta →</a>
+      <a href="agendar.html"   class="btn-secondary disabled" id="btn-agendar">Agendar mi primera clase</a>
     </div>
   </div>
 </div>
+
+<script>
+  const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const POLL_INTERVAL = 2500;  // cada 2.5 segundos
+  const TIMEOUT_MS    = 45000; // hasta 45 segundos
+
+  async function confirmarPlan() {
+    const { data: { session } } = await sb.auth.getSession();
+
+    // Sin sesión: no podemos verificar, habilitar botones igual
+    if (!session) { activarBotones(); return; }
+
+    const userId    = session.user.id;
+    const inicio    = Date.now();
+    let   intentos  = 0;
+    const mensajes  = ['Activando tu plan…', 'Comunicando con el banco…', 'Casi listo…'];
+
+    while (Date.now() - inicio < TIMEOUT_MS) {
+      const { data } = await sb
+        .from('compras')
+        .select('id')
+        .eq('alumna_id', userId)
+        .in('estado', ['activo', 'congelado'])
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (data && data.length > 0) {
+        mostrarExito(); return;
+      }
+
+      // Rotar mensaje del spinner
+      document.getElementById('spinner-txt').textContent = mensajes[intentos % mensajes.length];
+      intentos++;
+      await new Promise(r => setTimeout(r, POLL_INTERVAL));
+    }
+
+    // Timeout: pago probablemente OK pero el webhook tardó
+    mostrarTimeout();
+  }
+
+  function mostrarExito() {
+    document.getElementById('icono').textContent    = '🎉';
+    document.getElementById('titulo').innerHTML     = '¡Todo listo, <span>ya puedes volar!</span>';
+    document.getElementById('subtitulo').textContent = 'Tu pago fue aprobado y tu plan ya está activo.';
+
+    const box = document.getElementById('info-box');
+    box.className = 'info-box listo';
+    box.innerHTML = `
+      <div>✅ <strong>Pago aprobado</strong> por MercadoPago</div>
+      <div>📅 <strong>Tu plan está activo</strong> desde hoy</div>
+      <div>📧 Recibirás una confirmación en tu correo</div>
+    `;
+    activarBotones();
+  }
+
+  function mostrarTimeout() {
+    document.getElementById('icono').textContent    = '✅';
+    document.getElementById('titulo').innerHTML     = 'Pago <span>recibido</span>';
+    document.getElementById('subtitulo').textContent = 'Tu pago fue aprobado por MercadoPago.';
+
+    const box = document.getElementById('info-box');
+    box.className = 'info-box timeout';
+    box.innerHTML = `
+      <div>✅ <strong>Pago aprobado</strong> por MercadoPago</div>
+      <div>⏱ Tu plan puede tardar 1–2 minutos más en reflejarse en tu perfil</div>
+      <div>📧 Recibirás una confirmación en tu correo</div>
+    `;
+    activarBotones();
+  }
+
+  function activarBotones() {
+    document.getElementById('btn-cuenta').classList.remove('disabled');
+    document.getElementById('btn-agendar').classList.remove('disabled');
+  }
+
+  confirmarPlan();
+</script>
 </body>
 </html>
