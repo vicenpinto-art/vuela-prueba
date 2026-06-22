@@ -542,9 +542,15 @@ app.post('/importar-alumnas', async (req, res) => {
 
       const authData = { user: authJson };
 
+      // Separar nombre completo en nombre (primer palabra) y apellido (resto)
+      const partes   = nombre.trim().split(/\s+/);
+      const primerNombre = partes[0] || '';
+      const apellido     = partes.slice(1).join(' ') || '';
+
       const { error: upsertError } = await sb.from('usuarios').upsert({
         id:               authData.user.id,
-        nombre,
+        nombre:           primerNombre,
+        apellido,
         email,
         rut:              rut       || null,
         telefono:         telefono  || null,
