@@ -1,12 +1,21 @@
-const express = require('express');
-const cors    = require('cors');
-const crypto  = require('crypto');
+const express   = require('express');
+const cors      = require('cors');
+const crypto    = require('crypto');
+const rateLimit = require('express-rate-limit');
 const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.use(cors({ origin: process.env.CLIENT_URL || 'https://vuela-prueba.vicenpinto.workers.dev' }));
 app.use(express.json());
+
+const limiterPreferencia = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Demasiadas solicitudes. Intenta en unos minutos.' }
+});
 
 // ── VALIDACIÓN DE FIRMA WEBHOOK MERCADOPAGO ───────────────────
 // Verifica el header x-signature usando HMAC-SHA256 con MP_WEBHOOK_SECRET.
@@ -57,7 +66,7 @@ async function verificarJWT(req) {
 }
 
 // ── CREAR PREFERENCIA ─────────────────────────────────────────
-app.post('/crear-preferencia', async (req, res) => {
+app.post('/crear-preferencia', limiterPreferencia, async (req, res) => {
   const { plan_id, usuario_id, usuario_email, usuario_nombre,
           incluye_matricula, incluye_addon, boost, compra_id } = req.body;
 
