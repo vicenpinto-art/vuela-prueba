@@ -51,7 +51,9 @@ function validarFirmaMP(req) {
 
 // ── CONFIG ────────────────────────────────────────────────────
 const mp = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
-const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false }
+});
 
 // ── HEALTH CHECK ──────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ ok: true, servicio: 'Espacio Vuela Pagos' }));
@@ -548,6 +550,7 @@ app.post('/importar-alumnas', async (req, res) => {
 
       reporte.push({ nombre, email, contrasena, resultado: 'creada', detalle: '' });
       creadas++;
+      await new Promise(r => setTimeout(r, 80));
 
     } catch (err) {
       reporte.push({ nombre, email, contrasena: '', resultado: 'error', detalle: err.message });
