@@ -1333,7 +1333,7 @@ async function marcarAsisAdmin(alumnaId,claseId,presente){
 // ── ALUMNAS ───────────────────────────────────────────────────
 async function cargarAlumnas(){
   const hoyFecha = hoy();
-  const {data:usuarios} = await sb.from('usuarios').select('id,nombre,apellido,email,rol,created_at').eq('rol','alumna').order('created_at',{ascending:false});
+  const {data:usuarios} = await sb.from('usuarios').select('id,nombre,apellido,email,rol,created_at').eq('rol','alumna').order('created_at',{ascending:false}).limit(10000);
   const {data:compras} = await sb.from('compras').select('alumna_id,id,estado,fecha_fin,clases_disponibles,ilimitado,congelado_desde,planes(nombre,tipo)').or(`estado.eq.congelado,and(estado.eq.activo,fecha_fin.gte.${hoyFecha})`);
   const compraMap = new Map();
   const gymSet    = new Set();
