@@ -1,11 +1,43 @@
 const express = require('express');
-const cors = require('cors');
+const cors    = require('cors');
+const crypto  = require('crypto');
 const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.use(cors({ origin: process.env.CLIENT_URL || 'https://vuela-prueba.vicenpinto.workers.dev' }));
 app.use(express.json());
+
+// ── VALIDACIÓN DE FIRMA WEBHOOK MERCADOPAGO ───────────────────
+// Verifica el header x-signature usando HMAC-SHA256 con MP_WEBHOOK_SECRET.
+// Referencia: https://www.mercadopago.cl/developers/es/docs/your-integrations/notifications/webhooks
+function validarFirmaMP(req) {
+  const xSignature = req.headers['x-signature'];
+  const xRequestId = req.headers['x-request-id'];
+  const dataId     = req.body?.data?.id;
+
+  if (!xSignature || !xRequestId || !dataId || !process.env.MP_WEBHOOK_SECRET) return false;
+
+  const partes = {};
+  xSignature.split(',').forEach(p => {
+    const [k, v] = p.split('=');
+    if (k && v) partes[k.trim()] = v.trim();
+  });
+  const { ts, v1 } = partes;
+  if (!ts || !v1) return false;
+
+  const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+  const hmac = crypto
+    .createHmac('sha256', process.env.MP_WEBHOOK_SECRET)
+    .update(manifest)
+    .digest('hex');
+
+  try {
+    return crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(v1));
+  } catch {
+    return false;
+  }
+}
 
 // ── CONFIG ────────────────────────────────────────────────────
 const mp = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
@@ -158,6 +190,10 @@ app.post('/crear-preferencia', async (req, res) => {
 
 // ── DESCONTAR CLASES PRÓXIMAS (cron cada hora) ───────────────
 app.get('/descontar-proximas', async (req, res) => {
+  const token = req.headers['x-cron-token'] || req.query.token;
+  if (process.env.CRON_SECRET && token !== process.env.CRON_SECRET) {
+    return res.status(401).json({ error: 'No autorizado' });
+  }
   try {
     const { data: count } = await sb.rpc('descontar_clases_proximas');
     console.log(`✅ Descontadas ${count} clases`);
@@ -193,6 +229,10 @@ app.get('/generar-automatico', async (req, res) => {
 
 // ── WEBHOOK MERCADOPAGO ───────────────────────────────────────
 app.post('/webhook', async (req, res) => {
+  if (!validarFirmaMP(req)) {
+    console.warn('Webhook rechazado: firma inválida o ausente');
+    return res.sendStatus(401);
+  }
   res.sendStatus(200); // Responder inmediatamente para que MP no reintente
 
   const { type, data, action } = req.body;
