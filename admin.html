@@ -1336,8 +1336,12 @@ async function cargarAlumnas(){
   const {data:usuarios} = await sb.from('usuarios').select('id,nombre,apellido,email,rol,created_at').eq('rol','alumna').order('created_at',{ascending:false});
   const {data:compras} = await sb.from('compras').select('alumna_id,id,estado,fecha_fin,clases_disponibles,ilimitado,congelado_desde,planes(nombre,tipo)').or(`estado.eq.congelado,and(estado.eq.activo,fecha_fin.gte.${hoyFecha})`);
   const compraMap = new Map();
-  (compras||[]).forEach(c=>{if(!compraMap.has(c.alumna_id))compraMap.set(c.alumna_id,c);});
-  todasLasAlumnas = (usuarios||[]).map(u=>({...u,compra:compraMap.get(u.id)||null}));
+  const gymSet    = new Set();
+  (compras||[]).forEach(c=>{
+    if(['gym','addon_gym'].includes(c.planes?.tipo) && c.estado==='activo') gymSet.add(c.alumna_id);
+    if(!compraMap.has(c.alumna_id)) compraMap.set(c.alumna_id,c);
+  });
+  todasLasAlumnas = (usuarios||[]).map(u=>({...u,compra:compraMap.get(u.id)||null,tieneGym:gymSet.has(u.id)}));
   renderAlumnas(todasLasAlumnas);
 }
 function filtrarAlumnas(){
@@ -1348,7 +1352,7 @@ function renderAlumnas(lista){
   const el = document.getElementById('tabla-alumnas');
   if(!lista||lista.length===0){el.innerHTML='<p style="font-size:14px;color:var(--gray);padding:8px 0">No se encontraron alumnas.</p>';return;}
   el.innerHTML=`<div class="tabla-wrap"><table class="tabla">
-    <thead><tr><th>Nombre</th><th>Email</th><th>Plan</th><th>Clases</th><th>Vence</th><th></th></tr></thead>
+    <thead><tr><th>Nombre</th><th>Email</th><th>Plan</th><th>Clases</th><th>Gym</th><th>Vence</th><th></th></tr></thead>
     <tbody>${lista.map(a=>{
       const c=a.compra;
       let planBadge='<span class="badge badge-sin">Sin plan</span>';
@@ -1365,9 +1369,10 @@ function renderAlumnas(lista){
         <td style="font-size:12px;color:var(--gray)">${a.email}</td>
         <td>${planBadge}</td>
         <td style="text-align:center;font-weight:700;color:var(--coral)">${clasesTxt}</td>
+        <td style="text-align:center">${a.tieneGym?'<span style="color:#007a82;font-size:15px;font-weight:700">✓</span>':'<span style="color:var(--gray)">—</span>'}</td>
         <td style="font-size:12px;color:var(--gray)">${venceTxt}</td>
         <td style="display:flex;gap:5px;flex-wrap:wrap">
-          <button class="btn btn-cyan btn-sm" onclick="abrirAsignarPlan('${a.id}','${a.nombre||''} ${a.apellido||''}')">+ Plan</button>
+          <button class="btn btn-cyan btn-sm" onclick="abrirAsignarPlan('${a.id}','${a.nombre||''} ${a.apellido||''}')">Editar</button>
           ${c&&c.estado==='activo'?`<button class="btn btn-purple btn-sm" onclick="congelarPlan('${c.id}')">Congelar</button>`:''}
           ${c&&c.estado==='congelado'?`<button class="btn btn-cyan btn-sm" onclick="descongelarPlan('${c.id}')">Descongelar</button>`:''}
           ${c?`<button class="btn btn-secondary btn-sm" onclick="abrirExtender('${c.id}','${a.nombre} ${a.apellido}')">Extender</button>`:''}
