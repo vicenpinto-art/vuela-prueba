@@ -259,7 +259,11 @@
     <button class="modal-close" onclick="cerrarModal('modal-agendar')">✕</button>
     <h2>Confirmar agendamiento</h2>
     <div class="modal-clase-detalle" id="modal-detalle"></div>
-    <div class="modal-btns">
+    <div id="selector-plan" style="display:none; margin:14px 0 0;">
+      <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px;">¿Con qué producto agendas?</div>
+      <div id="opciones-plan"></div>
+    </div>
+    <div class="modal-btns" style="margin-top:16px;">
       <button class="btn-confirmar" id="btn-confirmar-agendar" onclick="confirmarAgendar()">Confirmar →</button>
       <button class="btn-modal-sec" onclick="cerrarModal('modal-agendar')">Cancelar</button>
     </div>
@@ -304,10 +308,12 @@
   let todasLasClases    = [];
   let misInscripciones  = new Set();
   let clasesConRutina   = new Set();
-  let tieneplanActivo   = false;
-  let planCongelado     = false;
-  let claseSeleccionada = null;
-  let filtroActivo      = 'todas';
+  let tieneplanActivo     = false;
+  let planCongelado       = false;
+  let claseSeleccionada   = null;
+  let filtroActivo        = 'todas';
+  let comprasActivas      = [];
+  let compraSeleccionadaId = null;
 
   // ── UTILS ─────────────────────────────────────────────────────
   function horaStr(fechaHora) {
@@ -357,18 +363,20 @@
     const hoy = serverDate();
     const { data } = await sb
       .from('compras')
-      .select('id,estado')
+      .select('id, estado, ilimitado, clases_disponibles, planes(nombre)')
       .eq('alumna_id', userId)
       .or(`estado.eq.congelado,and(estado.eq.activo,fecha_fin.gte.${hoy})`)
-      .limit(1);
+      .order('created_at', { ascending: false });
+
+    comprasActivas = (data || []).filter(c => c.estado === 'activo' && (c.ilimitado || (c.clases_disponibles ?? 1) > 0));
     const plan = data?.[0];
     tieneplanActivo = plan?.estado === 'activo';
     planCongelado   = plan?.estado === 'congelado';
     const alertaEl = document.getElementById('alerta-plan');
-    if(planCongelado){
+    if (planCongelado) {
       alertaEl.innerHTML = '❄️ Tu plan está congelado. Contacta a Espacio Vuela para reactivarlo.';
       alertaEl.classList.add('visible');
-    } else if(!tieneplanActivo){
+    } else if (!tieneplanActivo) {
       alertaEl.innerHTML = '⚠️ No tienes un plan activo. <a href="planes.html">Comprar plan →</a>';
       alertaEl.classList.add('visible');
     }
@@ -533,7 +541,41 @@
     document.getElementById('modal-agendar-msg').className = 'modal-msg';
     document.getElementById('btn-confirmar-agendar').disabled = false;
     document.getElementById('btn-confirmar-agendar').textContent = 'Confirmar →';
+
+    // Selector de producto si hay más de uno activo
+    const selectorEl   = document.getElementById('selector-plan');
+    const opcionesEl   = document.getElementById('opciones-plan');
+    if (comprasActivas.length > 1) {
+      compraSeleccionadaId = comprasActivas[0].id;
+      opcionesEl.innerHTML = comprasActivas.map((c, i) => {
+        const nombre    = c.planes?.nombre || 'Plan';
+        const disponib  = c.ilimitado ? 'Ilimitado' : `${c.clases_disponibles} clase${c.clases_disponibles !== 1 ? 's' : ''} disponible${c.clases_disponibles !== 1 ? 's' : ''}`;
+        return `<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;
+                              border:1.5px solid ${i === 0 ? 'var(--coral)' : 'rgba(0,0,0,.1)'};
+                              border-radius:10px;margin-bottom:6px;cursor:pointer;
+                              transition:border-color .15s" id="label-plan-${c.id}">
+          <input type="radio" name="plan-selector" value="${c.id}" ${i === 0 ? 'checked' : ''}
+                 onchange="seleccionarCompra('${c.id}')">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#111">${nombre}</div>
+            <div style="font-size:12px;color:#888;margin-top:2px">${disponib}</div>
+          </div>
+        </label>`;
+      }).join('');
+      selectorEl.style.display = 'block';
+    } else {
+      compraSeleccionadaId = comprasActivas[0]?.id || null;
+      selectorEl.style.display = 'none';
+    }
+
     abrirModal('modal-agendar');
+  }
+
+  function seleccionarCompra(id) {
+    compraSeleccionadaId = id;
+    document.querySelectorAll('#opciones-plan label').forEach(l => {
+      l.style.borderColor = l.id === `label-plan-${id}` ? 'var(--coral)' : 'rgba(0,0,0,.1)';
+    });
   }
 
   async function confirmarAgendar() {
@@ -543,8 +585,9 @@
     btn.textContent = 'Agendando...';
 
     const { data, error } = await sb.rpc('agendar_clase', {
-      p_clase_id: claseSeleccionada.id,
-      p_alumna_id: userId
+      p_clase_id:   claseSeleccionada.id,
+      p_alumna_id:  userId,
+      p_compra_id:  compraSeleccionadaId || null
     });
 
     if (error || !data?.ok) {
