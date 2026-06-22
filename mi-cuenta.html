@@ -228,7 +228,7 @@
     <div class="col-left">
       <div class="card">
         <div class="card-header">
-          <div class="card-titulo">Tu plan activo</div>
+          <div class="card-titulo">Mis productos</div>
           <div class="card-badge badge-sin-plan" id="plan-badge">—</div>
         </div>
         <div id="plan-contenido">
@@ -583,74 +583,83 @@
 
     if (!compras || compras.length === 0) { mostrarSinPlan(contenedor, badge); return; }
 
-    const c = compras[0];
-    compraIdActiva = c.id;
-
-    // Vencimiento inmediato: clases agotadas O fecha expirada → lo primero que ocurra
-    if (c.estado === 'activo') {
-      const clasesAgotadas = !c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles <= 0;
-      const vencidoPorFecha = c.fecha_fin < hoy;
-      if (clasesAgotadas || vencidoPorFecha) {
-        await sb.from('compras').update({ estado: 'vencido' }).eq('id', c.id);
-        mostrarSinPlan(contenedor, badge);
-        return;
+    // Filtrar vencidas y deduplicar clase_prueba (queda solo la más reciente)
+    const validas = [];
+    let tuvoPrueba = false;
+    for (const c of compras) {
+      if (c.estado === 'activo') {
+        const agotada  = !c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles <= 0;
+        const vencida  = c.fecha_fin < hoy;
+        if (agotada || vencida) { continue; }
       }
+      if (c.clase_prueba) {
+        if (tuvoPrueba) continue;
+        tuvoPrueba = true;
+      }
+      validas.push(c);
     }
 
-    const dias = diasHasta(c.fecha_fin);
-    const urgente = dias <= 5;
+    if (validas.length === 0) { mostrarSinPlan(contenedor, badge); return; }
 
-    // Badge
-    if (c.estado === 'congelado') {
-      badge.textContent = '❄️ Congelado'; badge.className = 'card-badge badge-congelado';
-    } else {
-      badge.textContent = 'Activo'; badge.className = 'card-badge badge-activo';
-    }
+    // compraIdActiva = plan principal (no clase_prueba), o el primero si solo hay prueba
+    const principal = validas.find(c => !c.clase_prueba) || validas[0];
+    compraIdActiva = principal.id;
+
+    // Badge global
+    const hayCongelado = validas.some(c => c.estado === 'congelado');
+    badge.textContent  = hayCongelado ? '❄️ Congelado' : 'Activo';
+    badge.className    = hayCongelado ? 'card-badge badge-congelado' : 'card-badge badge-activo';
 
     // Alertas
-    if (c.estado === 'congelado') {
-      const alertaCongelado = document.getElementById('alerta-sin-plan');
-      alertaCongelado.className = 'alerta congelado';
-      alertaCongelado.innerHTML = '❄️ Tu plan está congelado. Contacta a Espacio Vuela para reactivarlo.';
-      alertaCongelado.style.display = 'flex';
-    } else if (!c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles > 0 && c.clases_disponibles <= 2) {
+    if (hayCongelado) {
+      const el = document.getElementById('alerta-sin-plan');
+      el.className = 'alerta congelado';
+      el.innerHTML = '❄️ Tu plan está congelado. Contacta a Espacio Vuela para reactivarlo.';
+      el.style.display = 'flex';
+    } else if (validas.some(c => !c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles > 0 && c.clases_disponibles <= 2)) {
       document.getElementById('alerta-pocas').style.display = 'flex';
     }
 
-    const nombrePlan = c.planes?.nombre || 'Plan activo';
+    // Renderizar cada producto
+    contenedor.innerHTML = validas.map((c, idx) => {
+      const dias      = diasHasta(c.fecha_fin);
+      const urgente   = dias <= 5;
+      const nombre    = c.planes?.nombre || (c.clase_prueba ? 'Clase de prueba' : 'Plan activo');
+      const separador = idx > 0 ? 'padding-top:16px;margin-top:16px;border-top:1px solid rgba(0,0,0,.07);' : '';
+      const esPpal    = c.id === compraIdActiva;
 
-    contenedor.innerHTML = `
-      <div class="plan-nombre">${nombrePlan}</div>
-      <div class="plan-stats">
-        <div class="stat">
-          <div class="stat-valor coral ${c.ilimitado ? 'ilimitado' : ''}">${c.ilimitado ? '∞' : (c.clases_disponibles ?? '—')}</div>
-          <div class="stat-label">Disponibles</div>
-        </div>
-        <div class="stat">
-          <div class="stat-valor cyan">${c.clases_usadas ?? 0}</div>
-          <div class="stat-label">Usadas</div>
-        </div>
-        <div class="stat">
-          <div class="stat-valor gray">${dias}</div>
-          <div class="stat-label">Días restantes</div>
-        </div>
-      </div>
-      <div class="plan-vencimiento ${urgente ? 'urgente' : ''}">
-        ${urgente ? '⚠️' : '📅'} Vence el ${formatFecha(c.fecha_fin)}
-        ${c.estado === 'congelado' ? ' · <strong>Plan congelado</strong>' : ''}
-      </div>
-      ${(c.addon_gym || c.incluye_gym) ? '<div class="plan-addon">🏋️ Addon Gym incluido</div>' : ''}
-      ${c.estado === 'activo' ? `
-        <button
-          id="btn-boost"
-          onclick="pagarBoost()"
-          style="margin-top:14px;width:100%;padding:11px;border:none;border-radius:12px;
-                 background:linear-gradient(135deg,#fecb29,#ff8c00);color:#fff;
-                 font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;
-                 cursor:pointer;letter-spacing:.3px;transition:opacity .2s">
-          ⚡ Boost 1 día — $${Number(precioBoost).toLocaleString('es-CL')}
-        </button>` : ''}
-    `;
+      return `
+        <div style="${separador}">
+          <div class="plan-nombre">${nombre}</div>
+          <div class="plan-stats">
+            <div class="stat">
+              <div class="stat-valor coral ${c.ilimitado ? 'ilimitado' : ''}">${c.ilimitado ? '∞' : (c.clases_disponibles ?? '—')}</div>
+              <div class="stat-label">Disponibles</div>
+            </div>
+            <div class="stat">
+              <div class="stat-valor cyan">${c.clases_usadas ?? 0}</div>
+              <div class="stat-label">Usadas</div>
+            </div>
+            <div class="stat">
+              <div class="stat-valor gray">${dias}</div>
+              <div class="stat-label">Días restantes</div>
+            </div>
+          </div>
+          <div class="plan-vencimiento ${urgente ? 'urgente' : ''}">
+            ${urgente ? '⚠️' : '📅'} Vence el ${formatFecha(c.fecha_fin)}
+            ${c.estado === 'congelado' ? ' · <strong>Plan congelado</strong>' : ''}
+          </div>
+          ${(c.addon_gym || c.incluye_gym) ? '<div class="plan-addon">🏋️ Addon Gym incluido</div>' : ''}
+          ${esPpal && c.estado === 'activo' ? `
+            <button id="btn-boost" onclick="pagarBoost()"
+              style="margin-top:14px;width:100%;padding:11px;border:none;border-radius:12px;
+                     background:linear-gradient(135deg,#fecb29,#ff8c00);color:#fff;
+                     font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;
+                     cursor:pointer;letter-spacing:.3px;transition:opacity .2s">
+              ⚡ Boost 1 día — $${Number(precioBoost).toLocaleString('es-CL')}
+            </button>` : ''}
+        </div>`;
+    }).join('');
   }
 
   function mostrarSinPlan(contenedor, badge) {
