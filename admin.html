@@ -375,7 +375,12 @@
     <div class="section" id="sec-alumnas">
       <div class="section-title">Alumnas</div>
       <div class="section-sub">Gestiona planes, congela o extiende días.</div>
-      <div style="margin-bottom:16px"><input class="search-input" placeholder="Buscar por nombre o correo..." id="alumnas-search" oninput="filtrarAlumnas()"></div>
+      <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input class="search-input" placeholder="Buscar por nombre o correo..." id="alumnas-search" oninput="filtrarAlumnas()" style="flex:1;min-width:200px;max-width:320px">
+        <button class="btn btn-secondary btn-sm" onclick="exportarCSV('alumnas')">⬇ Alumnas</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportarCSV('compras')">⬇ Compras activas</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportarCSV('completo')">⬇ Completo</button>
+      </div>
       <div class="card">
         <div id="tabla-alumnas"><div class="sk" style="height:60px;margin-bottom:8px"></div><div class="sk" style="height:60px"></div></div>
       </div>
@@ -1337,7 +1342,7 @@ async function marcarAsisAdmin(alumnaId,claseId,presente){
 // ── ALUMNAS ───────────────────────────────────────────────────
 async function cargarAlumnas(){
   const hoyFecha = hoy();
-  const {data:usuarios} = await sb.from('usuarios').select('id,nombre,apellido,email,rol,created_at').eq('rol','alumna').order('created_at',{ascending:false}).limit(10000);
+  const {data:usuarios} = await sb.from('usuarios').select('id,nombre,apellido,email,rol,telefono,rut,fecha_nacimiento,created_at').eq('rol','alumna').order('created_at',{ascending:false}).limit(10000);
   const {data:compras} = await sb.from('compras').select('alumna_id,id,estado,fecha_fin,clases_disponibles,ilimitado,congelado_desde,planes(nombre,tipo)').or(`estado.eq.congelado,and(estado.eq.activo,fecha_fin.gte.${hoyFecha})`);
   const compraMap = new Map();
   const gymSet    = new Set();
@@ -1420,6 +1425,33 @@ function cambiarPagAlumnas(p){
   paginaAlumnas = p;
   renderAlumnas();
   document.getElementById('sec-alumnas').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function exportarCSV(tipo){
+  if(!todasLasAlumnas.length){alert('Cargando alumnas, espera un momento.');return;}
+  let filas=[], nombre='';
+  const q = (v) => `"${(v??'').toString().replace(/"/g,'""')}"`;
+  const fechaHoy = new Date().toLocaleDateString('es-CL').replace(/\//g,'-');
+  if(tipo==='alumnas'){
+    nombre=`alumnas_${fechaHoy}.csv`;
+    filas.push(['Nombre','Apellido','Email','Teléfono','RUT','Fecha Nacimiento','Creada'].join(';'));
+    todasLasAlumnas.forEach(a=>filas.push([q(a.nombre),q(a.apellido),q(a.email),q(a.telefono),q(a.rut),q(a.fecha_nacimiento),q(a.created_at?.slice(0,10))].join(';')));
+  } else if(tipo==='compras'){
+    nombre=`compras_activas_${fechaHoy}.csv`;
+    filas.push(['Nombre','Apellido','Email','Plan','Tipo','Estado','Inicio','Vencimiento','Clases Disponibles','Ilimitado','Gym'].join(';'));
+    todasLasAlumnas.filter(a=>a.compra).forEach(a=>{
+      const c=a.compra;
+      filas.push([q(a.nombre),q(a.apellido),q(a.email),q(c.planes?.nombre),q(c.planes?.tipo),q(c.estado),q(c.fecha_inicio),q(c.fecha_fin),q(c.clases_disponibles),q(c.ilimitado?'Sí':'No'),q(a.tieneGym?'Sí':'No')].join(';'));
+    });
+  } else {
+    nombre=`espacio_vuela_completo_${fechaHoy}.csv`;
+    filas.push(['Nombre','Apellido','Email','Teléfono','RUT','Fecha Nacimiento','Plan','Estado Plan','Vencimiento','Clases Disponibles','Ilimitado','Gym'].join(';'));
+    todasLasAlumnas.forEach(a=>{
+      const c=a.compra;
+      filas.push([q(a.nombre),q(a.apellido),q(a.email),q(a.telefono),q(a.rut),q(a.fecha_nacimiento),q(c?.planes?.nombre||'Sin plan'),q(c?.estado||'—'),q(c?.fecha_fin||'—'),q(c?.clases_disponibles??'—'),q(c?.ilimitado?'Sí':'No'),q(a.tieneGym?'Sí':'No')].join(';'));
+    });
+  }
+  const blob=new Blob(['﻿'+filas.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nombre;a.click();
 }
 let planesCache = [];
 let comprasAlumnaActual = [];
