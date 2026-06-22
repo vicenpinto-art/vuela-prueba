@@ -379,6 +379,7 @@
       <div class="card">
         <div id="tabla-alumnas"><div class="sk" style="height:60px;margin-bottom:8px"></div><div class="sk" style="height:60px"></div></div>
       </div>
+      <div id="paginacion-alumnas" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;flex-wrap:wrap"></div>
     </div>
 
     <!-- RUTINA DEL DÍA -->
@@ -748,6 +749,9 @@ let userId = null;
 let todosLosHorarios = [];
 let todasLasClases   = [];
 let todasLasAlumnas  = [];
+let alumnasFiltradas = [];
+let paginaAlumnas    = 1;
+const POR_PAGINA     = 100;
 let todosLosUsuarios = [];
 let claseAsisActiva  = null;
 let compraExtenderActiva = null;
@@ -1341,19 +1345,28 @@ async function cargarAlumnas(){
     if(['gym','addon_gym'].includes(c.planes?.tipo) && c.estado==='activo') gymSet.add(c.alumna_id);
     if(!compraMap.has(c.alumna_id)) compraMap.set(c.alumna_id,c);
   });
-  todasLasAlumnas = (usuarios||[]).map(u=>({...u,compra:compraMap.get(u.id)||null,tieneGym:gymSet.has(u.id)}));
-  renderAlumnas(todasLasAlumnas);
+  todasLasAlumnas  = (usuarios||[]).map(u=>({...u,compra:compraMap.get(u.id)||null,tieneGym:gymSet.has(u.id)}));
+  alumnasFiltradas = todasLasAlumnas;
+  paginaAlumnas    = 1;
+  renderAlumnas();
 }
 function filtrarAlumnas(){
   const q = document.getElementById('alumnas-search').value.toLowerCase();
-  renderAlumnas(todasLasAlumnas.filter(a=>`${a.nombre} ${a.apellido} ${a.email}`.toLowerCase().includes(q)));
+  alumnasFiltradas = q ? todasLasAlumnas.filter(a=>`${a.nombre} ${a.apellido} ${a.email}`.toLowerCase().includes(q)) : todasLasAlumnas;
+  paginaAlumnas = 1;
+  renderAlumnas();
 }
-function renderAlumnas(lista){
+function renderAlumnas(){
+  const lista = alumnasFiltradas;
   const el = document.getElementById('tabla-alumnas');
-  if(!lista||lista.length===0){el.innerHTML='<p style="font-size:14px;color:var(--gray);padding:8px 0">No se encontraron alumnas.</p>';return;}
-  el.innerHTML=`<div class="tabla-wrap"><table class="tabla">
+  if(!lista||lista.length===0){el.innerHTML='<p style="font-size:14px;color:var(--gray);padding:8px 0">No se encontraron alumnas.</p>';renderPaginacion();return;}
+  const totalPags = Math.ceil(lista.length / POR_PAGINA);
+  if(paginaAlumnas > totalPags) paginaAlumnas = totalPags;
+  const inicio = (paginaAlumnas - 1) * POR_PAGINA;
+  const pagina = lista.slice(inicio, inicio + POR_PAGINA);
+  el.innerHTML=`<div style="font-size:12px;color:var(--gray);margin-bottom:8px">${lista.length} alumnas encontradas</div><div class="tabla-wrap"><table class="tabla">
     <thead><tr><th>Nombre</th><th>Email</th><th>Plan</th><th>Clases</th><th>Gym</th><th>Vence</th><th></th></tr></thead>
-    <tbody>${lista.map(a=>{
+    <tbody>${pagina.map(a=>{
       const c=a.compra;
       let planBadge='<span class="badge badge-sin">Sin plan</span>';
       let clasesTxt='—', venceTxt='—';
@@ -1380,6 +1393,33 @@ function renderAlumnas(lista){
       </tr>`;
     }).join('')}
     </tbody></table></div>`;
+  renderPaginacion();
+}
+function renderPaginacion(){
+  const el = document.getElementById('paginacion-alumnas');
+  const total = alumnasFiltradas.length;
+  const totalPags = Math.ceil(total / POR_PAGINA);
+  if(totalPags <= 1){el.innerHTML='';return;}
+  const btnStyle = (activo) => `style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:${activo?'var(--coral)':'#fff'};color:${activo?'#fff':'var(--dark)'};font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;font-weight:${activo?700:400}"`;
+  let pages = [];
+  for(let i=1;i<=totalPags;i++){
+    if(i===1||i===totalPags||Math.abs(i-paginaAlumnas)<=2) pages.push(i);
+    else if(pages[pages.length-1]!=='...') pages.push('...');
+  }
+  el.innerHTML = [
+    `<button ${btnStyle(false)} onclick="cambiarPagAlumnas(${paginaAlumnas-1})" ${paginaAlumnas===1?'disabled':''}>←</button>`,
+    ...pages.map(p => p==='...'
+      ? `<span style="padding:0 4px;color:var(--gray)">…</span>`
+      : `<button ${btnStyle(p===paginaAlumnas)} onclick="cambiarPagAlumnas(${p})">${p}</button>`),
+    `<button ${btnStyle(false)} onclick="cambiarPagAlumnas(${paginaAlumnas+1})" ${paginaAlumnas===totalPags?'disabled':''}>→</button>`
+  ].join('');
+}
+function cambiarPagAlumnas(p){
+  const totalPags = Math.ceil(alumnasFiltradas.length / POR_PAGINA);
+  if(p<1||p>totalPags) return;
+  paginaAlumnas = p;
+  renderAlumnas();
+  document.getElementById('sec-alumnas').scrollIntoView({behavior:'smooth',block:'start'});
 }
 let planesCache = [];
 let comprasAlumnaActual = [];
