@@ -507,25 +507,40 @@ app.post('/importar-alumnas', async (req, res) => {
     const rut        = (a.rut     || '').replace(/\./g, '').trim();
 
     try {
-      const { data: authData, error: authError } = await sb.auth.admin.createUser({
-        email,
-        password: contrasena,
-        email_confirm: true,
-        user_metadata: { nombre }
+      // Llamada directa a la API REST de Supabase Auth para evitar conflictos
+      // de estado interno del cliente JS cuando se combina con verificarJWT()
+      const authResp = await fetch(`${process.env.SUPABASE_URL}/auth/v1/admin/users`, {
+        method:  'POST',
+        headers: {
+          'apikey':        process.env.SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+          'Content-Type':  'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          password:      contrasena,
+          email_confirm: true,
+          user_metadata: { nombre }
+        })
       });
 
-      if (authError) {
-        const yaExiste = authError.message?.toLowerCase().includes('already') || authError.status === 422;
+      const authJson = await authResp.json();
+
+      if (!authResp.ok) {
+        const msg = authJson?.msg || authJson?.message || authJson?.error_description || JSON.stringify(authJson);
+        const yaExiste = authResp.status === 422 || msg?.toLowerCase().includes('already');
         if (yaExiste) {
           reporte.push({ nombre, email, contrasena: '', resultado: 'saltada', detalle: 'Email ya registrado' });
           saltadas++;
         } else {
-          console.error(`[importar-alumnas] createUser error para ${email}:`, JSON.stringify(authError));
-          reporte.push({ nombre, email, contrasena: '', resultado: 'error', detalle: authError.message || JSON.stringify(authError) });
+          console.error(`[importar-alumnas] createUser error para ${email}: HTTP ${authResp.status}`, msg);
+          reporte.push({ nombre, email, contrasena: '', resultado: 'error', detalle: `HTTP ${authResp.status}: ${msg}` });
           errores++;
         }
         continue;
       }
+
+      const authData = { user: authJson };
 
       const { error: upsertError } = await sb.from('usuarios').upsert({
         id:               authData.user.id,
