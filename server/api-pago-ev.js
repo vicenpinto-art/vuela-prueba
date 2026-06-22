@@ -518,7 +518,8 @@ app.post('/importar-alumnas', async (req, res) => {
           reporte.push({ nombre, email, contrasena: '', resultado: 'saltada', detalle: 'Email ya registrado' });
           saltadas++;
         } else {
-          reporte.push({ nombre, email, contrasena: '', resultado: 'error', detalle: authError.message });
+          console.error(`[importar-alumnas] createUser error para ${email}:`, JSON.stringify(authError));
+          reporte.push({ nombre, email, contrasena: '', resultado: 'error', detalle: authError.message || JSON.stringify(authError) });
           errores++;
         }
         continue;
