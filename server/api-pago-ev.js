@@ -166,6 +166,20 @@ app.post('/crear-preferencia', limiterPreferencia, async (req, res) => {
   const plan = planesDB.find(p => p.id === plan_id);
   if (!plan) return res.status(404).json({ error: 'Plan no encontrado' });
 
+  // Bloquear compra duplicada de clase de prueba
+  if (plan.tipo === 'clase_prueba') {
+    const { data: yaComprada } = await sb
+      .from('compras')
+      .select('id')
+      .eq('alumna_id', usuario_id)
+      .eq('plan_id', plan_id)
+      .neq('estado', 'vencido')
+      .maybeSingle();
+    if (yaComprada) {
+      return res.status(400).json({ error: 'Ya adquiriste esta clase de prueba anteriormente.' });
+    }
+  }
+
   const planMatricula = planesDB.find(p => p.tipo === 'matricula');
   const planAddon     = planesDB.find(p => p.tipo === 'addon_gym');
 

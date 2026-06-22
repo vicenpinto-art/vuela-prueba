@@ -740,7 +740,7 @@
           <ul class="plan-features">
             ${features.map(f => `<li class="${f.nota ? 'nota' : ''}">${f.texto}</li>`).join('')}
           </ul>
-          <button class="btn-comprar" onclick="onComprar('${plan.id}')">
+          <button class="btn-comprar" data-plan-id="${plan.id}" onclick="onComprar('${plan.id}')">
             Comprar →
           </button>
         </div>
@@ -810,6 +810,12 @@
     incluyeAddon    = false;
 
     if (!planSeleccionado) return;
+
+    // Bloquear compra duplicada de clase de prueba en el cliente
+    if (planSeleccionado.tipo === 'clase_prueba' && plansPruebaYaComprados.has(planSeleccionado.id)) {
+      alert('Ya adquiriste esta clase de prueba anteriormente. Puedes verla en "Mi cuenta".');
+      return;
+    }
 
     // Cargar datos del usuario
     const { data: u } = await sb
@@ -954,12 +960,39 @@
     });
   });
 
+  // plan_ids de clase_prueba ya compradas por la usuaria actual
+  let plansPruebaYaComprados = new Set();
+
+  function actualizarBotonesPrueba() {
+    plansPruebaYaComprados.forEach(planId => {
+      const btn = document.querySelector(`button[data-plan-id="${planId}"]`);
+      if (!btn) return;
+      btn.textContent    = 'Ya adquirida ✓';
+      btn.disabled       = true;
+      btn.style.opacity  = '0.5';
+      btn.style.cursor   = 'default';
+      btn.onclick        = null;
+    });
+  }
+
   // ── SESIÓN ────────────────────────────────────────────────────
   async function verificarSesion() {
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
       document.getElementById('nav-login').style.display = 'none';
       document.getElementById('nav-cuenta').style.display = 'block';
+
+      // Cargar clases de prueba ya compradas para marcarlas en la UI
+      const { data: cp } = await sb
+        .from('compras')
+        .select('plan_id')
+        .eq('alumna_id', session.user.id)
+        .eq('clase_prueba', true)
+        .neq('estado', 'vencido');
+      if (cp) {
+        cp.forEach(c => plansPruebaYaComprados.add(c.plan_id));
+        actualizarBotonesPrueba();
+      }
     }
   }
 
