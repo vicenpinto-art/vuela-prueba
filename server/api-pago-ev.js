@@ -974,6 +974,34 @@ process.on('unhandledRejection', (reason) => {
   console.error('Promesa rechazada sin manejar:', reason);
 });
 
+// ── RECUPERACIÓN DE CONTRASEÑA ────────────────────────────────
+app.post('/enviar-recuperacion', async (req, res) => {
+  try {
+    await verificarAdmin(req);
+  } catch (e) {
+    return res.status(401).json({ error: 'No autorizado' });
+  }
+
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email requerido' });
+
+  const resp = await fetch(`${process.env.SUPABASE_URL}/auth/v1/recover`, {
+    method: 'POST',
+    headers: {
+      'apikey':       process.env.SUPABASE_SERVICE_KEY,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email })
+  });
+
+  if (!resp.ok) {
+    const msg = await resp.text();
+    return res.status(500).json({ error: `Supabase error: ${msg}` });
+  }
+
+  res.json({ ok: true });
+});
+
 process.on('uncaughtException', (err) => {
   console.error('Excepción no capturada:', err);
   process.exit(1);

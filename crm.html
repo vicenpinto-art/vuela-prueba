@@ -154,6 +154,24 @@
     </div>
   </div>
 
+  <!-- ── RECUPERACIÓN DE CONTRASEÑA ── -->
+  <div class="card" style="margin-bottom:20px">
+    <h2>Recuperar contraseña</h2>
+    <p class="subtitle">Busca una alumna y envíale un correo para que pueda crear una nueva contraseña.</p>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <input id="rec-buscar" type="text" placeholder="Nombre o email…" oninput="buscarAlumnaRec()" autocomplete="off"
+        style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;outline:none">
+    </div>
+    <div id="rec-resultados" style="display:none">
+      <div class="tabla-wrap">
+        <table>
+          <thead><tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th></th></tr></thead>
+          <tbody id="rec-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- ── SEPARADOR ── -->
   <div style="border-top:2px solid var(--border);margin:8px 0 28px"></div>
 
@@ -628,6 +646,52 @@
     a.href = URL.createObjectURL(blob);
     a.download = nombre;
     a.click();
+  }
+
+  // ── RECUPERACIÓN DE CONTRASEÑA ──────────────────────────────
+  let recTimer = null;
+  async function buscarAlumnaRec() {
+    clearTimeout(recTimer);
+    const q = document.getElementById('rec-buscar').value.trim();
+    const cont = document.getElementById('rec-resultados');
+    if (q.length < 2) { cont.style.display = 'none'; return; }
+    recTimer = setTimeout(async () => {
+      const isEmail = q.includes('@');
+      let query = sb.from('usuarios').select('id,nombre,apellido,email,telefono').eq('rol','alumna').limit(20);
+      if (isEmail) query = query.ilike('email', `%${q}%`);
+      else query = query.ilike('nombre', `%${q}%`);
+      const { data } = await query;
+      if (!data?.length) {
+        document.getElementById('rec-tbody').innerHTML = `<tr><td colspan="4" style="color:var(--gray);text-align:center;padding:16px">Sin resultados</td></tr>`;
+      } else {
+        document.getElementById('rec-tbody').innerHTML = data.map(a => `
+          <tr>
+            <td>${a.nombre || ''} ${a.apellido || ''}</td>
+            <td style="color:var(--gray)">${a.email}</td>
+            <td style="color:var(--gray)">${a.telefono || '—'}</td>
+            <td><button class="btn btn-secondary" style="padding:6px 14px;font-size:12px" onclick="enviarRecuperacion('${a.email}',this)">Enviar correo</button></td>
+          </tr>`).join('');
+      }
+      cont.style.display = 'block';
+    }, 300);
+  }
+
+  async function enviarRecuperacion(email, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Enviando…';
+    const resp = await fetch(`${SERVER_URL}/enviar-recuperacion`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
+      body: JSON.stringify({ email })
+    });
+    if (resp.ok) {
+      btn.textContent = '✓ Enviado';
+      btn.style.color = '#16a34a';
+    } else {
+      btn.textContent = 'Error';
+      btn.style.color = 'var(--coral)';
+      btn.disabled = false;
+    }
   }
 
   async function descargarAlumnas() {
