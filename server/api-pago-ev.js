@@ -583,6 +583,97 @@ app.post('/importar-alumnas', async (req, res) => {
   res.json({ creadas, saltadas, errores, reporte });
 });
 
+// ── DASHBOARD STATS ──────────────────────────────────────────
+app.get('/dashboard-stats', async (req, res) => {
+  const userAuth = await verificarJWT(req);
+  if (!userAuth || userAuth.email !== process.env.ADMIN_EMAIL)
+    return res.status(403).json({ error: 'No autorizado' });
+
+  const hoy       = new Date().toISOString().split('T')[0];
+  const en14dias  = new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0];
+  const mesActual = (new Date().getMonth() + 1).toString().padStart(2, '0');
+
+  const [pagosRes, comprasActRes, renovRes, expComprasRes, usuariosRes] = await Promise.all([
+    sb.from('pagos_historico').select('fecha_pago,monto,plan_nombre'),
+    sb.from('compras').select('alumna_id').eq('estado','activo').gte('fecha_fin', hoy),
+    sb.from('compras').select('alumna_id,fecha_fin,planes(nombre)')
+      .eq('estado','activo').gte('fecha_fin', hoy).lte('fecha_fin', en14dias).order('fecha_fin'),
+    sb.from('compras').select('alumna_id,fecha_fin')
+      .lt('fecha_fin', hoy).order('fecha_fin', { ascending: false }).limit(500),
+    sb.from('usuarios').select('id,nombre,apellido,email,estado_boxmagic,fecha_nacimiento')
+      .eq('rol','alumna').limit(10000),
+  ]);
+
+  const pagos    = pagosRes.data    || [];
+  const comprasAct  = comprasActRes.data || [];
+  const renovRaw    = renovRes.data     || [];
+  const expCompras  = expComprasRes.data|| [];
+  const usuarios    = usuariosRes.data  || [];
+
+  const usuarioMap    = new Map(usuarios.map(u => [u.id, u]));
+  const conPlanActivo = new Set(comprasAct.map(c => c.alumna_id));
+
+  // KPIs
+  const totalIngresos   = pagos.reduce((s, p) => s + (Number(p.monto) || 0), 0);
+  const clientesActivos = conPlanActivo.size;
+  const totalMembresias = pagos.length;
+
+  // Ventas mensuales
+  const porMes = {};
+  pagos.forEach(p => {
+    if (!p.fecha_pago) return;
+    const key = p.fecha_pago.slice(0, 7);
+    if (!porMes[key]) porMes[key] = { ingresos: 0, ventas: 0 };
+    porMes[key].ingresos += Number(p.monto) || 0;
+    porMes[key].ventas++;
+  });
+  const ventasMensuales = Object.entries(porMes).sort(([a],[b]) => a.localeCompare(b))
+    .map(([mes, d]) => ({ mes, ...d }));
+
+  // Estado BoxMagic
+  const porEstado = {};
+  usuarios.forEach(u => {
+    const est = u.estado_boxmagic || 'Sin datos';
+    porEstado[est] = (porEstado[est] || 0) + 1;
+  });
+
+  // Top 10 planes
+  const porPlan = {};
+  pagos.forEach(p => {
+    const key = p.plan_nombre || 'Desconocido';
+    if (!porPlan[key]) porPlan[key] = { ventas: 0, ingresos: 0 };
+    porPlan[key].ventas++;
+    porPlan[key].ingresos += Number(p.monto) || 0;
+  });
+  const top10 = Object.entries(porPlan).sort(([,a],[,b]) => b.ventas - a.ventas)
+    .slice(0, 10).map(([plan, d]) => ({ plan, ...d }));
+
+  // Renovaciones próximas
+  const renovaciones = renovRaw.map(r => {
+    const u = usuarioMap.get(r.alumna_id) || {};
+    return { nombre: u.nombre||'—', apellido: u.apellido||'', email: u.email||'', plan: r.planes?.nombre||'—', fecha_fin: r.fecha_fin };
+  });
+
+  // Por recuperar (tuvieron plan, ya no)
+  const seenIds = new Set();
+  const porRecuperar = [];
+  for (const c of expCompras) {
+    if (conPlanActivo.has(c.alumna_id) || seenIds.has(c.alumna_id)) continue;
+    seenIds.add(c.alumna_id);
+    const u = usuarioMap.get(c.alumna_id);
+    if (u) porRecuperar.push({ nombre: u.nombre, apellido: u.apellido, email: u.email, ultima_compra: c.fecha_fin });
+    if (porRecuperar.length >= 20) break;
+  }
+
+  // Cumpleaños del mes
+  const cumpleanos = usuarios
+    .filter(u => u.fecha_nacimiento?.slice(5, 7) === mesActual)
+    .map(u => ({ nombre: u.nombre, apellido: u.apellido, fecha: u.fecha_nacimiento }))
+    .sort((a, b) => parseInt(a.fecha?.slice(8)) - parseInt(b.fecha?.slice(8)));
+
+  res.json({ kpis: { totalIngresos, clientesActivos, totalMembresias }, ventasMensuales, porEstado, top10, renovaciones, porRecuperar, cumpleanos });
+});
+
 // ── IMPORTAR PAGOS HISTÓRICOS BOXMAGIC ───────────────────────
 const PLAN_MAP = {
   // VUELA
