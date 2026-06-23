@@ -321,16 +321,12 @@
     <!-- ASISTENCIA -->
     <div class="section" id="sec-asistencia">
       <div class="section-title">Asistencia</div>
-      <div class="section-sub">Selecciona una clase para ver la lista. Los toggles solo están activos en tus propias clases.</div>
-      <div class="asis-layout">
-        <div>
-          <div id="asis-lista-clases"><div class="sk" style="height:80px;margin-bottom:8px"></div><div class="sk" style="height:80px;margin-bottom:8px"></div><div class="sk" style="height:80px"></div></div>
-        </div>
-        <div id="asis-panel-right">
-          <div style="background:#fff;border-radius:16px;padding:40px;text-align:center;color:var(--gray);border:1px solid var(--border)">
-            <div style="font-size:36px;margin-bottom:12px">👈</div>
-            <p style="font-size:14px">Selecciona una clase</p>
-          </div>
+      <div class="section-sub">Selecciona una clase para ver y registrar la asistencia.</div>
+      <div id="asis-lista-clases"><div class="sk" style="height:80px;margin-bottom:8px"></div><div class="sk" style="height:80px;margin-bottom:8px"></div><div class="sk" style="height:80px"></div></div>
+      <div id="asis-panel-right" style="margin-top:16px">
+        <div style="border:1.5px dashed var(--border);border-radius:16px;padding:28px;text-align:center;color:var(--gray)">
+          <div style="font-size:28px;margin-bottom:8px">☝️</div>
+          <p style="font-size:13px;font-weight:500">Selecciona una clase para ver la lista de alumnas</p>
         </div>
       </div>
     </div>
@@ -1006,42 +1002,56 @@
       return `
         <div class="clase-chip${asistenciaClaseSelId === c.id ? ' sel' : ''}" onclick="seleccionarClaseAsistencia('${c.id}')">
           <div class="chip-hora">${horaStr(c.fecha_hora)}</div>
-          <div class="chip-nombre">${c.nombre}${esMia ? ' <span style="font-size:10px;color:var(--coral);font-weight:700">✓ Mi clase</span>' : ''}</div>
+          <div class="chip-nombre" style="display:flex;align-items:center;gap:4px">${c.nombre}${planBadge(c)}${esMia ? ' <span style="font-size:10px;color:var(--coral);font-weight:700">✓</span>' : ''}</div>
           <div class="chip-meta">👩‍🏫 ${c.profesora}</div>
         </div>`;
     };
 
-    // Agrupar por día (hora local de Santiago)
-    const porDia = {}; const diaLabels = {};
-    clasesAsistencia.forEach(c => {
-      const key = new Date(c.fecha_hora).toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
-      if (!porDia[key]) {
-        porDia[key] = [];
-        const f = new Date(c.fecha_hora);
-        diaLabels[key] = f.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Santiago' });
-      }
-      porDia[key].push(c);
-    });
+    const acordeonGrupo = (lista, prefijo) => {
+      if (!lista.length) return '<p style="font-size:12px;color:var(--gray);padding:6px 0">Sin clases.</p>';
+      const porDia = {}; const diaLabels = {};
+      lista.forEach(c => {
+        const key = new Date(c.fecha_hora).toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
+        if (!porDia[key]) {
+          porDia[key] = [];
+          diaLabels[key] = new Date(c.fecha_hora).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Santiago' });
+        }
+        porDia[key].push(c);
+      });
+      return Object.keys(porDia).sort().map((key, idx) => {
+        const id   = prefijo + key.replace(/-/g, '');
+        const open = idx === 0;
+        const n    = porDia[key].length;
+        return `
+          <button id="dia-btn-${id}" class="dia-toggle-btn${open ? ' open' : ''}" onclick="toggleDiaClases('${id}')">
+            <span class="dia-toggle-label">${diaLabels[key].charAt(0).toUpperCase() + diaLabels[key].slice(1)}</span>
+            <span class="dia-toggle-meta">
+              <span class="dia-toggle-count">${n} clase${n !== 1 ? 's' : ''}</span>
+              <span class="dia-toggle-arrow">▼</span>
+            </span>
+          </button>
+          <div id="dia-list-${id}" class="dia-clases-list${open ? ' open' : ''}">
+            ${porDia[key].map(chipHtml).join('')}
+          </div>`;
+      }).join('');
+    };
 
-    const dias = Object.keys(porDia).sort();
-    cont.innerHTML = dias.map((key, idx) => {
-      const id   = 'as' + key.replace(/-/g, '');
-      const open = idx === 0;
-      const total = porDia[key].length;
-      const mias  = porDia[key].filter(c => esMiClase(c.profesora)).length;
-      const meta  = mias ? `${total} clase${total !== 1 ? 's' : ''} · ${mias} mía${mias !== 1 ? 's' : ''}` : `${total} clase${total !== 1 ? 's' : ''}`;
-      return `
-        <button id="dia-btn-${id}" class="dia-toggle-btn${open ? ' open' : ''}" onclick="toggleDiaClases('${id}')">
-          <span class="dia-toggle-label">${diaLabels[key].charAt(0).toUpperCase() + diaLabels[key].slice(1)}</span>
-          <span class="dia-toggle-meta">
-            <span class="dia-toggle-count">${meta}</span>
-            <span class="dia-toggle-arrow">▼</span>
-          </span>
-        </button>
-        <div id="dia-list-${id}" class="dia-clases-list${open ? ' open' : ''}">
-          ${porDia[key].map(chipHtml).join('')}
-        </div>`;
-    }).join('');
+    const planes = clasesAsistencia.filter(c => !c.nombre?.startsWith('Gym '));
+    const gym    = clasesAsistencia.filter(c =>  c.nombre?.startsWith('Gym '));
+
+    cont.innerHTML = `
+      <div class="${planes.length && gym.length ? 'clases-2col' : ''}" style="align-items:start">
+        ${planes.length ? `
+          <div>
+            <div class="grupo-header" style="color:var(--coral)">Clases de planes</div>
+            ${acordeonGrupo(planes, 'ap')}
+          </div>` : ''}
+        ${gym.length ? `
+          <div>
+            <div class="grupo-header" style="color:#007a82">Gym</div>
+            ${acordeonGrupo(gym, 'ag')}
+          </div>` : ''}
+      </div>`;
   }
 
   async function seleccionarClaseAsistencia(claseId) {
