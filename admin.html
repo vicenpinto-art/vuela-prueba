@@ -6,6 +6,7 @@
   <title>Panel Admin — Espacio Vuela</title>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script src="nav.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -269,6 +270,7 @@
     <div class="sidebar-item" data-sec="ingresos"><span class="sidebar-icon">💰</span> Ingresos</div>
     <div class="sidebar-item" data-sec="perfil"><span class="sidebar-icon">👤</span> Mi Perfil</div>
     <a href="calendario.html" style="text-decoration:none"><div class="sidebar-item"><span class="sidebar-icon">📆</span> Calendario</div></a>
+    <div class="sidebar-item" data-sec="estadisticas"><span class="sidebar-icon">📊</span> Estadísticas</div>
     <a href="crm.html" style="text-decoration:none"><div class="sidebar-item"><span class="sidebar-icon">🗃️</span> Base de Datos</div></a>
   </aside>
 
@@ -289,6 +291,7 @@
     <div class="admin-mobile-nav-item" onclick="navegarMobile('eliminar-usuario')">🗑️ Eliminar usuaria</div>
     <div class="admin-mobile-nav-item" onclick="navegarMobile('ingresos')">💰 Ingresos</div>
     <div class="admin-mobile-nav-item" onclick="navegarMobile('perfil')">👤 Mi Perfil</div>
+    <div class="admin-mobile-nav-item" onclick="navegarMobile('estadisticas')">📊 Estadísticas</div>
     <a href="crm.html" style="text-decoration:none"><div class="admin-mobile-nav-item">🗃️ Base de Datos</div></a>
   </div>
 
@@ -517,6 +520,75 @@
       <div style="margin-bottom:16px"><input class="search-input" placeholder="Buscar por nombre o correo..." id="roles-search" oninput="filtrarRoles()"></div>
       <div class="card">
         <div id="tabla-roles"><div class="sk" style="height:60px;margin-bottom:8px"></div><div class="sk" style="height:60px"></div></div>
+      </div>
+    </div>
+
+    <!-- ESTADÍSTICAS -->
+    <div class="section" id="sec-estadisticas">
+      <div class="section-title">Estadísticas</div>
+      <div class="section-sub">Resumen histórico de ingresos y membresías.</div>
+
+      <div id="dash-loading-admin" style="text-align:center;padding:40px;color:var(--gray);font-size:14px">Cargando datos…</div>
+      <div id="dash-contenido-admin" style="display:none">
+
+        <!-- KPIs -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px" id="dash-kpis-admin"></div>
+
+        <!-- Gráfico de líneas -->
+        <div class="card" style="margin-bottom:16px;padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div style="font-size:14px;font-weight:700">Evolución de ventas mensuales</div>
+            <select id="dash-periodo" onchange="renderLineChartAdmin()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;cursor:pointer">
+              <option value="6m">Últimos 6 meses</option>
+              <option value="anio" selected>Este año</option>
+              <option value="12m">Últimos 12 meses</option>
+              <option value="todo">Todo el historial</option>
+            </select>
+          </div>
+          <canvas id="chart-linea-admin" height="110"></canvas>
+          <!-- Toggle año anterior -->
+          <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+            <label style="position:relative;display:inline-block;width:38px;height:22px;cursor:pointer">
+              <input type="checkbox" id="toggle-prev-anio" onchange="toggleAnioAnterior()" style="opacity:0;width:0;height:0">
+              <span id="toggle-track" style="position:absolute;inset:0;background:#ddd;border-radius:11px;transition:background .2s"></span>
+              <span id="toggle-thumb" style="position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></span>
+            </label>
+            <span style="font-size:13px;color:var(--gray)">Ver año anterior</span>
+            <span style="display:inline-block;width:24px;height:3px;background:#ff4e68;border-radius:2px;margin-left:4px"></span>
+          </div>
+        </div>
+
+        <!-- Gráfico barras + Top 10 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+          <div class="card" style="padding:20px">
+            <div style="font-size:14px;font-weight:700;margin-bottom:12px">Alumnas por estado (BoxMagic)</div>
+            <canvas id="chart-barras-admin" height="180"></canvas>
+          </div>
+          <div class="card" style="padding:20px">
+            <div style="font-size:14px;font-weight:700;margin-bottom:12px">Top 10 membresías más vendidas</div>
+            <div class="tabla-wrap">
+              <table class="tabla"><thead><tr><th>#</th><th>Plan</th><th>Ventas</th><th style="text-align:right">Ingresos</th></tr></thead>
+              <tbody id="dash-top10-admin"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Widgets -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+          <div class="card" style="padding:16px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:10px">🔔 Próximas renovaciones (14 días)</div>
+            <div id="dash-renov-admin" style="font-size:12px;max-height:200px;overflow-y:auto"></div>
+          </div>
+          <div class="card" style="padding:16px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:10px">📞 Por recuperar</div>
+            <div id="dash-recup-admin" style="font-size:12px;max-height:200px;overflow-y:auto"></div>
+          </div>
+          <div class="card" style="padding:16px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:10px">🎂 Cumpleaños del mes</div>
+            <div id="dash-cumple-admin" style="font-size:12px;max-height:200px;overflow-y:auto"></div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -825,6 +897,7 @@ document.querySelectorAll('.sidebar-item').forEach(item=>{
     if(sec==='ingresos'){iniciarIngresos();}
     if(sec==='roles' && todosLosUsuarios.length===0) cargarRoles();
     if(sec==='perfil') cargarPerfilAdmin();
+    if(sec==='estadisticas') cargarDashboardAdmin();
   });
 });
 
@@ -1807,6 +1880,7 @@ function navegarMobile(sec) {
   if(sec==='ingresos') iniciarIngresos();
   if(sec==='roles' && todosLosUsuarios.length===0) cargarRoles();
   if(sec==='perfil') cargarPerfilAdmin();
+  if(sec==='estadisticas') cargarDashboardAdmin();
 
   // Actualizar menú móvil
   document.querySelectorAll('.admin-mobile-nav-item').forEach(el => el.classList.remove('active'));
@@ -2310,6 +2384,198 @@ async function cargarIngresos(){
 
 function formatCLP(n){
   return '$'+Math.round(n).toLocaleString('es-CL');
+}
+
+// ── ESTADÍSTICAS / DASHBOARD ──────────────────────────────────
+let dashDataAdmin   = null;
+let chartLineaAdmin = null;
+let chartBarrasAdmin= null;
+
+async function cargarDashboardAdmin(force = false) {
+  if (dashDataAdmin && !force) return;
+  document.getElementById('dash-loading-admin').style.display   = 'block';
+  document.getElementById('dash-contenido-admin').style.display = 'none';
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const resp = await fetch('https://espacio-vuela-pagos.onrender.com/dashboard-stats', {
+      headers: { 'Authorization': `Bearer ${session.access_token}` }
+    });
+    if (!resp.ok) throw new Error();
+    dashDataAdmin = await resp.json();
+    renderDashboardAdmin();
+  } catch {
+    document.getElementById('dash-loading-admin').textContent = '⚠️ Error al cargar. Intenta de nuevo.';
+  }
+}
+
+function renderDashboardAdmin() {
+  document.getElementById('dash-loading-admin').style.display   = 'none';
+  document.getElementById('dash-contenido-admin').style.display = 'block';
+  const { kpis, top10, renovaciones, porRecuperar, cumpleanos } = dashDataAdmin;
+
+  // KPIs
+  document.getElementById('dash-kpis-admin').innerHTML = `
+    <div class="card" style="padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:800;color:#22c55e">${formatCLP(kpis.totalIngresos)}</div>
+      <div style="font-size:12px;color:var(--gray);margin-top:4px">Ingresos históricos</div>
+    </div>
+    <div class="card" style="padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:800;color:#3b82f6">${kpis.clientesActivos.toLocaleString('es-CL')}</div>
+      <div style="font-size:12px;color:var(--gray);margin-top:4px">Clientes activos ahora</div>
+    </div>
+    <div class="card" style="padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:800;color:#f59e0b">${kpis.totalMembresias.toLocaleString('es-CL')}</div>
+      <div style="font-size:12px;color:var(--gray);margin-top:4px">Membresías vendidas</div>
+    </div>
+  `;
+
+  renderLineChartAdmin();
+  renderBarChartAdmin();
+
+  // Top 10
+  document.getElementById('dash-top10-admin').innerHTML = top10.map((t,i) => `
+    <tr>
+      <td style="font-weight:700;color:var(--gray);width:28px">${i+1}</td>
+      <td style="font-weight:600;font-size:12px">${t.plan}</td>
+      <td style="text-align:center;font-weight:700;color:var(--coral)">${t.ventas.toLocaleString('es-CL')}</td>
+      <td style="text-align:right;font-size:12px;color:var(--gray)">${formatCLP(t.ingresos)}</td>
+    </tr>`).join('');
+
+  const row = s => `<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">${s}</div>`;
+  const vacio = t => `<div style="color:var(--gray);font-size:12px">${t}</div>`;
+
+  document.getElementById('dash-renov-admin').innerHTML = renovaciones.length
+    ? renovaciones.map(r => row(`<strong>${r.nombre} ${r.apellido}</strong><br><span style="color:var(--gray)">${r.plan} · ${r.fecha_fin}</span>`)).join('')
+    : vacio('Sin renovaciones próximas.');
+
+  document.getElementById('dash-recup-admin').innerHTML = porRecuperar.length
+    ? porRecuperar.slice(0,10).map(r => row(`<strong>${r.nombre} ${r.apellido||''}</strong><br><span style="color:var(--gray)">${r.email}</span>`)).join('')
+    : vacio('Sin clientes por recuperar.');
+
+  document.getElementById('dash-cumple-admin').innerHTML = cumpleanos.length
+    ? cumpleanos.map(c => row(`<strong>${c.nombre} ${c.apellido||''}</strong><br><span style="color:var(--gray)">🎂 ${c.fecha?.slice(5).replace('-','/')}</span>`)).join('')
+    : vacio('Sin cumpleaños este mes.');
+}
+
+function getPeriodData() {
+  const periodo = document.getElementById('dash-periodo').value;
+  const vm = dashDataAdmin.ventasMensuales;
+  const dataMap = new Map(vm.map(d => [d.mes, d]));
+  const now = new Date();
+  const cy = now.getFullYear(), cm = now.getMonth();
+  let months = [];
+
+  if (periodo === '6m') {
+    for (let i = 5; i >= 0; i--) { const d = new Date(cy, cm-i, 1); months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); }
+  } else if (periodo === 'anio') {
+    for (let m = 1; m <= cm+1; m++) months.push(`${cy}-${String(m).padStart(2,'0')}`);
+  } else if (periodo === '12m') {
+    for (let i = 11; i >= 0; i--) { const d = new Date(cy, cm-i, 1); months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); }
+  } else {
+    months = vm.map(d => d.mes);
+  }
+
+  const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const labels  = months.map(m => { const [y,mo] = m.split('-'); return `${MESES[+mo-1]} ${periodo==='todo'?y.slice(2):'`'+y.slice(2)}`; });
+  const current = months.map(m => dataMap.get(m)?.ingresos || 0);
+  const prevMos = months.map(m => { const [y,mo] = m.split('-'); return `${+y-1}-${mo}`; });
+  const prev    = prevMos.map(m => dataMap.get(m)?.ingresos || 0);
+  return { labels, current, prev };
+}
+
+function renderLineChartAdmin() {
+  if (!dashDataAdmin) return;
+  const { labels, current, prev } = getPeriodData();
+  const prevVisible = document.getElementById('toggle-prev-anio')?.checked || false;
+  if (chartLineaAdmin) chartLineaAdmin.destroy();
+  chartLineaAdmin = new Chart(document.getElementById('chart-linea-admin'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Año actual',
+          data: current,
+          borderColor: '#8b5cf6',
+          borderWidth: 2,
+          tension: 0.35,
+          fill: false,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#8b5cf6',
+        },
+        {
+          label: 'Año anterior',
+          data: prev,
+          borderColor: '#ff4e68',
+          borderWidth: 1.5,
+          tension: 0.35,
+          fill: false,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          pointBackgroundColor: '#ff4e68',
+          borderDash: [4, 3],
+          hidden: !prevVisible,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#111',
+          titleColor: '#fff',
+          bodyColor: '#ccc',
+          padding: 12,
+          cornerRadius: 8,
+          callbacks: {
+            label: item => {
+              const tag = item.datasetIndex === 0 ? '● Año actual   ' : '● Año anterior ';
+              return `${tag}${formatCLP(item.raw)}`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: { ticks: { callback: v => formatCLP(v), font: { size: 10 } }, grid: { color: 'rgba(0,0,0,.05)' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function toggleAnioAnterior() {
+  const on = document.getElementById('toggle-prev-anio').checked;
+  document.getElementById('toggle-track').style.background = on ? '#8b5cf6' : '#ddd';
+  document.getElementById('toggle-thumb').style.left = on ? '19px' : '3px';
+  if (chartLineaAdmin) {
+    chartLineaAdmin.data.datasets[1].hidden = !on;
+    chartLineaAdmin.update();
+  }
+}
+
+function renderBarChartAdmin() {
+  if (!dashDataAdmin) return;
+  const entries = Object.entries(dashDataAdmin.porEstado).sort(([,a],[,b]) => b-a).slice(0,8);
+  const colors  = ['#8b5cf6','#3b82f6','#22c55e','#f59e0b','#ff4e68','#ec4899','#06b6d4','#84cc16'];
+  if (chartBarrasAdmin) chartBarrasAdmin.destroy();
+  chartBarrasAdmin = new Chart(document.getElementById('chart-barras-admin'), {
+    type: 'bar',
+    data: {
+      labels: entries.map(([k]) => k),
+      datasets: [{ data: entries.map(([,v]) => v), backgroundColor: colors.slice(0,entries.length), borderRadius: 6 }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { font: { size: 10 }, maxRotation: 25 } },
+        y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,.05)' } }
+      }
+    }
+  });
 }
 
 // ── CERRAR SESIÓN ─────────────────────────────────────────────

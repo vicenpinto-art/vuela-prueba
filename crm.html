@@ -110,70 +110,19 @@
 <div class="container">
 
   <!-- ── DASHBOARD ── -->
-  <div class="card" style="margin-bottom:20px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+  <div class="card" style="margin-bottom:20px;background:#f0ebff;border:1.5px solid #e0d5ff">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:24px">📊</span>
       <div>
-        <h2>Dashboard</h2>
-        <p class="subtitle" style="margin-bottom:0">Resumen histórico · Espacio Vuela</p>
+        <div style="font-size:14px;font-weight:700">El Dashboard ahora está en el Panel Admin</div>
+        <div style="font-size:13px;color:var(--gray);margin-top:2px">Ve a <strong>Admin → Estadísticas</strong> para ver KPIs, gráficos y análisis de ventas.</div>
       </div>
-      <button class="btn btn-secondary" onclick="cargarDashboard(true)" id="dash-refresh" style="font-size:13px">↻ Actualizar</button>
-    </div>
-    <div id="dash-loading" style="text-align:center;padding:40px;color:var(--gray);font-size:14px">Cargando datos…</div>
-    <div id="dash-contenido" style="display:none">
-
-      <!-- KPIs -->
-      <div class="stats-grid" id="dash-kpis" style="margin-bottom:24px"></div>
-
-      <!-- Gráficos -->
-      <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:24px">
-        <div style="background:var(--bg);border-radius:12px;padding:16px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <div style="font-size:14px;font-weight:700">Evolución de ventas mensuales</div>
-            <select id="dash-anio" onchange="renderLineChart()" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:12px;background:#fff;cursor:pointer">
-              <option value="todos">Todos los años</option>
-              <option value="2023">2023</option>
-              <option value="2024">2024</option>
-              <option value="2025">2025</option>
-              <option value="2026">2026</option>
-            </select>
-          </div>
-          <canvas id="chart-linea"></canvas>
-        </div>
-        <div style="background:var(--bg);border-radius:12px;padding:16px">
-          <div style="font-size:14px;font-weight:700;margin-bottom:12px">Alumnas por estado (BoxMagic)</div>
-          <canvas id="chart-barras"></canvas>
-        </div>
-      </div>
-
-      <!-- Top 10 -->
-      <div style="margin-bottom:24px">
-        <div style="font-size:14px;font-weight:700;margin-bottom:12px">Top 10 membresías más vendidas</div>
-        <div class="tabla-wrap">
-          <table class="tabla">
-            <thead><tr><th>#</th><th>Plan</th><th>Ventas</th><th style="text-align:right">Ingresos totales</th></tr></thead>
-            <tbody id="dash-top10"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Widgets -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
-        <div style="background:var(--bg);border-radius:12px;padding:16px">
-          <div style="font-size:13px;font-weight:700;margin-bottom:10px">🔔 Próximas renovaciones (14 días)</div>
-          <div id="dash-renovaciones" style="font-size:12px;max-height:220px;overflow-y:auto"></div>
-        </div>
-        <div style="background:var(--bg);border-radius:12px;padding:16px">
-          <div style="font-size:13px;font-weight:700;margin-bottom:10px">📞 Por recuperar</div>
-          <div id="dash-recuperar" style="font-size:12px;max-height:220px;overflow-y:auto"></div>
-        </div>
-        <div style="background:var(--bg);border-radius:12px;padding:16px">
-          <div style="font-size:13px;font-weight:700;margin-bottom:10px">🎂 Cumpleaños del mes</div>
-          <div id="dash-cumpleanos" style="font-size:12px;max-height:220px;overflow-y:auto"></div>
-        </div>
-      </div>
-
+      <a href="admin.html" class="btn btn-secondary" style="margin-left:auto;font-size:13px;white-space:nowrap">Ir a Admin →</a>
     </div>
   </div>
+
+  <!-- ── DESCARGAS ── -->
+  <div class="card" style="margin-bottom:20px">
 
   <!-- ── DESCARGAS ── -->
   <div class="card" style="margin-bottom:20px">
@@ -374,7 +323,7 @@
 </div><!-- /container -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+
 <script>
   const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
@@ -397,116 +346,6 @@
     jwtToken = session.access_token;
     const { data: perfil } = await sb.from('usuarios').select('rol').eq('id', session.user.id).single();
     if (!perfil || perfil.rol !== 'admin') { window.location.href = 'mi-cuenta.html'; return; }
-    cargarDashboard();
-  }
-
-  // ── DASHBOARD ─────────────────────────────────────────────────
-  let dashData    = null;
-  let chartLinea  = null;
-  let chartBarras = null;
-
-  function formatCLP(n) {
-    if (n >= 1000000) return '$' + (n/1000000).toFixed(1).replace('.',',') + 'M';
-    if (n >= 1000)    return '$' + Math.round(n/1000).toLocaleString('es-CL') + 'K';
-    return '$' + Math.round(n).toLocaleString('es-CL');
-  }
-
-  async function cargarDashboard(force = false) {
-    if (dashData && !force) return;
-    document.getElementById('dash-loading').style.display   = 'block';
-    document.getElementById('dash-contenido').style.display = 'none';
-    document.getElementById('dash-refresh').disabled = true;
-    try {
-      const resp = await fetch(`${SERVER_URL}/dashboard-stats`, {
-        headers: { 'Authorization': `Bearer ${jwtToken}` }
-      });
-      if (!resp.ok) throw new Error('Error al cargar');
-      dashData = await resp.json();
-      renderDashboard();
-    } catch {
-      document.getElementById('dash-loading').textContent = '⚠️ Error al cargar el dashboard. Intenta de nuevo.';
-    } finally {
-      document.getElementById('dash-refresh').disabled = false;
-    }
-  }
-
-  function renderDashboard() {
-    document.getElementById('dash-loading').style.display   = 'none';
-    document.getElementById('dash-contenido').style.display = 'block';
-    const { kpis, top10, renovaciones, porRecuperar, cumpleanos } = dashData;
-
-    // KPIs
-    document.getElementById('dash-kpis').innerHTML = `
-      <div class="stat-box verde"><div class="num">${formatCLP(kpis.totalIngresos)}</div><div class="lbl">Ingresos históricos</div></div>
-      <div class="stat-box azul"><div class="num">${kpis.clientesActivos.toLocaleString('es-CL')}</div><div class="lbl">Clientes activos ahora</div></div>
-      <div class="stat-box naranja"><div class="num">${kpis.totalMembresias.toLocaleString('es-CL')}</div><div class="lbl">Membresías vendidas</div></div>
-    `;
-
-    renderLineChart();
-    renderBarChart();
-
-    // Top 10
-    document.getElementById('dash-top10').innerHTML = top10.map((t, i) => `
-      <tr>
-        <td style="font-weight:700;color:var(--gray);width:32px">${i+1}</td>
-        <td style="font-weight:600">${t.plan}</td>
-        <td style="text-align:center;font-weight:700;color:var(--coral)">${t.ventas.toLocaleString('es-CL')}</td>
-        <td style="text-align:right;color:var(--gray)">${formatCLP(t.ingresos)}</td>
-      </tr>
-    `).join('');
-
-    const itemStyle = 'padding:7px 0;border-bottom:1px solid var(--border)';
-    const sinDatos  = txt => `<div style="color:var(--gray);font-size:12px">${txt}</div>`;
-
-    // Renovaciones
-    document.getElementById('dash-renovaciones').innerHTML = renovaciones.length
-      ? renovaciones.map(r => `<div style="${itemStyle}"><div style="font-weight:600">${r.nombre} ${r.apellido}</div><div style="color:var(--gray)">${r.plan} · ${r.fecha_fin}</div></div>`).join('')
-      : sinDatos('Sin renovaciones próximas.');
-
-    // Por recuperar
-    document.getElementById('dash-recuperar').innerHTML = porRecuperar.length
-      ? porRecuperar.slice(0,10).map(r => `<div style="${itemStyle}"><div style="font-weight:600">${r.nombre} ${r.apellido||''}</div><div style="color:var(--gray)">${r.email}</div></div>`).join('')
-      : sinDatos('Sin clientes por recuperar.');
-
-    // Cumpleaños
-    document.getElementById('dash-cumpleanos').innerHTML = cumpleanos.length
-      ? cumpleanos.map(c => `<div style="${itemStyle}"><div style="font-weight:600">${c.nombre} ${c.apellido||''}</div><div style="color:var(--gray)">🎂 ${c.fecha?.slice(5).replace('-','/')}</div></div>`).join('')
-      : sinDatos('Sin cumpleaños este mes.');
-  }
-
-  function renderLineChart() {
-    if (!dashData) return;
-    const anio  = document.getElementById('dash-anio').value;
-    const datos = anio === 'todos'
-      ? dashData.ventasMensuales
-      : dashData.ventasMensuales.filter(d => d.mes.startsWith(anio));
-    const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    const labels   = datos.map(d => { const [y,m] = d.mes.split('-'); return `${MESES[+m-1]} ${y.slice(2)}`; });
-    const ingresos = datos.map(d => d.ingresos);
-    if (chartLinea) chartLinea.destroy();
-    chartLinea = new Chart(document.getElementById('chart-linea'), {
-      type: 'line',
-      data: { labels, datasets: [{ label: 'Ingresos', data: ingresos, borderColor: '#ff4e68', backgroundColor: 'rgba(255,78,104,0.08)', borderWidth: 2, tension: 0.4, fill: true, pointRadius: 3, pointHoverRadius: 5 }] },
-      options: { responsive: true, plugins: { legend: { display: false } }, scales: {
-        y: { ticks: { callback: v => formatCLP(v), font: { size: 10 } }, grid: { color: 'rgba(0,0,0,.05)' } },
-        x: { ticks: { font: { size: 10 } } }
-      }}
-    });
-  }
-
-  function renderBarChart() {
-    if (!dashData) return;
-    const entries = Object.entries(dashData.porEstado).sort(([,a],[,b]) => b-a).slice(0,8);
-    const colors  = ['#ff4e68','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16'];
-    if (chartBarras) chartBarras.destroy();
-    chartBarras = new Chart(document.getElementById('chart-barras'), {
-      type: 'bar',
-      data: { labels: entries.map(([k]) => k), datasets: [{ data: entries.map(([,v]) => v), backgroundColor: colors.slice(0, entries.length), borderRadius: 6 }] },
-      options: { responsive: true, plugins: { legend: { display: false } }, scales: {
-        x: { ticks: { font: { size: 10 }, maxRotation: 25 } },
-        y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,.05)' } }
-      }}
-    });
   }
 
   // ── COLUMNAS CSV BOXMAGIC (por posición) ──────────────────────
