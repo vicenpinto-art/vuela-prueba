@@ -1934,14 +1934,13 @@ function usarFechaRenovacion(fechaFin, nombrePlan){
 
 async function eliminarPlan(compraId){
   if(!confirm('¿Eliminar este plan? La alumna perderá acceso inmediatamente.')) return;
-  const {error:errInsc} = await sb.from('inscripciones').update({compra_id: null}).eq('compra_id', compraId);
-  if(errInsc) console.warn('Update inscripciones:', errInsc.message, errInsc.code, errInsc.details);
-  const {error} = await sb.from('compras').delete().eq('id', compraId);
-  if(error){
-    console.error('Delete compras:', error.message, error.code, error.details, error.hint);
-    toast('Error: '+error.message,'error');
-    return;
-  }
+  const {data:{session}} = await sb.auth.getSession();
+  const resp = await fetch(`${SERVER_URL}/eliminar-compra/${compraId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${session?.access_token}` }
+  });
+  const json = await resp.json();
+  if(!resp.ok){ toast('Error al eliminar plan: '+(json.error||resp.status),'error'); return; }
   toast('Plan eliminado ✓');
   cerrarModal('modal-asignar-plan');
   cargarAlumnas();

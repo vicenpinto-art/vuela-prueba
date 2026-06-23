@@ -692,6 +692,23 @@ app.post('/registrar-pago-manual', async (req, res) => {
   res.json({ ok: true });
 });
 
+// ── ELIMINAR COMPRA (ADMIN) ───────────────────────────────────
+app.delete('/eliminar-compra/:id', async (req, res) => {
+  const userAuth = await verificarAdmin(req);
+  if (!userAuth) return res.status(403).json({ error: 'No autorizado' });
+
+  const compraId = req.params.id;
+  if (!compraId) return res.status(400).json({ error: 'Falta id' });
+
+  // Desvincular inscripciones que referencian esta compra
+  await sb.from('inscripciones').update({ compra_id: null }).eq('compra_id', compraId);
+
+  const { error } = await sb.from('compras').delete().eq('id', compraId);
+  if (error) return res.status(409).json({ error: error.message, details: error.details, hint: error.hint });
+
+  res.json({ ok: true });
+});
+
 // ── DASHBOARD STATS ──────────────────────────────────────────
 app.get('/dashboard-stats', async (req, res) => {
   const userAuth = await verificarAdmin(req);
