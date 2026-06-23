@@ -2473,15 +2473,22 @@ function formatCLP(n){
 }
 
 // ── ESTADÍSTICAS / DASHBOARD ──────────────────────────────────
-// Obtiene el token de acceso refrescándolo si está vencido
+// Obtiene el token de acceso refrescándolo si está vencido o por vencer
 async function getAdminToken() {
-  let { data: { session } } = await sb.auth.getSession();
-  if (!session?.access_token) {
-    const { data: ref } = await sb.auth.refreshSession();
-    session = ref?.session;
+  try {
+    const sesRes = await sb.auth.getSession();
+    let session  = sesRes?.data?.session;
+    const expiraEn = session?.expires_at ? session.expires_at * 1000 - Date.now() : 0;
+    if (!session?.access_token || expiraEn < 120000) {
+      const ref = await sb.auth.refreshSession();
+      session = ref?.data?.session || session;
+    }
+    if (!session?.access_token) { window.location.href = 'login.html'; return null; }
+    return session.access_token;
+  } catch {
+    window.location.href = 'login.html';
+    return null;
   }
-  if (!session?.access_token) { window.location.href = 'login.html'; return null; }
-  return session.access_token;
 }
 
 let ingDetalleCompleto = [];

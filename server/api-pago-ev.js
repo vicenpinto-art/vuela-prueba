@@ -7,7 +7,17 @@ const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.set('trust proxy', 1);
-app.use(cors({ origin: process.env.CLIENT_URL || 'https://vuela-prueba.vicenpinto.workers.dev' }));
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'https://vuela-prueba.vicenpinto.workers.dev',
+  'https://vuela-prueba.pages.dev',
+  'https://espaciovuela.cl',
+  'https://www.espaciovuela.cl',
+].filter(Boolean);
+app.use(cors({
+  origin: (origin, cb) => cb(null, !origin || allowedOrigins.includes(origin) ? origin || true : false),
+  credentials: true,
+}));
 app.use(express.json());
 
 const limiterPreferencia = rateLimit({
@@ -57,6 +67,15 @@ const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_K
 
 // ── HEALTH CHECK ──────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ ok: true, servicio: 'Espacio Vuela Pagos' }));
+
+// ── DEBUG AUTH (temporal) ─────────────────────────────────────
+app.get('/debug-auth', async (req, res) => {
+  const origin = req.headers['origin'] || '(sin origin)';
+  const auth   = req.headers['authorization'] || '(sin token)';
+  const token  = auth.startsWith('Bearer ') ? auth.slice(7, 30) + '…' : '(vacío)';
+  const user   = await verificarJWT(req);
+  res.json({ origin, tokenInicio: token, userEmail: user?.email || null, ADMIN_EMAIL: process.env.ADMIN_EMAIL || '(no seteado)' });
+});
 
 // ── VERIFICAR JWT SUPABASE ────────────────────────────────────
 async function verificarJWT(req) {
