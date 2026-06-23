@@ -274,18 +274,19 @@
 
       <div class="card">
         <div class="card-header">
-          <div class="card-titulo">Próximas clases</div>
-          <a href="calendario.html" class="btn-primary" style="font-size:12px; padding:8px 14px;">+ Agendar</a>
+          <div class="card-titulo">Acciones rápidas</div>
         </div>
-        <div id="clases-contenido">
-          <div class="skeleton" style="height:60px; margin-bottom:10px; border-radius:12px;"></div>
-          <div class="skeleton" style="height:60px; border-radius:12px;"></div>
+        <div class="acciones-grid">
+          <a href="calendario.html" class="accion-btn"><span class="accion-icon">📅</span><span class="accion-label">Agendar clase</span></a>
+          <a href="planes.html" class="accion-btn"><span class="accion-icon">💳</span><span class="accion-label">Ver planes</span></a>
+          <a href="mis-clases.html" class="accion-btn"><span class="accion-icon">📋</span><span class="accion-label">Mis clases</span></a>
+          <a href="https://wa.me/56973841513" target="_blank" class="accion-btn"><span class="accion-icon">💬</span><span class="accion-label">WhatsApp</span></a>
         </div>
       </div>
 
       <div class="card" id="card-gym-booking" style="display:none">
         <a href="agendar.html" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:18px;background:linear-gradient(135deg,#007a82,#00b4c4);border-radius:14px;color:#fff;font-weight:700;font-size:15px;text-decoration:none;letter-spacing:.3px">
-          🏋️ Agenda tu hora en el gym
+          🏋️ Reserva tu hora de gym
         </a>
       </div>
     </div>
@@ -305,13 +306,12 @@
 
       <div class="card">
         <div class="card-header">
-          <div class="card-titulo">Acciones rápidas</div>
+          <div class="card-titulo">Próximas clases</div>
         </div>
-        <div class="acciones-grid">
-          <a href="calendario.html" class="accion-btn"><span class="accion-icon">📅</span><span class="accion-label">Agendar clase</span></a>
-          <a href="planes.html" class="accion-btn"><span class="accion-icon">💳</span><span class="accion-label">Ver planes</span></a>
-          <a href="mis-clases.html" class="accion-btn"><span class="accion-icon">📋</span><span class="accion-label">Mis clases</span></a>
-          <a href="https://wa.me/56973841513" target="_blank" class="accion-btn"><span class="accion-icon">💬</span><span class="accion-label">WhatsApp</span></a>
+        <a href="calendario.html" class="btn-primary btn-full" style="margin-bottom:14px;">Agenda tu clase →</a>
+        <div id="clases-contenido">
+          <div class="skeleton" style="height:60px; margin-bottom:10px; border-radius:12px;"></div>
+          <div class="skeleton" style="height:60px; border-radius:12px;"></div>
         </div>
       </div>
     </div>
@@ -838,8 +838,7 @@
     const contenedor = document.getElementById('clases-contenido');
     if (!inscripciones || inscripciones.length === 0) {
       contenedor.innerHTML = `
-        <div class="sin-clases"><span class="icon">📭</span>No tienes clases agendadas próximamente.</div>
-        <a href="agendar.html" class="btn-primary btn-full" style="margin-top:16px;">Agendar mi primera clase →</a>`;
+        <div class="sin-clases"><span class="icon">📭</span>No tienes clases agendadas próximamente.</div>`;
       return;
     }
     contenedor.innerHTML = inscripciones.map(ins => {
