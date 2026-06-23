@@ -434,8 +434,8 @@ function renderCalendario(anio, mes){
     num.textContent=d;
     cell.appendChild(num);
 
-    // Puntos de clases (máx 3)
-    if(clasesHoy.length>0){
+    // Puntos de clases (máx 3) — no mostrar en feriados
+    if(clasesHoy.length>0 && !esFeriado){
       const dotsWrap=document.createElement('div');
       dotsWrap.className='cal-dots';
       const max=Math.min(clasesHoy.length,3);
@@ -472,10 +472,12 @@ function mostrarDia(fechaStr){
 
   let html = `<div class="day-panel-header">
     <div class="day-fecha">${fechaLeg.charAt(0).toUpperCase()+fechaLeg.slice(1)}</div>
-    ${feriado?`<div class="feriado-banner">🎉 Feriado: ${feriado} — Las clases pueden tener menor asistencia</div>`:''}
+    ${feriado?`<div class="feriado-banner">🎉 Feriado: ${feriado}</div>`:''}
   </div>`;
 
-  if(clases.length===0){
+  if(feriado){
+    html += `<div class="sin-clases-dia">No hay clases este día por ser feriado.</div>`;
+  } else if(clases.length===0){
     html += `<div class="sin-clases-dia">No hay clases programadas para este día.</div>`;
   } else {
     html += `<div class="day-clases-lista">${clases.map(c=>renderClaseCard(c,feriado)).join('')}</div>`;

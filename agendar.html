@@ -325,6 +325,22 @@
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  // ── FERIADOS CHILE ────────────────────────────────────────────
+  const FERIADOS = {
+    '2026-01-01':'Año Nuevo','2026-04-03':'Viernes Santo','2026-04-04':'Sábado Santo',
+    '2026-05-01':'Día del Trabajo','2026-05-21':'Glorias Navales','2026-06-29':'San Pedro y San Pablo',
+    '2026-07-16':'Virgen del Carmen','2026-08-15':'Asunción de la Virgen',
+    '2026-09-18':'Independencia Nacional','2026-09-19':'Glorias del Ejército',
+    '2026-10-12':'Encuentro de Dos Mundos','2026-10-31':'Iglesias Evangélicas',
+    '2026-11-01':'Todos los Santos','2026-12-08':'Inmaculada Concepción','2026-12-25':'Navidad',
+    '2027-01-01':'Año Nuevo','2027-03-26':'Viernes Santo','2027-03-27':'Sábado Santo',
+    '2027-05-01':'Día del Trabajo','2027-05-21':'Glorias Navales','2027-06-28':'San Pedro y San Pablo',
+    '2027-07-16':'Virgen del Carmen','2027-08-15':'Asunción de la Virgen',
+    '2027-09-18':'Independencia Nacional','2027-09-19':'Glorias del Ejército',
+    '2027-10-11':'Encuentro de Dos Mundos','2027-10-31':'Iglesias Evangélicas',
+    '2027-11-01':'Todos los Santos','2027-12-08':'Inmaculada Concepción','2027-12-25':'Navidad',
+  };
+
   // ── ESTADO ────────────────────────────────────────────────────
   let userId       = null;
   let todasLasClases    = [];
@@ -444,7 +460,7 @@
   // ── RENDER ────────────────────────────────────────────────────
   function renderClases() {
     const wrap = document.getElementById('clases-wrap');
-    const filtradas = todasLasClases.filter(matchFiltro);
+    const filtradas = todasLasClases.filter(c => !FERIADOS[diaKey(c.fecha_hora)] && matchFiltro(c));
 
     if (filtradas.length === 0) {
       wrap.innerHTML = `<div class="sin-clases"><span class="icon">📭</span><p>No hay clases disponibles para este filtro.</p></div>`;
