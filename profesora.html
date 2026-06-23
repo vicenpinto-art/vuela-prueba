@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -1009,7 +1009,7 @@
     const chipHtml = (c) => {
       const esMia = esMiClase(c);
       return `
-        <div class="clase-chip${asistenciaClaseSelId === c.id ? ' sel' : ''}" onclick="seleccionarClaseAsistencia('${c.id}')">
+        <div class="clase-chip${asistenciaClaseSelId === c.id ? ' sel' : ''}" data-id="${c.id}" onclick="seleccionarClaseAsistencia('${c.id}')">
           <div class="chip-hora">${horaStr(c.fecha_hora)}</div>
           <div class="chip-nombre" style="display:flex;align-items:center;gap:4px">${c.nombre}${planBadge(c)}${esMia ? ' <span style="font-size:10px;color:var(--coral);font-weight:700">✓</span>' : ''}</div>
           <div class="chip-meta">👩‍🏫 ${c.profesora}</div>
@@ -1065,7 +1065,10 @@
 
   async function seleccionarClaseAsistencia(claseId) {
     asistenciaClaseSelId = claseId;
-    renderChipsAsistencia();
+    // Actualizar selección sin re-renderizar (evita colapsar el acordeón)
+    document.querySelectorAll('#asis-lista-clases .clase-chip').forEach(el => el.classList.remove('sel'));
+    const chipSel = document.querySelector(`#asis-lista-clases .clase-chip[data-id="${claseId}"]`);
+    if (chipSel) chipSel.classList.add('sel');
 
     const clase = clasesAsistencia.find(c => c.id === claseId);
     const esMia = clase ? esMiClase(clase.profesora) : false;
@@ -1607,3 +1610,4 @@
   <script>if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js");</script>
 </body>
 </html>
+
