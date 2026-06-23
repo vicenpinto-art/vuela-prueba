@@ -1934,10 +1934,14 @@ function usarFechaRenovacion(fechaFin, nombrePlan){
 
 async function eliminarPlan(compraId){
   if(!confirm('¿Eliminar este plan? La alumna perderá acceso inmediatamente.')) return;
-  // Desvincular inscripciones antes de borrar para evitar error de FK
-  await sb.from('inscripciones').update({compra_id: null}).eq('compra_id', compraId);
+  const {error:errInsc} = await sb.from('inscripciones').update({compra_id: null}).eq('compra_id', compraId);
+  if(errInsc) console.warn('Update inscripciones:', errInsc.message, errInsc.code, errInsc.details);
   const {error} = await sb.from('compras').delete().eq('id', compraId);
-  if(error){toast('Error al eliminar plan','error');return;}
+  if(error){
+    console.error('Delete compras:', error.message, error.code, error.details, error.hint);
+    toast('Error: '+error.message,'error');
+    return;
+  }
   toast('Plan eliminado ✓');
   cerrarModal('modal-asignar-plan');
   cargarAlumnas();
