@@ -109,6 +109,35 @@
 
 <div class="container">
 
+  <!-- ── DESCARGAS ── -->
+  <div class="card" style="margin-bottom:20px">
+    <h2 style="margin-bottom:6px">Descargar base de datos</h2>
+    <p class="subtitle" style="margin-bottom:20px">Exporta los datos del sistema en formato CSV, compatible con Excel.</p>
+
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-end">
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--gray);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Alumnas</div>
+        <button class="btn btn-secondary" onclick="descargarAlumnas()">📥 Descargar todas las alumnas</button>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--gray);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Registro de pagos</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <select id="filtro-anio" style="padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;background:#fff;cursor:pointer">
+            <option value="todos">Todos los años</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+          </select>
+          <button class="btn btn-secondary" onclick="descargarPagos()">📥 Descargar pagos</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SEPARADOR ── -->
+  <div style="border-top:2px solid var(--border);margin:8px 0 28px"></div>
+
   <!-- ── PASO 1: SUBIR ARCHIVO ── -->
   <div id="paso-upload">
     <div class="card">
@@ -567,6 +596,50 @@
 
   setupDropZone();
   init();
+
+  // ── DESCARGAS ─────────────────────────────────────────────────
+  function csvBlob(headers, filas) {
+    const q = v => `"${(v??'').toString().replace(/"/g,'""')}"`;
+    const contenido = [headers.join(';'), ...filas.map(f => f.map(q).join(';'))].join('\n');
+    return new Blob(['﻿' + contenido], { type: 'text/csv;charset=utf-8;' });
+  }
+  function descargarBlob(blob, nombre) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nombre;
+    a.click();
+  }
+
+  async function descargarAlumnas() {
+    const { data } = await sb.from('usuarios')
+      .select('nombre,apellido,email,telefono,rut,fecha_nacimiento,created_at')
+      .eq('rol','alumna').order('created_at',{ascending:false}).limit(10000);
+    if (!data?.length) { alert('No hay alumnas.'); return; }
+    const fecha = new Date().toLocaleDateString('es-CL').replace(/\//g,'-');
+    const blob = csvBlob(
+      ['Nombre','Apellido','Email','Teléfono','RUT','Fecha Nacimiento','Creada'],
+      data.map(a => [a.nombre,a.apellido,a.email,a.telefono,a.rut,a.fecha_nacimiento,a.created_at?.slice(0,10)])
+    );
+    descargarBlob(blob, `alumnas_${fecha}.csv`);
+  }
+
+  async function descargarPagos() {
+    const anio = document.getElementById('filtro-anio').value;
+    let query = sb.from('pagos_historico')
+      .select('nombre,apellido,rut,plan_nombre,plan_categoria,incluye_gym,duracion_meses,monto,estado,tipo_pago,fecha_pago,vendedor')
+      .order('fecha_pago', { ascending: true }).limit(50000);
+    if (anio !== 'todos') {
+      query = query.gte('fecha_pago', `${anio}-01-01`).lte('fecha_pago', `${anio}-12-31`);
+    }
+    const { data } = await query;
+    if (!data?.length) { alert('No hay pagos para ese período.'); return; }
+    const fecha = new Date().toLocaleDateString('es-CL').replace(/\//g,'-');
+    const blob = csvBlob(
+      ['Nombre','Apellido','RUT','Plan','Categoría','Incluye Gym','Duración (meses)','Monto','Estado','Tipo de Pago','Fecha de Pago','Vendedor'],
+      data.map(p => [p.nombre,p.apellido,p.rut,p.plan_nombre,p.plan_categoria,p.incluye_gym?'Sí':'No',p.duracion_meses,p.monto,p.estado,p.tipo_pago,p.fecha_pago,p.vendedor])
+    );
+    descargarBlob(blob, `pagos_${anio}_${fecha}.csv`);
+  }
 
   // ══════════════════════════════════════════════════════════════
   // IMPORTAR PAGOS HISTÓRICOS
