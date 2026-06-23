@@ -1719,9 +1719,10 @@ async function confirmarAsignarPlan(){
   // Registrar en pagos_historico para unificar con historial
   if(!noIngresos && monto > 0){
     const tipoPago = document.getElementById('asignar-tipo-pago').value;
+    const { data:{ session: sesManual } } = await sb.auth.getSession();
     await fetch(`${SERVER_URL}/registrar-pago-manual`, {
       method: 'POST',
-      headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${jwtToken}` },
+      headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${sesManual?.access_token}` },
       body: JSON.stringify({
         alumna_id:      alumnaId,
         plan_nombre:    planNombre,
@@ -2340,8 +2341,9 @@ async function cargarIngresos(){
 
   let data;
   try {
+    const { data:{ session: sesIng } } = await sb.auth.getSession();
     const resp = await fetch(`${SERVER_URL}/ingresos-mes?mes=${mesVal}`, {
-      headers: { 'Authorization': `Bearer ${jwtToken}` }
+      headers: { 'Authorization': `Bearer ${sesIng?.access_token}` }
     });
     if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
     data = await resp.json();
