@@ -1,0 +1,989 @@
+﻿id;Nombre;Apellido;RUT/DNI;Plan;Monto;Estado;Tipo de Pago;Fecha de Pago;Vendedor/a
+382690;Constanza;Maldonado;18935269-K;CLASES VUELA CON GYM ILIMITADAS ;;activo;efectivo;02-11-2025;Daniela Gonzalez
+383745;Francisca;Escobar;20432018-7;PROMO GYM ANUAL;125000;activo;mercadopago;30-09-2025;Daniela Gonzalez
+383745;Francisca;Escobar;20432018-7;Clase gratis;;activo;efectivo;31-10-2025;Daniela Gonzalez
+383821;Macarena;Cortés;14400408-6;CLASE SUELTA PLAN MUÉVETE;7000;activo;mercadopago;11-11-2025;Sin Información
+383821;Macarena;Cortés;14400408-6;CLASE SUELTA PLAN MUÉVETE;7000;activo;mercadopago;13-11-2025;Sin Información
+383821;Macarena;Cortés;14400408-6;CLASE SUELTA PLAN MUÉVETE;7000;activo;mercadopago;17-11-2025;Sin Información
+383821;Macarena;Cortés;14400408-6;CLASE SUELTA PLAN MUÉVETE;7000;activo;mercadopago;19-11-2025;Sin Información
+383821;Macarena;Cortés;14400408-6;CLASE SUELTA PLAN MUÉVETE;7000;activo;mercadopago;21-11-2025;Sin Información
+383821;Macarena;Cortés;14400408-6;CLASE SUELTA PLAN MUÉVETE;7000;activo;mercadopago;23-11-2025;Sin Información
+383821;Macarena;Cortés;14400408-6;CLASE SUELTA PLAN MUÉVETE;7000;activo;mercadopago;26-11-2025;Sin Información
+383821;Macarena;Cortés;14400408-6;MUEVETE 12 CLASES AL MES;54000;activo;mercadopago;22-09-2025;Sin Información
+383821;Macarena;Cortés;14400408-6;MUEVETE 6 CLASES AL MES;38990;activo;mercadopago;12-12-2025;Sin Información
+362117;Sofia;Morales Brito;17995716-7;VUELA 4 CLASES AL MES + GYM;48000;activo;mercadopago;01-09-2025;Sin Información
+362117;Sofia;Morales Brito;17995716-7;VUELA 4 CLASES AL MES + GYM;48000;activo;mercadopago;30-09-2025;Sin Información
+362117;Sofia;Morales Brito;17995716-7;VUELA 4 CLASES AL MES + GYM;51990;activo;mercadopago;04-12-2025;Sin Información
+362117;Sofia;Morales Brito;17995716-7;GYM MENSUAL;;activo;efectivo;01-09-2025;Daniela Gonzalez
+362117;Sofia;Morales Brito;17995716-7;GYM MENSUAL;;activo;efectivo;01-10-2025;Daniela Gonzalez
+386372;Catalina;Salazar;19433620-9;VUELA 12 CLASES AL MES;75000;congelado;credito;02-10-2025;Daniela Gonzalez
+390773;Maria Cristina;González Quiroz;16710534-3;TRIMESTRAL (SIN GYM) MUEVETE CLASES ILIMITADAS ;185000;activo;mercadopago;30-09-2025;Sin Información
+390773;Maria Cristina;González Quiroz;16710534-3;DIVA URBANA;22000;activo;efectivo;16-10-2025;Daniela Gonzalez
+397184;Javiera;Moncada;18149072-1;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;mercadopago;13-09-2025;Sin Información
+397184;Javiera;Moncada;18149072-1;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;transferencia;27-10-2025;Daniela Gonzalez
+397184;Javiera;Moncada;18149072-1;GYM MENSUAL;22500;inactivo;mercadopago;07-12-2025;Sin Información
+403148;Veronica;Rubio;21394894-6;GYM MENSUAL;19990;inactivo;transferencia;06-10-2025;Daniela Gonzalez
+403148;Veronica;Rubio;21394894-6;GYM MENSUAL;19990;inactivo;transferencia;12-11-2025;Daniela Gonzalez
+403148;Veronica;Rubio;21394894-6;GYM MENSUAL;22500;inactivo;transferencia;15-12-2025;Daniela Gonzalez
+403281;Constanza ;Morales;19514881-3;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;transferencia;08-09-2025;Daniela Gonzalez
+403281;Constanza ;Morales;19514881-3;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;credito;08-10-2025;Daniela Gonzalez
+403281;Constanza ;Morales;19514881-3;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;mercadopago;10-11-2025;Sin Información
+403281;Constanza ;Morales;19514881-3;CLASES (SIN GYM) VUELA ILIMITADAS;99990;activo;mercadopago;11-12-2025;Sin Información
+412615;Victoria;Cifuentes;18981042-3;MUEVETE 12 CLASES AL MES;54000;inactivo;mercadopago;22-09-2025;Sin Información
+412615;Victoria;Cifuentes;18981042-3;MUEVETE 12 CLASES AL MES;54000;inactivo;mercadopago;22-10-2025;Sin Información
+412615;Victoria;Cifuentes;18981042-3;DIVA URBANA;22000;inactivo;efectivo;28-10-2025;Daniela Gonzalez
+415266;Fernanda;Figueroa;21022287-1;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;27-11-2025;Daniela Gonzalez
+415266;Fernanda;Figueroa;21022287-1;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;transferencia;29-09-2025;Daniela Gonzalez
+415266;Fernanda;Figueroa;21022287-1;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;transferencia;28-10-2025;Daniela Gonzalez
+416869;Loreto;Rojas;17317954-5;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;mercadopago;17-09-2025;Sin Información
+416869;Loreto;Rojas;17317954-5;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;credito;14-10-2025;Daniela Gonzalez
+416869;Loreto;Rojas;17317954-5;CLASES VUELA CON GYM ILIMITADAS ;112990;activo;credito;01-12-2025;Daniela Gonzalez
+416869;Loreto;Rojas;17317954-5;CLASES VUELA CON GYM ILIMITADAS ;112990;activo;mercadopago;30-12-2025;Sin Información
+416869;Loreto;Rojas;17317954-5;DISEÑO DE RUTINA 1 SESION;15000;activo;credito;10-11-2025;Daniela Gonzalez
+420491;Antonia;Montaña;21272743-1;GYM MENSUAL;19990;inactivo;mercadopago;01-09-2025;Sin Información
+422323;Constanza Paz;Cortes Valdebenito;21829130-9;Clase gratis;;inactivo;efectivo;08-11-2025;Daniela Gonzalez
+430830;Javiera;Sepulveda Cabello;19559491-0;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;debito;17-10-2025;Daniela Gonzalez
+430830;Javiera;Sepulveda Cabello;19559491-0;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;transferencia;17-11-2025;Daniela Gonzalez
+430830;Javiera;Sepulveda Cabello;19559491-0;VUELA 8 CLASES AL MES;60000;inactivo;transferencia;05-09-2025;Daniela Gonzalez
+430830;Javiera;Sepulveda Cabello;19559491-0;CLASES (SIN GYM) VUELA ILIMITADAS;99990;inactivo;debito;17-12-2025;Daniela Gonzalez
+435767;Tamara;Muñoz;;CLASES VUELA CON GYM ILIMITADAS ;29000;activo;transferencia;09-09-2025;Daniela Gonzalez
+435767;Tamara;Muñoz;;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;debito;26-09-2025;Daniela Gonzalez
+435767;Tamara;Muñoz;;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;debito;27-10-2025;Daniela Gonzalez
+435767;Tamara;Muñoz;;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;mercadopago;28-11-2025;Sin Información
+435767;Tamara;Muñoz;;CLASES VUELA CON GYM ILIMITADAS ;112990;activo;debito;29-12-2025;Daniela Gonzalez
+439035;Mely;Haro;19563307-k;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;mercadopago;21-09-2025;Sin Información
+439035;Mely;Haro;19563307-k;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;mercadopago;22-10-2025;Sin Información
+439035;Mely;Haro;19563307-k;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;mercadopago;24-11-2025;Sin Información
+439035;Mely;Haro;19563307-k;CLASES (SIN GYM) VUELA ILIMITADAS;99990;inactivo;mercadopago;26-12-2025;Sin Información
+246726;Tania ;zambrano;;MUEVETE 4 CLASES AL MES;;inactivo;efectivo;15-09-2025;Daniela Gonzalez
+246726;Tania ;zambrano;;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;27-11-2025;Daniela Gonzalez
+246726;Tania ;zambrano;;CLASE SUELTA PLAN MUÉVETE;;inactivo;efectivo;15-09-2025;Daniela Gonzalez
+246726;Tania ;zambrano;;CLASE SUELTA PLAN MUÉVETE;;inactivo;efectivo;20-11-2025;Daniela Gonzalez
+246726;Tania ;zambrano;;CLASE SUELTA PLAN MUÉVETE;;inactivo;efectivo;21-11-2025;Daniela Gonzalez
+246726;Tania ;zambrano;;MUEVETE 8 CLASES AL MES;40000;inactivo;transferencia;26-09-2025;Daniela Gonzalez
+246726;Tania ;zambrano;;Clase gratis;;inactivo;efectivo;22-11-2025;Daniela Gonzalez
+197662;daniela;Ramirez Ortega;;CLASE SUELTA PLAN MUÉVETE;7000;activo;transferencia;24-11-2025;Daniela Gonzalez
+450145;Macarena;Moreno Ponce;;PROMO GYM ANUAL;125000;activo;credito;30-09-2025;Daniela Gonzalez
+439107;Dubravzka;Staback;;Clase gratis;;inactivo;efectivo;12-09-2025;Daniela Gonzalez
+452065;Javiera;Romero Romero;21540151-0;Clase gratis;;inactivo;efectivo;08-11-2025;Daniela Gonzalez
+460310;Javiera Constanza ;Broughton Olguín;20117492-9;VUELA 6 CLASES AL MES;48000;inactivo;credito;29-09-2025;Daniela Gonzalez
+16326;Pamela;cruzat;;MUEVETE 4 CLASES AL MES + GYM;38000;activo;debito;08-10-2025;Daniela Gonzalez
+16326;Pamela;cruzat;;MUEVETE 4 CLASES AL MES + GYM;40990;activo;debito;12-12-2025;Daniela Gonzalez
+16326;Pamela;cruzat;;GYM MENSUAL;;activo;efectivo;08-10-2025;Daniela Gonzalez
+16326;Pamela;cruzat;;GYM MENSUAL;;activo;efectivo;11-11-2025;Daniela Gonzalez
+16326;Pamela;cruzat;;MUEVETE 6 CLASES + GYM;48000;activo;debito;11-11-2025;Daniela Gonzalez
+462471;Catalina del Rosario;Cortés Cortés;17661333-5;GYM MENSUAL;22500;inactivo;debito;15-12-2025;Daniela Gonzalez
+468656;Lourdes;Gonzalez;19319854-6;GYM MENSUAL;19990;inactivo;mercadopago;02-09-2025;Sin Información
+468656;Lourdes;Gonzalez;19319854-6;GYM MENSUAL;19990;inactivo;mercadopago;10-10-2025;Sin Información
+468656;Lourdes;Gonzalez;19319854-6;GYM MENSUAL;19990;inactivo;mercadopago;17-11-2025;Sin Información
+136688;bernardita;pacheco;;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;14-10-2025;Daniela Gonzalez
+495167;Camila;Saa;17680868-3;MUEVETE 4 CLASES AL MES;25000;activo;mercadopago;27-10-2025;Sin Información
+495167;Camila;Saa;17680868-3;MUEVETE 4 CLASES AL MES;25000;activo;mercadopago;25-11-2025;Sin Información
+495167;Camila;Saa;17680868-3;MUEVETE 4 CLASES AL MES;27990;activo;mercadopago;30-12-2025;Sin Información
+495167;Camila;Saa;17680868-3;CLASE SUELTA PLAN MUÉVETE;7000;activo;mercadopago;30-09-2025;Sin Información
+495167;Camila;Saa;17680868-3;CLASE SUELTA PLAN MUÉVETE;7000;activo;mercadopago;05-10-2025;Sin Información
+495167;Camila;Saa;17680868-3;CLASE SUELTA PLAN MUÉVETE;7000;activo;mercadopago;14-10-2025;Sin Información
+495167;Camila;Saa;17680868-3;CLASE SUELTA PLAN MUÉVETE;7000;activo;mercadopago;21-10-2025;Sin Información
+495167;Camila;Saa;17680868-3;CLASE SUELTA PLAN MUÉVETE;7000;activo;mercadopago;18-11-2025;Sin Información
+253837;Paulina Alejandra  ;Mesa Zapata;;VUELA 4 CLASES AL MES + GYM;48000;inactivo;debito;09-09-2025;Daniela Gonzalez
+498371;josefina;Siri valenzuela;19080760-6;MUEVETE 4 CLASES AL MES;25000;congelado;mercadopago;09-11-2025;Sin Información
+518200;Elizabeth;Pardo;19638982-2;Clase gratis;;inactivo;transferencia;13-11-2025;Daniela Gonzalez
+518200;Elizabeth;Pardo;19638982-2;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;21-11-2025;Daniela Gonzalez
+364735;Paula;Acosta;;GYM PLAN ANUAL;125000;activo;debito;26-09-2025;Daniela Gonzalez
+532201;Francisca;Garrido;18119434-0;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;mercadopago;17-09-2025;Sin Información
+532201;Francisca;Garrido;18119434-0;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;mercadopago;03-11-2025;Sin Información
+532201;Francisca;Garrido;18119434-0;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;mercadopago;29-11-2025;Sin Información
+532201;Francisca;Garrido;18119434-0;CLASES VUELA CON GYM ILIMITADAS ;112990;activo;mercadopago;29-12-2025;Sin Información
+414176;Elizabeth;Tellez Cruz;18245691-8 ;PROMO GYM ANUAL;125000;activo;debito;01-10-2025;Daniela Gonzalez
+414176;Elizabeth;Tellez Cruz;18245691-8 ;TALLER INTRODUCCIÓN A HEELS;26990;activo;credito;30-12-2025;Daniela Gonzalez
+542916;Catalina;Marquez Rojas;21081269-5;GYM TRIMESTRAL;50970;inactivo;mercadopago;29-09-2025;Sin Información
+543949;Paloma;Subiabre;;GYM MENSUAL;19990;inactivo;debito;13-10-2025;Daniela Gonzalez
+544588;Cecilia;Mouras;18102763-0;GYM MENSUAL;19990;inactivo;debito;18-11-2025;Daniela Gonzalez
+558817;Nilda;Melendez Singer;26135617-1;Clase gratis;;inactivo;efectivo;31-10-2025;Daniela Gonzalez
+543039;simone;da silva;;VUELA 4 CLASES AL MES + GYM;48000;congelado;debito;15-10-2025;Daniela Gonzalez
+543039;simone;da silva;;VUELA 4 CLASES AL MES + GYM;48000;congelado;debito;17-11-2025;Daniela Gonzalez
+543039;simone;da silva;;GYM MENSUAL;;congelado;debito;15-10-2025;Daniela Gonzalez
+543039;simone;da silva;;GYM MENSUAL;;congelado;efectivo;17-11-2025;Daniela Gonzalez
+543039;simone;da silva;;GYM MENSUAL;;congelado;debito;17-12-2025;Daniela Gonzalez
+543039;simone;da silva;;VUELA 4 CLASES AL MES + GYM;48000;congelado;debito;22-09-2025;Daniela Gonzalez
+543039;simone;da silva;;VUELA 4 CLASES AL MES + GYM;51990;congelado;debito;17-12-2025;Daniela Gonzalez
+561489;Janice;Pellegrin;17579777-7;MUEVETE 8 CLASES AL MES;40000;activo;mercadopago;01-10-2025;Sin Información
+561489;Janice;Pellegrin;17579777-7;MUEVETE 6 CLASES AL MES;35000;activo;mercadopago;13-11-2025;Sin Información
+561489;Janice;Pellegrin;17579777-7;MUEVETE 6 CLASES AL MES;38990;activo;mercadopago;05-12-2025;Sin Información
+562686;Marcela;Boussac Andaur;18981318-K;MUEVETE 4 CLASES AL MES + GYM;38000;inactivo;pago online;18-11-2025;Daniela Gonzalez
+562686;Marcela;Boussac Andaur;18981318-K;GYM MENSUAL;;inactivo;efectivo;18-11-2025;Daniela Gonzalez
+563846;Danae;Mora;;CLASE SUELTA PLAN VUELA;12000;activo;credito;30-12-2025;Daniela Gonzalez
+563846;Danae;Mora;;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;transferencia;02-09-2025;Daniela Gonzalez
+563846;Danae;Mora;;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;transferencia;02-09-2025;Daniela Gonzalez
+563846;Danae;Mora;;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;transferencia;03-10-2025;Daniela Gonzalez
+563846;Danae;Mora;;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;transferencia;03-11-2025;Daniela Gonzalez
+563846;Danae;Mora;;CLASES (SIN GYM) VUELA ILIMITADAS;99990;activo;transferencia;01-12-2025;Daniela Gonzalez
+563846;Danae;Mora;;CLASE SUELTA PLAN MUÉVETE;9000;activo;credito;30-12-2025;Daniela Gonzalez
+563846;Danae;Mora;;TALLER BALLET PARA ADULTAS;29990;activo;credito;21-12-2025;Daniela Gonzalez
+563846;Danae;Mora;;TALLER ENTRENAMIENTO PARA VOLAR;29990;activo;efectivo;29-12-2025;Daniela Gonzalez
+565853;Sofía;Correa;19422330-7;GYM MENSUAL;19990;inactivo;transferencia;02-10-2025;Daniela Gonzalez
+566723;Irma;Nanjarí Godoy;;GYM MENSUAL;19990;activo;debito;09-09-2025;Daniela Gonzalez
+566723;Irma;Nanjarí Godoy;;GYM MENSUAL;19990;activo;debito;10-10-2025;Daniela Gonzalez
+566723;Irma;Nanjarí Godoy;;GYM MENSUAL;19990;activo;debito;25-11-2025;Daniela Gonzalez
+569567;Viviana Andre;Valle Valle;206732393;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;30-12-2025;Daniela Gonzalez
+569567;Viviana Andre;Valle Valle;206732393;MUEVETE 4 CLASES AL MES + GYM;40990;inactivo;transferencia;30-12-2025;Daniela Gonzalez
+569567;Viviana Andre;Valle Valle;206732393;GYM MENSUAL;;inactivo;efectivo;30-12-2025;Daniela Gonzalez
+569695;Michelle;Avilés M.;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;02-09-2025;Daniela Gonzalez
+569695;Michelle;Avilés M.;;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;08-09-2025;Daniela Gonzalez
+569695;Michelle;Avilés M.;;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;11-10-2025;Sin Información
+571990;Victoria;Nuñez Henriquez;16193577-8;VUELA 8 CLASES AL MES;60000;activo;mercadopago;29-09-2025;Sin Información
+571990;Victoria;Nuñez Henriquez;16193577-8;VUELA 8 CLASES AL MES;60000;activo;mercadopago;26-10-2025;Sin Información
+571990;Victoria;Nuñez Henriquez;16193577-8;VUELA 8 CLASES AL MES;60000;activo;mercadopago;24-11-2025;Sin Información
+571990;Victoria;Nuñez Henriquez;16193577-8;VUELA 8 CLASES AL MES;65990;activo;mercadopago;26-12-2025;Sin Información
+574983;Francisca;Pacheco González;18934888-6;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;transferencia;08-09-2025;Daniela Gonzalez
+574983;Francisca;Pacheco González;18934888-6;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;transferencia;20-10-2025;Daniela Gonzalez
+574983;Francisca;Pacheco González;18934888-6;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;transferencia;24-11-2025;Daniela Gonzalez
+574983;Francisca;Pacheco González;18934888-6;TRIMESTRAL (SIN GYM) VUELA CLASES ILIMITADAS;180000;activo;transferencia;01-12-2025;Daniela Gonzalez
+576495;Alejandra;Valdés;19673108-3;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;24-11-2025;Daniela Gonzalez
+580209;Tania ;Rojas Rosales;16637095-7;VUELA 4 CLASES AL MES;38990;activo;mercadopago;09-12-2025;Sin Información
+580209;Tania ;Rojas Rosales;16637095-7;VUELA 6 CLASES AL MES;48000;activo;mercadopago;28-09-2025;Sin Información
+580209;Tania ;Rojas Rosales;16637095-7;VUELA 6 CLASES AL MES;48000;activo;mercadopago;31-10-2025;Sin Información
+581727;Inga;Marticorena Olivos;20367831-2;GYM MENSUAL;19990;inactivo;transferencia;22-09-2025;Daniela Gonzalez
+581727;Inga;Marticorena Olivos;20367831-2;GYM MENSUAL;19990;inactivo;transferencia;17-11-2025;Daniela Gonzalez
+581730;Fernanda;Huaiquinao;18166226-3;MUEVETE 6 CLASES AL MES;35000;activo;mercadopago;29-09-2025;Sin Información
+581730;Fernanda;Huaiquinao;18166226-3;MUEVETE 6 CLASES AL MES;35000;activo;mercadopago;29-10-2025;Sin Información
+581730;Fernanda;Huaiquinao;18166226-3;MUEVETE 6 CLASES AL MES;38990;activo;mercadopago;01-12-2025;Sin Información
+581730;Fernanda;Huaiquinao;18166226-3;GYM TRIMESTRAL;50000;activo;transferencia;30-12-2025;Daniela Gonzalez
+589884;Sofia;Torres;;MUEVETE 4 CLASES AL MES + GYM;38000;activo;transferencia;06-10-2025;Daniela Gonzalez
+589884;Sofia;Torres;;MUEVETE 4 CLASES AL MES + GYM;40990;activo;transferencia;08-12-2025;Daniela Gonzalez
+589884;Sofia;Torres;;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;transferencia;06-11-2025;Daniela Gonzalez
+589884;Sofia;Torres;;GYM MENSUAL;;activo;efectivo;08-12-2025;Daniela Gonzalez
+546922;Catalina;Infante;;GYM MENSUAL;19990;inactivo;transferencia;13-09-2025;Daniela Gonzalez
+260250;Joselin;Cabeza;;GYM MENSUAL;19990;inactivo;debito;01-09-2025;Daniela Gonzalez
+260250;Joselin;Cabeza;;GYM MENSUAL;19990;inactivo;transferencia;04-10-2025;Daniela Gonzalez
+260250;Joselin;Cabeza;;GYM MENSUAL;22500;inactivo;debito;01-12-2025;Daniela Gonzalez
+595598;Carolina;Muñoz Leiva;13497156-8;VUELA 8 CLASES AL MES;65990;activo;mercadopago;29-12-2025;Sin Información
+595598;Carolina;Muñoz Leiva;13497156-8;VUELA 12 CLASES AL MES;75000;activo;mercadopago;21-09-2025;Sin Información
+595598;Carolina;Muñoz Leiva;13497156-8;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;mercadopago;20-10-2025;Sin Información
+595598;Carolina;Muñoz Leiva;13497156-8;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;mercadopago;24-11-2025;Sin Información
+596860;Catalina Ivette;Rojas Toro;18970103-9;PROMO GYM ANUAL;125000;activo;transferencia;30-09-2025;Daniela Gonzalez
+438909;Camila;Castro Gaete;;MUEVETE 8 CLASES AL MES;40000;inactivo;mercadopago;12-09-2025;Daniela Gonzalez
+438909;Camila;Castro Gaete;;MUEVETE 8 CLASES AL MES;40000;inactivo;mercadopago;28-10-2025;Sin Información
+600083;Diana;Farji González;20.664.366-8;GYM MENSUAL;19990;inactivo;transferencia;27-11-2025;Daniela Gonzalez
+609561;Natalia ;Ovalle Villarroel;16470682-6;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;02-11-2025;Sin Información
+609561;Natalia ;Ovalle Villarroel;16470682-6;VUELA 6 CLASES AL MES;48000;inactivo;mercadopago;30-09-2025;Sin Información
+609565;Paz;Lema Vidal;20996743-k;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;04-11-2025;Daniela Gonzalez
+580080;Francisca;Valenzuela;;CLASES VUELA CON GYM ILIMITADAS ;;inactivo;efectivo;10-09-2025;Daniela Gonzalez
+580080;Francisca;Valenzuela;;CLASES VUELA CON GYM ILIMITADAS ;;inactivo;efectivo;14-10-2025;Daniela Gonzalez
+580080;Francisca;Valenzuela;;CLASES VUELA CON GYM ILIMITADAS ;;inactivo;efectivo;15-11-2025;Daniela Gonzalez
+611949;Camila;Rijo;17044619-4;GYM MENSUAL;19990;inactivo;transferencia;06-10-2025;Daniela Gonzalez
+611949;Camila;Rijo;17044619-4;GYM MENSUAL;19990;inactivo;mercadopago;09-11-2025;Sin Información
+611949;Camila;Rijo;17044619-4;VUELA 4 CLASES AL MES + GYM;48000;inactivo;mercadopago;04-09-2025;Sin Información
+618259;Natalia;Honores Borquez;19205335-8;MUEVETE 6 CLASES AL MES;35000;inactivo;mercadopago;21-10-2025;Sin Información
+620991;Carola;Bastías De la Maza ;15635937-8;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;07-11-2025;Daniela Gonzalez
+620991;Carola;Bastías De la Maza ;15635937-8;CLASES MUEVETE CON GYM ILIMITADAS ;75000;inactivo;debito;07-11-2025;Daniela Gonzalez
+465785;Valentina;Padilla;;VUELA 6 CLASES + GYM;61000;inactivo;mercadopago;18-11-2025;Sin Información
+624540;Sylvana;Manqueo Mendoza;;Clase gratis;;inactivo;efectivo;13-11-2025;Daniela Gonzalez
+625933;Luciana;Melio Cerpa;18935371-5;VUELA 8 CLASES AL MES;60000;activo;debito;17-10-2025;Daniela Gonzalez
+625933;Luciana;Melio Cerpa;18935371-5;VUELA 8 CLASES AL MES;60000;activo;debito;20-11-2025;Daniela Gonzalez
+626869;Camila;León;17674185-6;MUEVETE 4 CLASES AL MES;25000;activo;debito;12-09-2025;Daniela Gonzalez
+626869;Camila;León;17674185-6;MUEVETE 6 CLASES AL MES;38990;activo;debito;03-12-2025;Daniela Gonzalez
+626869;Camila;León;17674185-6;DIVA URBANA;22000;activo;transferencia;15-10-2025;Daniela Gonzalez
+626869;Camila;León;17674185-6;MUEVETE 4 CLASES AL MES;25000;activo;debito;19-11-2025;Daniela Gonzalez
+626869;Camila;León;17674185-6;CLASE SUELTA PLAN MUÉVETE;9000;activo;debito;27-12-2025;Daniela Gonzalez
+231214;Ángeles ;Duran;;Clase gratis;;inactivo;efectivo;03-09-2025;Daniela Gonzalez
+437586;María Belén ;Hernández ;18.830.734-5;GYM MENSUAL;19990;inactivo;transferencia;29-09-2025;Daniela Gonzalez
+617275;Macarena ;Peñaloza Alarcón  ;;GYM TRIMESTRAL;50970;inactivo;pago online;03-11-2025;Daniela Gonzalez
+631822;Francisca;Rodriguez;;VUELA 4 CLASES AL MES;35000;inactivo;debito;02-09-2025;Daniela Gonzalez
+608479;Laura;Bustamante;;GYM MENSUAL;19990;inactivo;mercadopago;09-11-2025;Sin Información
+608479;Laura;Bustamante;;GYM MENSUAL;22500;inactivo;mercadopago;08-12-2025;Sin Información
+608479;Laura;Bustamante;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;08-10-2025;Daniela Gonzalez
+608479;Laura;Bustamante;;DISEÑO DE RUTINA 1 SESION;15000;inactivo;debito;08-10-2025;Daniela Gonzalez
+608479;Laura;Bustamante;;GYM MENSUAL;19990;inactivo;debito;08-10-2025;Daniela Gonzalez
+608479;Laura;Bustamante;;Clase gratis;;inactivo;efectivo;14-11-2025;Daniela Gonzalez
+600781;Karen;Foz;;GYM MENSUAL;19990;activo;mercadopago;09-09-2025;Sin Información
+600781;Karen;Foz;;GYM MENSUAL;19990;activo;credito;14-10-2025;Daniela Gonzalez
+600781;Karen;Foz;;GYM MENSUAL;22500;activo;debito;09-12-2025;Daniela Gonzalez
+37983;María Belén ;Gómez ;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;25-11-2025;Daniela Gonzalez
+37983;María Belén ;Gómez ;;CLASE SUELTA PLAN MUÉVETE;9000;inactivo;debito;09-12-2025;Daniela Gonzalez
+641646;Juliana Aurora;Piérola castro;21013241-4;MUEVETE 4 CLASES AL MES;25000;inactivo;debito;30-10-2025;Daniela Gonzalez
+641646;Juliana Aurora;Piérola castro;21013241-4;GYM MENSUAL;;inactivo;efectivo;05-12-2025;Daniela Gonzalez
+641646;Juliana Aurora;Piérola castro;21013241-4;MUEVETE 4 CLASES AL MES + GYM;40990;inactivo;debito;05-12-2025;Daniela Gonzalez
+597624;Martina;Aceituno;;ACCESO DIARIO GYM;4000;inactivo;mercadopago;16-10-2025;Sin Información
+439304;Katherine;Rojo;;TALLER BALLET PARA ADULTAS;29990;activo;transferencia;22-12-2025;Daniela Gonzalez
+663180;Isidora Ignacia;Sotomayor García;18464884-9;MUEVETE 6 CLASES AL MES;35000;activo;mercadopago;11-09-2025;Sin Información
+663180;Isidora Ignacia;Sotomayor García;18464884-9;MUEVETE 6 CLASES AL MES;35000;activo;mercadopago;07-10-2025;Sin Información
+663180;Isidora Ignacia;Sotomayor García;18464884-9;MUEVETE 6 CLASES AL MES;35000;activo;mercadopago;02-11-2025;Sin Información
+663180;Isidora Ignacia;Sotomayor García;18464884-9;MUEVETE 6 CLASES AL MES;35000;activo;mercadopago;29-11-2025;Sin Información
+666867;Rocio;Villa Vera;15777983-4;GYM MENSUAL;19990;inactivo;mercadopago;22-09-2025;Sin Información
+666867;Rocio;Villa Vera;15777983-4;GYM MENSUAL;19990;inactivo;mercadopago;04-11-2025;Sin Información
+666867;Rocio;Villa Vera;15777983-4;GYM MENSUAL;22500;inactivo;mercadopago;09-12-2025;Daniela Gonzalez
+319131;Gabriela;Martínez;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;19-11-2025;Daniela Gonzalez
+319131;Gabriela;Martínez;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;01-12-2025;Daniela Gonzalez
+319131;Gabriela;Martínez;;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;04-12-2025;Daniela Gonzalez
+666893;Valentina;Beldaño Carrillo;20323574-7;GYM MENSUAL;19990;inactivo;mercadopago;08-09-2025;Sin Información
+671567;Paloma ;Contreras;19199641-0;MUEVETE 6 CLASES AL MES;38990;inactivo;mercadopago;16-12-2025;Sin Información
+668235;Renata (Flavia);Estay;;Clase gratis;;inactivo;efectivo;10-11-2025;Daniela Gonzalez
+674316;Francisca ;Valdebenito Gangas;19584490-9;PROMO GYM ANUAL;125000;activo;transferencia;01-10-2025;Daniela Gonzalez
+677342;Stephanie;Corcoran Barrios;;MUEVETE 12 CLASES AL MES + GYM;67000;inactivo;mercadopago;15-09-2025;Sin Información
+677342;Stephanie;Corcoran Barrios;;MUEVETE 12 CLASES AL MES + GYM;67000;inactivo;mercadopago;11-11-2025;Sin Información
+677342;Stephanie;Corcoran Barrios;;MUEVETE 12 CLASES AL MES + GYM;72990;inactivo;mercadopago;15-12-2025;Sin Información
+677342;Stephanie;Corcoran Barrios;;CLASE SUELTA PLAN VUELA;12000;inactivo;mercadopago;15-10-2025;Sin Información
+677342;Stephanie;Corcoran Barrios;;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;mercadopago;15-10-2025;Sin Información
+260450;Evelyn;Valencia;17.661.989-5;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;13-09-2025;Daniela Gonzalez
+690448;Andrea ;Coliñir lopez;;GYM MENSUAL;19990;inactivo;mercadopago;01-09-2025;Sin Información
+690448;Andrea ;Coliñir lopez;;GYM MENSUAL;19990;inactivo;mercadopago;01-10-2025;Sin Información
+690448;Andrea ;Coliñir lopez;;GYM MENSUAL;19990;inactivo;mercadopago;03-11-2025;Sin Información
+690448;Andrea ;Coliñir lopez;;GYM MENSUAL;22500;inactivo;mercadopago;04-12-2025;Sin Información
+696563;Nicole;Cereño Hernández;18.645.792-7;GYM MENSUAL;19990;inactivo;transferencia;16-09-2025;Daniela Gonzalez
+696563;Nicole;Cereño Hernández;18.645.792-7;GYM MENSUAL;19990;inactivo;transferencia;10-11-2025;Daniela Gonzalez
+699659;Yessenia ;Márquez;18659805-9;VUELA 4 CLASES AL MES + GYM;48000;inactivo;debito;12-09-2025;Daniela Gonzalez
+699659;Yessenia ;Márquez;18659805-9;VUELA 4 CLASES AL MES + GYM;48000;inactivo;debito;10-10-2025;Daniela Gonzalez
+699707;Tamara;Vera Jara;20991600-2;MUEVETE 12 CLASES AL MES;54000;inactivo;transferencia;09-09-2025;Daniela Gonzalez
+702745;Bárbara ;Gutiérrez;18656872-9;Clase gratis;;inactivo;efectivo;14-11-2025;Daniela Gonzalez
+704418;Mini;R;12621078-7;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;mercadopago;21-09-2025;Sin Información
+705563;Maritza;Gutierrez;20471993-4;MUEVETE 4 CLASES AL MES;25000;activo;transferencia;01-09-2025;Daniela Gonzalez
+565928;Gabriela ;Cardozo Patiño;;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;03-09-2025;Daniela Gonzalez
+565928;Gabriela ;Cardozo Patiño;;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;03-10-2025;Daniela Gonzalez
+47092;Fran;Tapia Olivera;157194577;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;15-11-2025;Daniela Gonzalez
+47092;Fran;Tapia Olivera;157194577;GYM MENSUAL;19990;inactivo;debito;02-09-2025;Daniela Gonzalez
+47092;Fran;Tapia Olivera;157194577;Clase gratis;;inactivo;efectivo;15-11-2025;Daniela Gonzalez
+718611;Yennakelis  ;serrano;945793331;GYM MENSUAL;;activo;efectivo;19-10-2025;Daniela Gonzalez
+718611;Yennakelis  ;serrano;945793331;GYM MENSUAL;;activo;efectivo;19-11-2025;Daniela Gonzalez
+718611;Yennakelis  ;serrano;945793331;VUELA 6 CLASES + GYM;61000;activo;transferencia;19-10-2025;Daniela Gonzalez
+718611;Yennakelis  ;serrano;945793331;VUELA 6 CLASES + GYM;61000;activo;transferencia;19-11-2025;Daniela Gonzalez
+728770;Paz;Medel;25051660-6;MUEVETE 8 CLASES AL MES;40000;inactivo;debito;24-09-2025;Daniela Gonzalez
+728770;Paz;Medel;25051660-6;MUEVETE 8 CLASES AL MES;40000;inactivo;mercadopago;30-10-2025;Sin Información
+728770;Paz;Medel;25051660-6;MUEVETE 8 CLASES AL MES;40000;inactivo;mercadopago;30-11-2025;Sin Información
+728770;Paz;Medel;25051660-6;Clase gratis;;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+728770;Paz;Medel;25051660-6;CLASE DE PRUEBA VUELA;7000;inactivo;debito;15-12-2025;Daniela Gonzalez
+728770;Paz;Medel;25051660-6;CLASE DE PRUEBA VUELA;7000;inactivo;debito;16-12-2025;Daniela Gonzalez
+732243;Andrea;Muñoz;19385765-5;DISEÑO DE RUTINA 1 SESION;15000;inactivo;pago online;20-11-2025;Daniela Gonzalez
+732243;Andrea;Muñoz;19385765-5;GYM MENSUAL;19990;inactivo;pago online;20-11-2025;Daniela Gonzalez
+333284;Dania ;Munoz;;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+333284;Dania ;Munoz;;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;09-10-2025;Sin Información
+333284;Dania ;Munoz;;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;mercadopago;27-11-2025;Sin Información
+108615;Daniela;Duran Escalona;19.110.622-9;Clase gratis;;activo;efectivo;13-11-2025;Daniela Gonzalez
+108615;Daniela;Duran Escalona;19.110.622-9;MUEVETE 6 CLASES AL MES;35000;activo;transferencia;05-09-2025;Daniela Gonzalez
+108615;Daniela;Duran Escalona;19.110.622-9;TALLER DE CUECA;12000;activo;transferencia;10-09-2025;Daniela Gonzalez
+108615;Daniela;Duran Escalona;19.110.622-9;MUEVETE 4 CLASES AL MES + GYM;38000;activo;transferencia;08-10-2025;Daniela Gonzalez
+108615;Daniela;Duran Escalona;19.110.622-9;GYM MENSUAL;;activo;efectivo;08-10-2025;Daniela Gonzalez
+108615;Daniela;Duran Escalona;19.110.622-9;GYM MENSUAL;;activo;efectivo;04-12-2025;Daniela Gonzalez
+108615;Daniela;Duran Escalona;19.110.622-9;MUEVETE 6 CLASES + GYM;48000;activo;debito;03-11-2025;Daniela Gonzalez
+108615;Daniela;Duran Escalona;19.110.622-9;MUEVETE 6 CLASES + GYM;51990;activo;debito;04-12-2025;Daniela Gonzalez
+544544;Geraldine;Faria;;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;03-11-2025;Sin Información
+544544;Geraldine;Faria;;VUELA 4 CLASES AL MES;38990;inactivo;mercadopago;16-12-2025;Sin Información
+729407;María Jesús;Larral Molina;20.474.364-9;PROMO GYM ANUAL;125000;activo;transferencia;26-09-2025;Daniela Gonzalez
+729407;María Jesús;Larral Molina;20.474.364-9;CLASE SUELTA PLAN MUÉVETE;7000;activo;transferencia;25-11-2025;Daniela Gonzalez
+751147;Isis;Rondón Peñaloza;26312427-8;GYM MENSUAL;;activo;efectivo;08-10-2025;Daniela Gonzalez
+751147;Isis;Rondón Peñaloza;26312427-8;GYM MENSUAL;;activo;efectivo;06-11-2025;Daniela Gonzalez
+751147;Isis;Rondón Peñaloza;26312427-8;MUEVETE 8 CLASES AL MES + GYM;53000;activo;mercadopago;08-10-2025;Sin Información
+751147;Isis;Rondón Peñaloza;26312427-8;MUEVETE 8 CLASES AL MES + GYM;53000;activo;mercadopago;06-11-2025;Sin Información
+751147;Isis;Rondón Peñaloza;26312427-8;MUEVETE 8 CLASES AL MES + GYM;53000;activo;mercadopago;01-12-2025;Sin Información
+751147;Isis;Rondón Peñaloza;26312427-8;MUEVETE 4 CLASES AL MES;25000;activo;mercadopago;10-09-2025;Sin Información
+751147;Isis;Rondón Peñaloza;26312427-8;Clase gratis;;activo;efectivo;30-10-2025;Daniela Gonzalez
+751147;Isis;Rondón Peñaloza;26312427-8;Clase gratis;;activo;efectivo;13-11-2025;Daniela Gonzalez
+751219;Paula;Urrutia;18605366-4;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;10-09-2025;Sin Información
+751219;Paula;Urrutia;18605366-4;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;07-11-2025;Sin Información
+751219;Paula;Urrutia;18605366-4;MUEVETE 4 CLASES AL MES;27990;inactivo;mercadopago;13-12-2025;Sin Información
+427285;Daniella;Ibaceta;;VUELA 4 CLASES AL MES + GYM;48000;inactivo;transferencia;13-11-2025;Daniela Gonzalez
+427285;Daniella;Ibaceta;;VUELA 4 CLASES AL MES + GYM;51990;inactivo;transferencia;12-12-2025;Daniela Gonzalez
+427285;Daniella;Ibaceta;;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;08-10-2025;Daniela Gonzalez
+427285;Daniella;Ibaceta;;CLASE SUELTA PLAN VUELA;12000;inactivo;mercadopago;08-09-2025;Daniela Gonzalez
+427285;Daniella;Ibaceta;;GYM MENSUAL;;inactivo;transferencia;12-12-2025;Daniela Gonzalez
+753778;Mariana;Caceres;;D-U Street & girly;16000;inactivo;transferencia;08-11-2025;Daniela Gonzalez
+754705;Mariana;Zamora;;DIVA URBANA;22000;inactivo;transferencia;01-11-2025;Daniela Gonzalez
+754705;Mariana;Zamora;;Clase gratis;;inactivo;efectivo;26-11-2025;Daniela Gonzalez
+758390;Natalia;Arévalo;15566992-6;GYM MENSUAL;19990;activo;debito;15-09-2025;Daniela Gonzalez
+758390;Natalia;Arévalo;15566992-6;GYM MENSUAL;19990;activo;debito;15-10-2025;Daniela Gonzalez
+758390;Natalia;Arévalo;15566992-6;GYM MENSUAL;19990;activo;transferencia;13-11-2025;Daniela Gonzalez
+758390;Natalia;Arévalo;15566992-6;GYM MENSUAL;22500;activo;debito;15-12-2025;Daniela Gonzalez
+758390;Natalia;Arévalo;15566992-6;DISEÑO DE RUTINA 1 SESION;20000;activo;debito;15-12-2025;Daniela Gonzalez
+758390;Natalia;Arévalo;15566992-6;TALLER DE CUECA;10000;activo;debito;01-09-2025;Daniela Gonzalez
+660587;Constanza;Gonzalez;;GYM MENSUAL;19990;inactivo;debito;20-11-2025;Daniela Gonzalez
+760304;Constanza;Canales Lizama;18840390-5;VUELA 6 CLASES + GYM;61000;inactivo;mercadopago;30-09-2025;Sin Información
+760304;Constanza;Canales Lizama;18840390-5;VUELA 4 CLASES AL MES + GYM;48000;inactivo;mercadopago;08-09-2025;Sin Información
+760304;Constanza;Canales Lizama;18840390-5;VUELA 4 CLASES AL MES + GYM;48000;inactivo;mercadopago;08-11-2025;Sin Información
+761676;Flavia Carolina ;Muñoz Vergara;22269227-K;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;17-11-2025;Daniela Gonzalez
+219820;Alessandra;Dellarossa;;Clase gratis;;inactivo;efectivo;04-11-2025;Daniela Gonzalez
+219820;Alessandra;Dellarossa;;Clase gratis;;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+631249;Tiare ;Vigueras ;;VUELA 6 CLASES AL MES;49990;congelado;transferencia;09-12-2025;Daniela Gonzalez
+772787;Trinidad Paz;Barros Cáceres;19890212-8;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;08-09-2025;Daniela Gonzalez
+772787;Trinidad Paz;Barros Cáceres;19890212-8;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;13-10-2025;Sin Información
+773247;Amalia Francisca;Molina Ibáñez;201088860;MUEVETE 4 CLASES AL MES;27990;inactivo;mercadopago;08-12-2025;Sin Información
+773247;Amalia Francisca;Molina Ibáñez;201088860;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;09-09-2025;Daniela Gonzalez
+774046;Daniela;Carrillo Mancilla;19022029-k;GYM MENSUAL;19990;activo;mercadopago;29-10-2025;Sin Información
+774046;Daniela;Carrillo Mancilla;19022029-k;GYM MENSUAL;22500;activo;mercadopago;01-12-2025;Sin Información
+785921;Katherine;Alvarez;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;18-11-2025;Daniela Gonzalez
+790359;Javiera Paz Ignacia ;Castillo Varela ;18925837-2;GYM MENSUAL;19990;activo;mercadopago;08-09-2025;Sin Información
+790359;Javiera Paz Ignacia ;Castillo Varela ;18925837-2;GYM MENSUAL;19990;activo;mercadopago;13-10-2025;Sin Información
+790359;Javiera Paz Ignacia ;Castillo Varela ;18925837-2;Clase gratis;;activo;transferencia;06-11-2025;Daniela Gonzalez
+790359;Javiera Paz Ignacia ;Castillo Varela ;18925837-2;GYM TRIMESTRAL;50970;activo;mercadopago;17-11-2025;Sin Información
+791240;Tabatha ;Mangelsdorff Renner;17701859-7;Clase gratis;;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+795230;María Fernanda ;Saavedra;210031545;VUELA 6 CLASES AL MES;48000;inactivo;transferencia;27-10-2025;Daniela Gonzalez
+795230;María Fernanda ;Saavedra;210031545;VUELA 6 CLASES AL MES;48000;inactivo;transferencia;28-11-2025;Daniela Gonzalez
+799132;Alejandra;Escalona;27.193.111-5;VUELA 6 CLASES AL MES;48000;activo;mercadopago;09-09-2025;Sin Información
+799132;Alejandra;Escalona;27.193.111-5;MUEVETE 6 CLASES AL MES;35000;activo;mercadopago;24-11-2025;Sin Información
+799132;Alejandra;Escalona;27.193.111-5;MUEVETE 6 CLASES AL MES;38990;activo;mercadopago;10-12-2025;Sin Información
+800212;Elena;Araya Castillo;15331322-9;VUELA 4 CLASES AL MES;35000;activo;mercadopago;01-09-2025;Sin Información
+800212;Elena;Araya Castillo;15331322-9;VUELA 4 CLASES AL MES;35000;activo;transferencia;06-10-2025;Daniela Gonzalez
+800212;Elena;Araya Castillo;15331322-9;VUELA 4 CLASES AL MES;35000;activo;transferencia;10-11-2025;Daniela Gonzalez
+800212;Elena;Araya Castillo;15331322-9;VUELA 6 CLASES AL MES;49990;activo;transferencia;22-12-2025;Daniela Gonzalez
+800273;Alejandra;Bobadilla Osorio;18864749-9;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;mercadopago;07-09-2025;Sin Información
+121540;Roandra;Alvarez;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;26-12-2025;Daniela Gonzalez
+803375;Javiera ;González Rubio;20444808-6;MUEVETE 4 CLASES AL MES + GYM;38000;inactivo;transferencia;28-09-2025;Daniela Gonzalez
+803375;Javiera ;González Rubio;20444808-6;GYM MENSUAL;;inactivo;transferencia;28-09-2025;Daniela Gonzalez
+803378;Camila Leonor ;Huerta Droguett ;19639500-8;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;02-10-2025;Daniela Gonzalez
+803381;Camila ;Tapia Aravena;20298398-7;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;29-09-2025;Daniela Gonzalez
+804181;Rayen;Corvalán;;CLASE SUELTA PLAN MUÉVETE;9000;inactivo;transferencia;30-12-2025;Daniela Gonzalez
+804181;Rayen;Corvalán;;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;22-09-2025;Daniela Gonzalez
+804181;Rayen;Corvalán;;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;01-10-2025;Daniela Gonzalez
+804181;Rayen;Corvalán;;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;20-10-2025;Daniela Gonzalez
+804181;Rayen;Corvalán;;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;03-11-2025;Daniela Gonzalez
+804181;Rayen;Corvalán;;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;10-11-2025;Daniela Gonzalez
+804181;Rayen;Corvalán;;CLASE SUELTA PLAN MUÉVETE;9000;inactivo;transferencia;09-12-2025;Daniela Gonzalez
+804686;Antonia anais ;zapata rivas ;22933236-8;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;30-09-2025;Daniela Gonzalez
+805709;Francisca ;Aguilera Marquez;20052467-5;GYM MENSUAL;19990;inactivo;mercadopago;12-09-2025;Sin Información
+805709;Francisca ;Aguilera Marquez;20052467-5;GYM MENSUAL;19990;inactivo;mercadopago;13-10-2025;Sin Información
+805709;Francisca ;Aguilera Marquez;20052467-5;GYM MENSUAL;19990;inactivo;mercadopago;17-11-2025;Sin Información
+805709;Francisca ;Aguilera Marquez;20052467-5;GYM MENSUAL;22500;inactivo;mercadopago;18-12-2025;Sin Información
+806670;Millaray;Vergara;21592129-8;GYM MENSUAL;19990;inactivo;transferencia;07-11-2025;Daniela Gonzalez
+811709;Fernanda;Cares Cuevas;19515881-9;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;11-09-2025;Sin Información
+811709;Fernanda;Cares Cuevas;19515881-9;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;06-10-2025;Sin Información
+811709;Fernanda;Cares Cuevas;19515881-9;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;10-11-2025;Sin Información
+815035;Camila Francisca;Hidalgo Bascur ;19.309.136-9;VUELA 4 CLASES AL MES;35000;activo;transferencia;16-09-2025;Daniela Gonzalez
+815035;Camila Francisca;Hidalgo Bascur ;19.309.136-9;VUELA 6 CLASES AL MES;48000;activo;transferencia;14-10-2025;Daniela Gonzalez
+815035;Camila Francisca;Hidalgo Bascur ;19.309.136-9;VUELA 6 CLASES AL MES;49990;activo;mercadopago;10-12-2025;Sin Información
+815605;Anabel ;Ponce;27185908-2;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;30-09-2025;Sin Información
+820355;Carla;Trigo Muñoz;19668119-1;GYM MENSUAL;19990;inactivo;mercadopago;08-09-2025;Sin Información
+820355;Carla;Trigo Muñoz;19668119-1;GYM MENSUAL;19990;inactivo;mercadopago;09-10-2025;Sin Información
+824313;María Paz;Marambio;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;06-09-2025;Daniela Gonzalez
+824313;María Paz;Marambio;;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;08-09-2025;Daniela Gonzalez
+823791;Magaly;Antileo Valdes;;DIVA URBANA;22000;inactivo;efectivo;16-10-2025;Daniela Gonzalez
+836616;Elio;Vallejos Baccelliere;18446296-6;GYM MENSUAL;19990;inactivo;debito;10-10-2025;Daniela Gonzalez
+836731;Scarleth Valentina;Jerez Sepúlveda;20.549.766-8;MUEVETE 4 CLASES AL MES + GYM;38000;inactivo;transferencia;24-09-2025;Daniela Gonzalez
+836731;Scarleth Valentina;Jerez Sepúlveda;20.549.766-8;MUEVETE 4 CLASES AL MES + GYM;38000;inactivo;transferencia;28-10-2025;Daniela Gonzalez
+836731;Scarleth Valentina;Jerez Sepúlveda;20.549.766-8;GYM MENSUAL;;inactivo;transferencia;24-09-2025;Daniela Gonzalez
+364949;Monserrat ;Zepeda ;;VUELA 4 CLASES AL MES;35000;activo;mercadopago;11-09-2025;Sin Información
+364949;Monserrat ;Zepeda ;;VUELA 4 CLASES AL MES;35000;activo;mercadopago;23-10-2025;Sin Información
+364949;Monserrat ;Zepeda ;;VUELA 4 CLASES AL MES;38990;activo;mercadopago;04-12-2025;Sin Información
+37117;Yasmina;Marquez Perez;;VUELA 8 CLASES AL MES;60000;inactivo;debito;26-09-2025;Daniela Gonzalez
+578927;Daniela;Larral Molina;;GYM MENSUAL;19990;activo;transferencia;01-09-2025;Daniela Gonzalez
+578927;Daniela;Larral Molina;;PROMO GYM ANUAL;125000;activo;transferencia;29-09-2025;Daniela Gonzalez
+842035;Nicole;Gonzalez;18425347-k;GYM MENSUAL;19990;inactivo;transferencia;08-10-2025;Daniela Gonzalez
+190350;Paula;Rojas Cardinali;;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;mercadopago;22-09-2025;Sin Información
+846076;Josefa Isidora ;Jaque Escobar ;22589234-2;VUELA 8 CLASES AL MES;60000;inactivo;debito;23-09-2025;Daniela Gonzalez
+846076;Josefa Isidora ;Jaque Escobar ;22589234-2;VUELA 8 CLASES AL MES;60000;inactivo;transferencia;16-10-2025;Daniela Gonzalez
+846076;Josefa Isidora ;Jaque Escobar ;22589234-2;VUELA 8 CLASES AL MES;60000;inactivo;transferencia;18-11-2025;Daniela Gonzalez
+846650;Paulette Almendra;Canelo Galvez;20761420-3;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;03-09-2025;Daniela Gonzalez
+846650;Paulette Almendra;Canelo Galvez;20761420-3;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;30-09-2025;Daniela Gonzalez
+847080;Emmariely;Méndez Rodríguez;28585741;GYM MENSUAL;19990;inactivo;mercadopago;11-09-2025;Sin Información
+847080;Emmariely;Méndez Rodríguez;28585741;GYM MENSUAL;19990;inactivo;mercadopago;12-10-2025;Sin Información
+847726;Constanza Violeta;Maldonado Dávila;;CLASES VUELA CON GYM ILIMITADAS ;;activo;efectivo;04-11-2025;Daniela Gonzalez
+847726;Constanza Violeta;Maldonado Dávila;;TRIMESTRAL VUELA CON GYM CLASES ILIMITADAS ;270000;activo;debito;26-11-2025;Daniela Gonzalez
+848103;Laura;Escobedo bravo;21881240-6;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;04-10-2025;Daniela Gonzalez
+848171;Montserrat Carolina;Nuñez Flores;19.926.741-8;GYM MENSUAL;19990;inactivo;mercadopago;23-09-2025;Sin Información
+848171;Montserrat Carolina;Nuñez Flores;19.926.741-8;GYM MENSUAL;19990;inactivo;mercadopago;23-10-2025;Sin Información
+848171;Montserrat Carolina;Nuñez Flores;19.926.741-8;GYM MENSUAL;19990;inactivo;mercadopago;28-11-2025;Sin Información
+848171;Montserrat Carolina;Nuñez Flores;19.926.741-8;GYM MENSUAL;22500;inactivo;mercadopago;29-12-2025;Sin Información
+214937;María José ;Bustos ;;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;23-09-2025;Daniela Gonzalez
+214937;María José ;Bustos ;;VUELA 4 CLASES AL MES;35000;inactivo;credito;03-11-2025;Daniela Gonzalez
+55048;Sofia;Vásquez Orrego ;;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;21-09-2025;Sin Información
+55048;Sofia;Vásquez Orrego ;;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;21-10-2025;Sin Información
+850884;Karyn Amira ;Manzano Diaz;21067972-3;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;17-09-2025;Daniela Gonzalez
+852976;María Francisca ;Constenla Pérez;;CLASES MUEVETE CON GYM ILIMITADAS ;75000;activo;mercadopago;17-09-2025;Sin Información
+852976;María Francisca ;Constenla Pérez;;TRIMESTRAL MUEVETE CON GYM CLASES ILIMITADAS;125000;activo;transferencia;27-09-2025;Daniela Gonzalez
+852976;María Francisca ;Constenla Pérez;;DIVA URBANA;22000;activo;efectivo;17-10-2025;Daniela Gonzalez
+852976;María Francisca ;Constenla Pérez;;TRIMESTRAL (SIN GYM) MUEVETE CLASES ILIMITADAS ;235990;activo;transferencia;18-12-2025;Daniela Gonzalez
+852976;María Francisca ;Constenla Pérez;;TALLER INTRODUCCIÓN A HEELS;26990;activo;credito;29-12-2025;Daniela Gonzalez
+653073;Indira ;Briceño;;Clase gratis;;inactivo;debito;07-11-2025;Daniela Gonzalez
+853288;Constanza;Stancic;;Clase gratis;;inactivo;efectivo;30-10-2025;Daniela Gonzalez
+855030;Paula ;Ponzano Quintanar;16470558-7;GYM PLAN ANUAL;175990;activo;mercadopago;05-12-2025;Sin Información
+855484;Natalia;Palma Fuentes;20.237.432-8;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;01-09-2025;Sin Información
+855484;Natalia;Palma Fuentes;20.237.432-8;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;14-10-2025;Sin Información
+855484;Natalia;Palma Fuentes;20.237.432-8;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;01-12-2025;Sin Información
+857392;Consuelo Paz;Báez Smith;19636372-6;GYM MENSUAL;19990;inactivo;transferencia;22-09-2025;Daniela Gonzalez
+857705;Fernanda Andrea;González Sánchez;18.413.442-k;GYM MENSUAL;19990;inactivo;transferencia;06-09-2025;Daniela Gonzalez
+857705;Fernanda Andrea;González Sánchez;18.413.442-k;GYM MENSUAL;19990;inactivo;mercadopago;15-10-2025;Sin Información
+857705;Fernanda Andrea;González Sánchez;18.413.442-k;GYM MENSUAL;19990;inactivo;transferencia;18-11-2025;Daniela Gonzalez
+859279;amalia;sepulveda koch;18765891-8;MUEVETE 4 CLASES AL MES;25000;activo;mercadopago;10-09-2025;Sin Información
+859279;amalia;sepulveda koch;18765891-8;MUEVETE 4 CLASES AL MES;27990;activo;mercadopago;15-12-2025;Sin Información
+526404;Pascale Stephanie;Castro Morgado;16074204-6;GYM MENSUAL;19990;inactivo;debito;10-11-2025;Daniela Gonzalez
+526404;Pascale Stephanie;Castro Morgado;16074204-6;GYM MENSUAL;22500;inactivo;debito;17-12-2025;Daniela Gonzalez
+526404;Pascale Stephanie;Castro Morgado;16074204-6;DISEÑO DE RUTINA 1 SESION;15000;inactivo;debito;07-10-2025;Daniela Gonzalez
+526404;Pascale Stephanie;Castro Morgado;16074204-6;4 DISEÑOS DE RUTINA;56000;inactivo;efectivo;10-11-2025;Daniela Gonzalez
+526404;Pascale Stephanie;Castro Morgado;16074204-6;4 DISEÑOS DE RUTINA;74000;inactivo;debito;17-12-2025;Daniela Gonzalez
+526404;Pascale Stephanie;Castro Morgado;16074204-6;TALLER BALLET PARA ADULTAS;29990;inactivo;credito;24-12-2025;Daniela Gonzalez
+862941;Sofia Loreto ;Baeza Cordero ;20472277-3;MUEVETE 12 CLASES AL MES;54000;inactivo;mercadopago;30-09-2025;Sin Información
+862941;Sofia Loreto ;Baeza Cordero ;20472277-3;MUEVETE 12 CLASES AL MES;59990;inactivo;mercadopago;05-12-2025;Sin Información
+862941;Sofia Loreto ;Baeza Cordero ;20472277-3;MUEVETE 6 CLASES AL MES;35000;inactivo;mercadopago;06-11-2025;Sin Información
+760360;Anastasia;Acuña bustamante;;VUELA 12 CLASES AL MES;75000;inactivo;mercadopago;01-09-2025;Sin Información
+687767;Tamara;Olea Donoso;;GYM MENSUAL;19990;inactivo;mercadopago;01-10-2025;Sin Información
+687767;Tamara;Olea Donoso;;GYM MENSUAL;19990;inactivo;mercadopago;02-11-2025;Sin Información
+687767;Tamara;Olea Donoso;;GYM MENSUAL;22500;inactivo;mercadopago;01-12-2025;Sin Información
+226478;Dominique;Vidal;;GYM MENSUAL;19990;activo;mercadopago;01-10-2025;Sin Información
+226478;Dominique;Vidal;;GYM MENSUAL;19990;activo;mercadopago;31-10-2025;Sin Información
+226478;Dominique;Vidal;;GYM MENSUAL;22500;activo;mercadopago;01-12-2025;Sin Información
+866184;Kimberly ;Hernández;18614648-4;GYM MENSUAL;19990;inactivo;mercadopago;03-09-2025;Sin Información
+866184;Kimberly ;Hernández;18614648-4;GYM MENSUAL;19990;inactivo;mercadopago;07-10-2025;Sin Información
+866184;Kimberly ;Hernández;18614648-4;GYM MENSUAL;19990;inactivo;mercadopago;01-12-2025;Sin Información
+866184;Kimberly ;Hernández;18614648-4;CLASE SUELTA PLAN VUELA;12000;inactivo;mercadopago;08-10-2025;Sin Información
+868058;SANDRA;MARIN GARCES;19961378-2;GYM MENSUAL;19990;activo;transferencia;08-09-2025;Daniela Gonzalez
+868058;SANDRA;MARIN GARCES;19961378-2;GYM PLAN ANUAL;155880;activo;credito;09-10-2025;Daniela Gonzalez
+869007;Gabriela Ignacia;Silva Sutil;19.529.261-2;GYM MENSUAL;19990;inactivo;mercadopago;07-11-2025;Sin Información
+869007;Gabriela Ignacia;Silva Sutil;19.529.261-2;GYM TRIMESTRAL;50000;inactivo;transferencia;31-12-2025;Daniela Gonzalez
+555340;Javiera;Ya;;CLASE SUELTA PLAN MUÉVETE;7000;activo;debito;11-09-2025;Daniela Gonzalez
+555340;Javiera;Ya;;CLASE SUELTA PLAN MUÉVETE;7000;activo;debito;26-09-2025;Daniela Gonzalez
+555340;Javiera;Ya;;CLASE SUELTA PLAN MUÉVETE;7000;activo;debito;09-10-2025;Daniela Gonzalez
+555340;Javiera;Ya;;CLASE SUELTA PLAN MUÉVETE;7000;activo;debito;23-10-2025;Daniela Gonzalez
+871304;Mariana Antonia ;Garay Sims;17408266-9;Clase gratis;;activo;transferencia;13-11-2025;Daniela Gonzalez
+871304;Mariana Antonia ;Garay Sims;17408266-9;MUEVETE 12 CLASES AL MES + GYM;67000;activo;mercadopago;15-09-2025;Sin Información
+871304;Mariana Antonia ;Garay Sims;17408266-9;MUEVETE 12 CLASES AL MES + GYM;67000;activo;mercadopago;15-10-2025;Sin Información
+871304;Mariana Antonia ;Garay Sims;17408266-9;DISEÑO DE RUTINA 1 SESION;15000;activo;transferencia;15-09-2025;Daniela Gonzalez
+875218;Jennis ;Olivares Orrego ;15685526-k;MUEVETE 8 CLASES AL MES;40000;inactivo;mercadopago;29-09-2025;Sin Información
+875218;Jennis ;Olivares Orrego ;15685526-k;MUEVETE 8 CLASES AL MES;40000;inactivo;mercadopago;29-10-2025;Sin Información
+666815;Rocio; Baeza Neira;;GYM MENSUAL;19990;inactivo;mercadopago;23-09-2025;Sin Información
+581592;Consuelo;Acuña;;GYM MENSUAL;19990;inactivo;debito;13-10-2025;Daniela Gonzalez
+581592;Consuelo;Acuña;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;13-10-2025;Daniela Gonzalez
+581592;Consuelo;Acuña;;Clase gratis;;inactivo;efectivo;15-11-2025;Daniela Gonzalez
+880500;Renata Florencia ;Lagos Hernández ;21654198-7;MUEVETE 4 CLASES AL MES;25000;activo;transferencia;22-09-2025;Daniela Gonzalez
+165344;Catalina;AP;;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;28-10-2025;Daniela Gonzalez
+530431;Antonia;Yañez;;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;07-10-2025;Sin Información
+882632;Emma Francisca Paz ;Quintana Carriel;24388195-1;MUEVETE 8 CLASES AL MES;40000;inactivo;transferencia;30-09-2025;Daniela Gonzalez
+882632;Emma Francisca Paz ;Quintana Carriel;24388195-1;MUEVETE 8 CLASES AL MES;40000;inactivo;transferencia;27-10-2025;Daniela Gonzalez
+575009;Fernanda ;Jofre;;CLASE SUELTA PLAN MUÉVETE;9000;inactivo;transferencia;01-12-2025;Daniela Gonzalez
+575009;Fernanda ;Jofre;;CLASE SUELTA PLAN MUÉVETE;9000;inactivo;transferencia;05-12-2025;Daniela Gonzalez
+169021;Francisca;Garcia;;MUEVETE 4 CLASES AL MES;25000;congelado;transferencia;24-09-2025;Daniela Gonzalez
+885875;Javiera;Díaz Cofré;21.203.040-6;MUEVETE 6 CLASES AL MES;35000;inactivo;transferencia;02-10-2025;Daniela Gonzalez
+885875;Javiera;Díaz Cofré;21.203.040-6;MUEVETE 4 CLASES AL MES + GYM;38000;inactivo;transferencia;05-11-2025;Daniela Gonzalez
+885875;Javiera;Díaz Cofré;21.203.040-6;MUEVETE 4 CLASES AL MES + GYM;40990;inactivo;transferencia;18-12-2025;Daniela Gonzalez
+885875;Javiera;Díaz Cofré;21.203.040-6;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;05-11-2025;Daniela Gonzalez
+890017;Laura Isabel;Baeza Cordero;21.295.096-3;MUEVETE 4 CLASES AL MES;27990;inactivo;mercadopago;22-12-2025;Sin Información
+890017;Laura Isabel;Baeza Cordero;21.295.096-3;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;25-09-2025;Daniela Gonzalez
+890844;Amaranta Rodríguez López;;;MUEVETE 4 CLASES AL MES;25000;inactivo;debito;03-09-2025;Daniela Gonzalez
+890844;Amaranta Rodríguez López;;;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;08-10-2025;Sin Información
+890844;Amaranta Rodríguez López;;;MUEVETE 4 CLASES AL MES + GYM;40990;inactivo;mercadopago;17-12-2025;Sin Información
+891286;Mati;Gonzalez Piña;19.460.098-4;GYM MENSUAL;19990;inactivo;mercadopago;04-09-2025;Sin Información
+891303;Lisett Ilse ;Cortés Cortés;18529511-7;GYM MENSUAL;19990;inactivo;mercadopago;04-09-2025;Sin Información
+891303;Lisett Ilse ;Cortés Cortés;18529511-7;GYM MENSUAL;19990;inactivo;mercadopago;05-10-2025;Sin Información
+891303;Lisett Ilse ;Cortés Cortés;18529511-7;GYM MENSUAL;19990;inactivo;mercadopago;09-11-2025;Sin Información
+892611;Gabriela ;Polanco;19171619-1;GYM MENSUAL;19990;inactivo;mercadopago;03-09-2025;Sin Información
+892611;Gabriela ;Polanco;19171619-1;GYM MENSUAL;19990;inactivo;mercadopago;01-10-2025;Sin Información
+893205;Josefa Anaís;Moraga Baeza;20.102.864-7;GYM MENSUAL;19990;inactivo;transferencia;09-09-2025;Daniela Gonzalez
+358004;Catalina ;Arias;;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+323547;Ana;Hernandez Vera;18.065.001-6;MUEVETE 6 CLASES AL MES;35000;inactivo;mercadopago;02-10-2025;Sin Información
+894524;Ljubitza;Milling Marifil ;19953274-k;GYM MENSUAL;19990;inactivo;debito;03-09-2025;Daniela Gonzalez
+894524;Ljubitza;Milling Marifil ;19953274-k;GYM MENSUAL;19990;inactivo;transferencia;06-10-2025;Daniela Gonzalez
+894524;Ljubitza;Milling Marifil ;19953274-k;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;debito;01-10-2025;Daniela Gonzalez
+894524;Ljubitza;Milling Marifil ;19953274-k;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;09-10-2025;Daniela Gonzalez
+894551;Antonia ;Becerra Maldonado;19857260-8;GYM MENSUAL;19990;inactivo;transferencia;02-09-2025;Daniela Gonzalez
+797129;Francisca;Arellano;;VUELA 8 CLASES AL MES;60000;activo;mercadopago;29-10-2025;Sin Información
+797129;Francisca;Arellano;;VUELA 8 CLASES AL MES;65990;activo;mercadopago;22-12-2025;Sin Información
+797129;Francisca;Arellano;;CLASES VUELA CON GYM ILIMITADAS ;90000;activo;mercadopago;28-09-2025;Sin Información
+894668;Nataly  ;Curilaf;17827269-1;GYM MENSUAL;19990;activo;debito;04-09-2025;Daniela Gonzalez
+894668;Nataly  ;Curilaf;17827269-1;GYM MENSUAL;19990;activo;mercadopago;04-10-2025;Sin Información
+894668;Nataly  ;Curilaf;17827269-1;GYM MENSUAL;19990;activo;mercadopago;03-11-2025;Sin Información
+895956;Consuelo Antonia;Reinao Fisher;19362387-5;GYM MENSUAL;19990;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+895956;Consuelo Antonia;Reinao Fisher;19362387-5;GYM MENSUAL;19990;inactivo;mercadopago;01-10-2025;Sin Información
+895956;Consuelo Antonia;Reinao Fisher;19362387-5;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;01-10-2025;Daniela Gonzalez
+895956;Consuelo Antonia;Reinao Fisher;19362387-5;Clase gratis;;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+896406;Carla ;Gutiérrez Madariaga;16656942-7;MUEVETE 8 CLASES AL MES;40000;activo;mercadopago;29-09-2025;Sin Información
+896406;Carla ;Gutiérrez Madariaga;16656942-7;MUEVETE 12 CLASES AL MES;54000;activo;mercadopago;25-10-2025;Sin Información
+896406;Carla ;Gutiérrez Madariaga;16656942-7;CLASES MUEVETE CON GYM ILIMITADAS ;75000;activo;mercadopago;18-11-2025;Sin Información
+896406;Carla ;Gutiérrez Madariaga;16656942-7;DISEÑO DE RUTINA 1 SESION;15000;activo;transferencia;20-11-2025;Daniela Gonzalez
+896406;Carla ;Gutiérrez Madariaga;16656942-7;MUEVETE 12 CLASES AL MES + GYM;72990;activo;mercadopago;23-12-2025;Sin Información
+896406;Carla ;Gutiérrez Madariaga;16656942-7;GYM MENSUAL;;activo;transferencia;23-12-2025;Daniela Gonzalez
+311940;Sara;Brauer ;;VUELA 4 CLASES AL MES + GYM;48000;inactivo;mercadopago;17-09-2025;Sin Información
+311940;Sara;Brauer ;;VUELA 4 CLASES AL MES + GYM;48000;inactivo;mercadopago;18-10-2025;Sin Información
+311940;Sara;Brauer ;;VUELA 4 CLASES AL MES + GYM;48000;inactivo;mercadopago;13-11-2025;Sin Información
+311940;Sara;Brauer ;;GYM MENSUAL;;inactivo;efectivo;17-09-2025;Daniela Gonzalez
+311940;Sara;Brauer ;;GYM MENSUAL;22500;inactivo;efectivo;13-11-2025;Daniela Gonzalez
+311940;Sara;Brauer ;;Clase gratis;;inactivo;efectivo;01-11-2025;Daniela Gonzalez
+898705;Melanie;Cordero Orellana;19701252-8;CLASES MUEVETE CON GYM ILIMITADAS ;75000;inactivo;mercadopago;06-09-2025;Sin Información
+898705;Melanie;Cordero Orellana;19701252-8;CLASES MUEVETE CON GYM ILIMITADAS ;75000;inactivo;debito;15-10-2025;Daniela Gonzalez
+898705;Melanie;Cordero Orellana;19701252-8;MUEVETE 8 CLASES AL MES;40000;inactivo;mercadopago;01-12-2025;Sin Información
+899483;Stefani;Pirona Yusti;25267503-5;GYM MENSUAL;19990;inactivo;debito;09-09-2025;Daniela Gonzalez
+899483;Stefani;Pirona Yusti;25267503-5;GYM MENSUAL;19990;inactivo;debito;18-11-2025;Daniela Gonzalez
+881856;Mariangel;Naranjo;258252799;GYM MENSUAL;19990;inactivo;debito;09-09-2025;Daniela Gonzalez
+890666;Yasna;Albornoz Garrido;20389127-k;GYM MENSUAL;19990;inactivo;debito;03-09-2025;Daniela Gonzalez
+890666;Yasna;Albornoz Garrido;20389127-k;GYM MENSUAL;19990;inactivo;debito;02-10-2025;Daniela Gonzalez
+890666;Yasna;Albornoz Garrido;20389127-k;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;04-09-2025;Daniela Gonzalez
+600902;Almendra;Gomez;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;22-10-2025;Daniela Gonzalez
+600902;Almendra;Gomez;;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;debito;20-11-2025;Daniela Gonzalez
+901992;Elisa ;Araya Lopetegui;22114122-9;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;mercadopago;04-11-2025;Sin Información
+903529;Isadora;Sobera Moreno;22023639-0;GYM MENSUAL;19990;inactivo;transferencia;21-09-2025;Daniela Gonzalez
+903529;Isadora;Sobera Moreno;22023639-0;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;21-09-2025;Daniela Gonzalez
+903529;Isadora;Sobera Moreno;22023639-0;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;21-09-2025;Daniela Gonzalez
+903529;Isadora;Sobera Moreno;22023639-0;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;21-09-2025;Daniela Gonzalez
+904060;Belén;Castro Calzado;21649834-8;GYM MENSUAL;19990;inactivo;transferencia;22-09-2025;Daniela Gonzalez
+904060;Belén;Castro Calzado;21649834-8;GYM MENSUAL;19990;inactivo;transferencia;10-11-2025;Daniela Gonzalez
+904710;Isabel;Rivera Montiel;25350904k;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;07-10-2025;Daniela Gonzalez
+904710;Isabel;Rivera Montiel;25350904k;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;16-10-2025;Daniela Gonzalez
+904710;Isabel;Rivera Montiel;25350904k;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;18-11-2025;Daniela Gonzalez
+904710;Isabel;Rivera Montiel;25350904k;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;02-09-2025;Daniela Gonzalez
+904710;Isabel;Rivera Montiel;25350904k;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;30-10-2025;Daniela Gonzalez
+904710;Isabel;Rivera Montiel;25350904k;ACCESO DIARIO GYM;4000;inactivo;transferencia;13-10-2025;Daniela Gonzalez
+905010;DANIELA;MORAGA INOSTROZA;20657759-2;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;03-09-2025;Daniela Gonzalez
+905010;DANIELA;MORAGA INOSTROZA;20657759-2;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;07-10-2025;Daniela Gonzalez
+907031;Javiera;Viveros Astete;18.809.436-8;MUEVETE 4 CLASES AL MES + GYM;38000;inactivo;mercadopago;25-09-2025;Sin Información
+907031;Javiera;Viveros Astete;18.809.436-8;MUEVETE 4 CLASES AL MES + GYM;38000;inactivo;mercadopago;26-10-2025;Sin Información
+907031;Javiera;Viveros Astete;18.809.436-8;MUEVETE 4 CLASES AL MES + GYM;38000;inactivo;mercadopago;28-11-2025;Sin Información
+907031;Javiera;Viveros Astete;18.809.436-8;MUEVETE 4 CLASES AL MES + GYM;40990;inactivo;mercadopago;31-12-2025;Sin Información
+907031;Javiera;Viveros Astete;18.809.436-8;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;29-09-2025;Daniela Gonzalez
+907031;Javiera;Viveros Astete;18.809.436-8;GYM MENSUAL;;inactivo;efectivo;25-09-2025;Daniela Gonzalez
+907031;Javiera;Viveros Astete;18.809.436-8;Clase gratis;;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+907031;Javiera;Viveros Astete;18.809.436-8;Clase gratis;;inactivo;transferencia;11-11-2025;Daniela Gonzalez
+907654;Flavia Nathaly ;Molina Astete;17705061-K;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;17-09-2025;Sin Información
+907654;Flavia Nathaly ;Molina Astete;17705061-K;MUEVETE 4 CLASES AL MES;25000;inactivo;debito;15-10-2025;Daniela Gonzalez
+907654;Flavia Nathaly ;Molina Astete;17705061-K;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;18-11-2025;Sin Información
+556440;valeria;contreras;;Clase gratis;;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+911176;Isidora ;Gómez Palma;21789475-1;GYM MENSUAL;19990;inactivo;mercadopago;22-09-2025;Sin Información
+911176;Isidora ;Gómez Palma;21789475-1;GYM MENSUAL;19990;inactivo;mercadopago;21-10-2025;Sin Información
+912934;Francisca Belén ;Aguilar González.;20762685-6;CLASE SUELTA PLAN VUELA;12000;inactivo;transferencia;17-09-2025;Daniela Gonzalez
+912934;Francisca Belén ;Aguilar González.;20762685-6;CLASE SUELTA PLAN VUELA;12000;inactivo;transferencia;25-09-2025;Daniela Gonzalez
+914241;Génesis Valentina;Díaz León;22.175.296-1;GYM MENSUAL;19990;inactivo;transferencia;30-09-2025;Daniela Gonzalez
+914241;Génesis Valentina;Díaz León;22.175.296-1;GYM MENSUAL;19990;inactivo;transferencia;11-11-2025;Daniela Gonzalez
+915426;Valeria;Salinas Padilla;18955026-k;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;09-09-2025;Sin Información
+916014;Catalina;Sanhueza Rosales;20128818-5;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;09-09-2025;Sin Información
+614553;Catalina;Brisso Catalán;;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+918346;Rocío  ;Figueroa Ramírez;17546195-7;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+918391;Valeria;Yañez Tripailaf;18545873-3;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+918391;Valeria;Yañez Tripailaf;18545873-3;VUELA 4 CLASES AL MES + GYM;48000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+918391;Valeria;Yañez Tripailaf;18545873-3;GYM MENSUAL;;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+918391;Valeria;Yañez Tripailaf;18545873-3;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+918595;Rocío ;Celis López ;16144467-7;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+918599;Paz;Nuñez Contreras ;15907024-7;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+918229;Romina;Márquez Vera;18370992-5;GYM MENSUAL;19990;inactivo;transferencia;10-09-2025;Daniela Gonzalez
+918229;Romina;Márquez Vera;18370992-5;DISEÑO DE RUTINA 5 SESIONES;70000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+919244;Antonia ;Pinochet Quezada;20.287.672-2;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+919244;Antonia ;Pinochet Quezada;20.287.672-2;GYM MENSUAL;;inactivo;efectivo;02-09-2025;Daniela Gonzalez
+919244;Antonia ;Pinochet Quezada;20.287.672-2;VUELA 4 CLASES AL MES + GYM;48000;inactivo;debito;02-09-2025;Daniela Gonzalez
+919244;Antonia ;Pinochet Quezada;20.287.672-2;VUELA 4 CLASES AL MES + GYM;48000;inactivo;mercadopago;06-10-2025;Sin Información
+919248;Sofía ;Astaburuaga García ;21031008-8;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+919248;Sofía ;Astaburuaga García ;21031008-8;GYM MENSUAL;19990;inactivo;debito;02-09-2025;Daniela Gonzalez
+919248;Sofía ;Astaburuaga García ;21031008-8;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;09-09-2025;Daniela Gonzalez
+919620;Javiera Andrea ;Miranda Tolorza ;20191941-K;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+919620;Javiera Andrea ;Miranda Tolorza ;20191941-K;GYM MENSUAL;19990;inactivo;transferencia;15-09-2025;Daniela Gonzalez
+919620;Javiera Andrea ;Miranda Tolorza ;20191941-K;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;15-09-2025;Daniela Gonzalez
+919833;Francisca  ;Rodríguez;18785323-0;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;01-09-2025;Daniela Gonzalez
+919833;Francisca  ;Rodríguez;18785323-0;VUELA 4 CLASES AL MES;35000;inactivo;debito;02-09-2025;Daniela Gonzalez
+919833;Francisca  ;Rodríguez;18785323-0;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;13-10-2025;Daniela Gonzalez
+919852;Camila  ;Bustamante;19237229-1;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;02-09-2025;Daniela Gonzalez
+919852;Camila  ;Bustamante;19237229-1;VUELA 8 CLASES AL MES;60000;inactivo;transferencia;02-09-2025;Daniela Gonzalez
+921368;MARIA FERNANDA ;PERERA SANCHEZ ;25484487-K;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;03-09-2025;Daniela Gonzalez
+889753;Nicole alejandra;libuy bustamante;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;05-09-2025;Daniela Gonzalez
+889753;Nicole alejandra;libuy bustamante;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;05-09-2025;Daniela Gonzalez
+922844;Silvana Macarena ;Flores Jara;18884428-6;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;05-09-2025;Daniela Gonzalez
+746239;Fernanda ;Trigueros;;Clase gratis;;inactivo;efectivo;12-09-2025;Daniela Gonzalez
+581975;Amanda ;Vicencio ;20858387-5;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;07-09-2025;Daniela Gonzalez
+581975;Amanda ;Vicencio ;20858387-5;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;07-09-2025;Daniela Gonzalez
+581975;Amanda ;Vicencio ;20858387-5;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;20-10-2025;Daniela Gonzalez
+924046;Francisca;Miranda;;GYM MENSUAL;19990;inactivo;transferencia;14-11-2025;Daniela Gonzalez
+924046;Francisca;Miranda;;GYM MENSUAL;22500;inactivo;mercadopago;17-12-2025;Sin Información
+924046;Francisca;Miranda;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;14-11-2025;Daniela Gonzalez
+925117;Constanza Javiera ;Rojas Campillay ;17194816-9;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;09-09-2025;Daniela Gonzalez
+113916;magdalena ;benavides ;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;09-09-2025;Daniela Gonzalez
+554633;Valentina;Pentz Mu;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;09-09-2025;Daniela Gonzalez
+554633;Valentina;Pentz Mu;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;22-09-2025;Daniela Gonzalez
+554633;Valentina;Pentz Mu;;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;30-09-2025;Sin Información
+554633;Valentina;Pentz Mu;;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;04-11-2025;Sin Información
+417183;Camila;Vergara Fuentes;;CLASE DE PRUEBA VUELA;7000;inactivo;debito;09-09-2025;Daniela Gonzalez
+406234;Johana;Botero;;TALLER DE CUECA;12000;nuevo;transferencia;10-09-2025;Daniela Gonzalez
+928688;Michelle; Díaz;19281878-8;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;15-09-2025;Daniela Gonzalez
+928688;Michelle; Díaz;19281878-8;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;22-09-2025;Daniela Gonzalez
+928688;Michelle; Díaz;19281878-8;MUEVETE 4 CLASES AL MES + GYM;38000;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+928688;Michelle; Díaz;19281878-8;MUEVETE 4 CLASES AL MES + GYM;40990;inactivo;transferencia;09-12-2025;Daniela Gonzalez
+928688;Michelle; Díaz;19281878-8;GYM MENSUAL;;inactivo;debito;09-12-2025;Daniela Gonzalez
+929060;Francisca Soledad;Aravena Sánchez;20.846.428-0;GYM MENSUAL;19990;activo;transferencia;16-09-2025;Daniela Gonzalez
+929060;Francisca Soledad;Aravena Sánchez;20.846.428-0;GYM MENSUAL;19990;activo;credito;27-10-2025;Daniela Gonzalez
+929060;Francisca Soledad;Aravena Sánchez;20.846.428-0;CLASE DE PRUEBA MUEVETE;5000;activo;transferencia;16-09-2025;Daniela Gonzalez
+929095;Constanza Elizabeth ;Cáceres Nahuelhual;20816498-8;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;16-09-2025;Daniela Gonzalez
+929095;Constanza Elizabeth ;Cáceres Nahuelhual;20816498-8;MUEVETE 4 CLASES AL MES;25000;inactivo;debito;20-09-2025;Daniela Gonzalez
+929095;Constanza Elizabeth ;Cáceres Nahuelhual;20816498-8;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;18-10-2025;Sin Información
+931375;Rikki Luna;Sánchez;17404768c-5;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;22-09-2025;Daniela Gonzalez
+475824;Constanza ;Alarcon;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;22-09-2025;Daniela Gonzalez
+475824;Constanza ;Alarcon;;MUEVETE 4 CLASES AL MES + GYM;38000;inactivo;mercadopago;30-09-2025;Sin Información
+475824;Constanza ;Alarcon;;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;04-11-2025;Sin Información
+475824;Constanza ;Alarcon;;Clase gratis;;inactivo;transferencia;11-11-2025;Daniela Gonzalez
+931796;Carolina ;Romo;16029629-1;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;22-09-2025;Daniela Gonzalez
+931796;Carolina ;Romo;16029629-1;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;30-09-2025;Sin Información
+931813;Camila Alejandra ;Abarca Flores ;19537635-8;CLASE DE PRUEBA MUEVETE;5000;activo;transferencia;21-09-2025;Daniela Gonzalez
+931813;Camila Alejandra ;Abarca Flores ;19537635-8;MUEVETE 4 CLASES AL MES;25000;activo;pago online;30-09-2025;Daniela Gonzalez
+931813;Camila Alejandra ;Abarca Flores ;19537635-8;MUEVETE 4 CLASES AL MES;25000;activo;mercadopago;27-10-2025;Sin Información
+931813;Camila Alejandra ;Abarca Flores ;19537635-8;MUEVETE 6 CLASES AL MES;35000;activo;mercadopago;23-11-2025;Sin Información
+931813;Camila Alejandra ;Abarca Flores ;19537635-8;VUELA 4 CLASES AL MES;38990;activo;mercadopago;27-12-2025;Sin Información
+271526;Genesis;Romero;;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;22-09-2025;Daniela Gonzalez
+271526;Genesis;Romero;;VUELA 4 CLASES AL MES + GYM;48000;inactivo;debito;24-09-2025;Daniela Gonzalez
+271526;Genesis;Romero;;VUELA 4 CLASES AL MES + GYM;48000;inactivo;mercadopago;26-10-2025;Sin Información
+271526;Genesis;Romero;;VUELA 6 CLASES AL MES;48000;inactivo;mercadopago;19-11-2025;Sin Información
+831593;Alla;Sharabanova;269739703;VUELA 4 CLASES AL MES;35000;inactivo;debito;20-09-2025;Daniela Gonzalez
+931844;Mabel ;Soto Garrido;15389795-6;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;22-09-2025;Daniela Gonzalez
+931853;Catalina ;Labraña Labraña;19681141-9;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;22-09-2025;Daniela Gonzalez
+932209;Javiera;Moya;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;03-12-2025;Daniela Gonzalez
+932240;Daniela Paz ;Sologuren Acevedo ;15346083-3;GYM MENSUAL;19990;activo;debito;22-09-2025;Daniela Gonzalez
+932240;Daniela Paz ;Sologuren Acevedo ;15346083-3;CLASE DE PRUEBA MUEVETE;5000;activo;debito;22-09-2025;Daniela Gonzalez
+932240;Daniela Paz ;Sologuren Acevedo ;15346083-3;DISEÑO DE RUTINA 1 SESION;15000;activo;debito;22-09-2025;Daniela Gonzalez
+932240;Daniela Paz ;Sologuren Acevedo ;15346083-3;DISEÑO DE RUTINA 1 SESION;15000;activo;debito;23-10-2025;Daniela Gonzalez
+933134;Catalina Antonella;Sandoval Campos;20044549-K;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;23-09-2025;Daniela Gonzalez
+933142;Magaly Andrea ;Antileo Valdés;19288765-8;CLASES MUEVETE CON GYM ILIMITADAS ;75000;activo;pago online;23-09-2025;Daniela Gonzalez
+933142;Magaly Andrea ;Antileo Valdés;19288765-8;CLASES MUEVETE CON GYM ILIMITADAS ;75000;activo;mercadopago;27-10-2025;Sin Información
+933142;Magaly Andrea ;Antileo Valdés;19288765-8;TRIMESTRAL MUEVETE CON GYM CLASES ILIMITADAS;225000;activo;mercadopago;25-11-2025;Sin Información
+933151;Fernanda Paz ;Rojas Herrera;21551388-2;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;23-09-2025;Daniela Gonzalez
+933151;Fernanda Paz ;Rojas Herrera;21551388-2;GYM MENSUAL;19990;inactivo;transferencia;23-09-2025;Daniela Gonzalez
+919360;Constanza;Mendoza Reyes;17125644-5;CLASES VUELA CON GYM ILIMITADAS ;90000;congelado;credito;09-10-2025;Daniela Gonzalez
+934404;Valentina;Catalán Navarro;18522722-7;TRIMESTRAL MUEVETE CON GYM CLASES ILIMITADAS;199990;inactivo;credito;24-09-2025;Daniela Gonzalez
+421321;Denisse;Urzúa Quilan;19405992-2;GYM MENSUAL;19990;inactivo;debito;24-09-2025;Daniela Gonzalez
+421321;Denisse;Urzúa Quilan;19405992-2;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;24-09-2025;Daniela Gonzalez
+934554;Macarena ;Salinas Peña;18925934-4;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;24-09-2025;Daniela Gonzalez
+506625;Marcela Roach;Roach;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;24-09-2025;Daniela Gonzalez
+757397;Pamela;Palma Currin;;DISEÑO DE RUTINA 1 SESION;15000;activo;transferencia;24-09-2025;Daniela Gonzalez
+757397;Pamela;Palma Currin;;CLASE DE PRUEBA MUEVETE;5000;activo;debito;26-09-2025;Daniela Gonzalez
+757397;Pamela;Palma Currin;;GYM TRIMESTRAL;50970;activo;debito;26-09-2025;Daniela Gonzalez
+757397;Pamela;Palma Currin;;GYM TRIMESTRAL;57000;activo;credito;23-12-2025;Daniela Gonzalez
+934875;Sofía Almendra;Parraguez León;20468643-2;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;25-09-2025;Daniela Gonzalez
+934875;Sofía Almendra;Parraguez León;20468643-2;VUELA 4 CLASES AL MES + GYM;48000;inactivo;transferencia;25-09-2025;Daniela Gonzalez
+934875;Sofía Almendra;Parraguez León;20468643-2;VUELA 4 CLASES AL MES + GYM;48000;inactivo;pago online;23-10-2025;Daniela Gonzalez
+934875;Sofía Almendra;Parraguez León;20468643-2;GYM MENSUAL;;inactivo;pago online;23-10-2025;Daniela Gonzalez
+934875;Sofía Almendra;Parraguez León;20468643-2;GYM MENSUAL;;inactivo;pago online;27-09-2025;Daniela Gonzalez
+934875;Sofía Almendra;Parraguez León;20468643-2;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;28-11-2025;Sin Información
+934875;Sofía Almendra;Parraguez León;20468643-2;VUELA 4 CLASES AL MES;38990;inactivo;mercadopago;26-12-2025;Sin Información
+934880;MARIA JOSE ;CORVALAN ROJAS;21199910-1;GYM MENSUAL;19990;inactivo;transferencia;25-09-2025;Daniela Gonzalez
+492508;Antonia;Ureta Martin;21009909-3 ;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;25-09-2025;Daniela Gonzalez
+492508;Antonia;Ureta Martin;21009909-3 ;VUELA 8 CLASES AL MES;60000;inactivo;pago online;09-10-2025;Daniela Gonzalez
+492508;Antonia;Ureta Martin;21009909-3 ;VUELA 6 CLASES AL MES;48000;inactivo;mercadopago;11-11-2025;Sin Información
+935895;María Jesús ;Barril Pailamilla ;18093854-0;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;26-09-2025;Daniela Gonzalez
+348025;Grace Isolde;Wandersleben ;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;26-09-2025;Daniela Gonzalez
+348025;Grace Isolde;Wandersleben ;;MUEVETE 8 CLASES AL MES;40000;inactivo;mercadopago;06-10-2025;Sin Información
+301358;Isidora;Cornejo;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;26-09-2025;Daniela Gonzalez
+936201;Catalina Paola;Bustamante Pollard;21.011.949-3;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;24-09-2025;Daniela Gonzalez
+936201;Catalina Paola;Bustamante Pollard;21.011.949-3;MUEVETE 4 CLASES AL MES;25000;inactivo;credito;01-10-2025;Daniela Gonzalez
+826705;Antonia;Stieglitz;;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;29-09-2025;Daniela Gonzalez
+91907;Paula;Standen León ;19.443.990-3;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;13-11-2025;Daniela Gonzalez
+91907;Paula;Standen León ;19.443.990-3;MUEVETE 4 CLASES AL MES;27990;inactivo;mercadopago;09-12-2025;Sin Información
+937148;Montserrat Antonia;Muñoz Román;21.578.529-7;GYM MENSUAL;19990;inactivo;transferencia;28-09-2025;Daniela Gonzalez
+937148;Montserrat Antonia;Muñoz Román;21.578.529-7;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;28-09-2025;Daniela Gonzalez
+938307;Isabel;Milling;13263642-7;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;29-09-2025;Daniela Gonzalez
+938307;Isabel;Milling;13263642-7;GYM MENSUAL;19990;inactivo;debito;29-09-2025;Daniela Gonzalez
+938307;Isabel;Milling;13263642-7;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;09-10-2025;Daniela Gonzalez
+938348;Sofía ;Padilla Reyes;21473141-k;PROMO GYM ANUAL;125000;activo;credito;29-09-2025;Daniela Gonzalez
+938356;Jhomara ;Valle Iliza;23641113-3;PROMO GYM ANUAL;125000;activo;credito;29-09-2025;Daniela Gonzalez
+938377;Martyna ;Navarro Rivera;21292811-9;ACCESO DIARIO GYM;4000;inactivo;efectivo;29-09-2025;Daniela Gonzalez
+938381;Florenza  ;Caiozzi;21699491-4;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;29-09-2025;Daniela Gonzalez
+938381;Florenza  ;Caiozzi;21699491-4;VUELA 6 CLASES AL MES;48000;inactivo;transferencia;17-10-2025;Daniela Gonzalez
+938381;Florenza  ;Caiozzi;21699491-4;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;17-11-2025;Daniela Gonzalez
+281702;Tamara;Soto Acevedo;;VUELA 8 CLASES AL MES;60000;inactivo;transferencia;29-09-2025;Daniela Gonzalez
+281702;Tamara;Soto Acevedo;;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;29-09-2025;Daniela Gonzalez
+933987;Camila;Perez García;;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;29-09-2025;Daniela Gonzalez
+933987;Camila;Perez García;;VUELA 6 CLASES AL MES;48000;inactivo;debito;30-09-2025;Daniela Gonzalez
+933987;Camila;Perez García;;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;04-11-2025;Sin Información
+933987;Camila;Perez García;;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;28-11-2025;Sin Información
+933987;Camila;Perez García;;VUELA 4 CLASES AL MES;38990;inactivo;mercadopago;30-12-2025;Sin Información
+933987;Camila;Perez García;;CLASE SUELTA PLAN VUELA;12000;inactivo;mercadopago;26-12-2025;Sin Información
+938833;Jael Aurora;Medina Cid;21723627-4;PROMO GYM ANUAL;125000;activo;transferencia;29-09-2025;Daniela Gonzalez
+938837;Yanira;García;20.498.232-5;CLASE DE PRUEBA VUELA;7000;activo;transferencia;29-09-2025;Daniela Gonzalez
+938837;Yanira;García;20.498.232-5;VUELA 4 CLASES AL MES;35000;activo;debito;30-09-2025;Daniela Gonzalez
+938837;Yanira;García;20.498.232-5;VUELA 4 CLASES AL MES;35000;activo;transferencia;04-11-2025;Daniela Gonzalez
+938837;Yanira;García;20.498.232-5;VUELA 4 CLASES AL MES;35000;activo;transferencia;30-11-2025;Daniela Gonzalez
+938837;Yanira;García;20.498.232-5;VUELA 4 CLASES AL MES;38990;activo;debito;30-12-2025;Daniela Gonzalez
+939109;Francisca Alejandra; Mora Segura ;18749475-3;GYM MENSUAL;19990;inactivo;transferencia;03-10-2025;Daniela Gonzalez
+939109;Francisca Alejandra; Mora Segura ;18749475-3;GYM MENSUAL;19990;inactivo;transferencia;07-11-2025;Daniela Gonzalez
+939109;Francisca Alejandra; Mora Segura ;18749475-3;GYM MENSUAL;22500;inactivo;transferencia;11-12-2025;Daniela Gonzalez
+289885;Teresa;Cid;;PROMO GYM ANUAL;125000;activo;pago online;30-09-2025;Daniela Gonzalez
+939362;Natalie ;Medina Cid;19034231-K;PROMO GYM ANUAL;125000;activo;pago online;30-09-2025;Daniela Gonzalez
+939362;Natalie ;Medina Cid;19034231-K;DISEÑO DE RUTINA 1 SESION;15000;activo;transferencia;08-11-2025;Daniela Gonzalez
+939425;Nicole Carolina;Rojas Peralta;20052832-8;PROMO GYM ANUAL;125000;activo;credito;30-09-2025;Daniela Gonzalez
+939467;Valentina;Guzman;20474125-5;PROMO GYM ANUAL;125000;activo;credito;30-09-2025;Daniela Gonzalez
+555435;karla;barrientos;;GYM MENSUAL;19990;inactivo;transferencia;30-09-2025;Daniela Gonzalez
+939567;Tania ;Castillo Prieto ;19704763-1;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;30-09-2025;Daniela Gonzalez
+939567;Tania ;Castillo Prieto ;19704763-1;MUEVETE 4 CLASES AL MES + GYM;38000;inactivo;debito;15-10-2025;Daniela Gonzalez
+939567;Tania ;Castillo Prieto ;19704763-1;GYM MENSUAL;;inactivo;efectivo;15-10-2025;Daniela Gonzalez
+826002;PAULA;GUERRA;185373479;PROMO GYM ANUAL;125000;activo;pago online;30-09-2025;Daniela Gonzalez
+939950;Mónica;Cortez Álvarez;11207242-K;CLASE DE PRUEBA VUELA;7000;inactivo;debito;30-09-2025;Daniela Gonzalez
+941382;Soledad  ;Silva;12905131-0;CLASE DE PRUEBA VUELA;7000;congelado;debito;30-09-2025;Daniela Gonzalez
+941382;Soledad  ;Silva;12905131-0;VUELA 8 CLASES AL MES;60000;congelado;debito;30-09-2025;Daniela Gonzalez
+941382;Soledad  ;Silva;12905131-0;VUELA 8 CLASES AL MES;60000;congelado;debito;04-11-2025;Daniela Gonzalez
+941382;Soledad  ;Silva;12905131-0;VUELA 8 CLASES AL MES;60000;congelado;debito;28-11-2025;Daniela Gonzalez
+942375;Jael Valentina ;Jara Soto;21466789-4;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;02-10-2025;Daniela Gonzalez
+942375;Jael Valentina ;Jara Soto;21466789-4;GYM MENSUAL;19990;inactivo;debito;02-10-2025;Daniela Gonzalez
+942375;Jael Valentina ;Jara Soto;21466789-4;DISEÑO DE RUTINA 1 SESION;15000;inactivo;debito;02-10-2025;Daniela Gonzalez
+943289;Yumiko;García Rojas;44523248-3;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;03-10-2025;Daniela Gonzalez
+943289;Yumiko;García Rojas;44523248-3;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;04-10-2025;Daniela Gonzalez
+943289;Yumiko;García Rojas;44523248-3;Clase gratis;;inactivo;efectivo;04-11-2025;Daniela Gonzalez
+145438;Paulina;Bucarey;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;06-10-2025;Daniela Gonzalez
+945801;Ignacia ;Cabrera Bahamondes;20666071-6;CLASE DE PRUEBA MUEVETE;5000;activo;transferencia;06-10-2025;Daniela Gonzalez
+945801;Ignacia ;Cabrera Bahamondes;20666071-6;VUELA 8 CLASES AL MES;60000;activo;transferencia;13-10-2025;Daniela Gonzalez
+945801;Ignacia ;Cabrera Bahamondes;20666071-6;VUELA 8 CLASES AL MES;60000;activo;credito;03-11-2025;Daniela Gonzalez
+945838;Beatriz  ;González;21334757-8;CLASE DE PRUEBA VUELA;7000;inactivo;debito;04-10-2025;Daniela Gonzalez
+945849;Grecia ;Rojas;25634125-5;GYM MENSUAL;19990;inactivo;debito;06-10-2025;Daniela Gonzalez
+945849;Grecia ;Rojas;25634125-5;GYM MENSUAL;19990;inactivo;transferencia;18-11-2025;Daniela Gonzalez
+945849;Grecia ;Rojas;25634125-5;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;06-10-2025;Daniela Gonzalez
+945849;Grecia ;Rojas;25634125-5;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;debito;21-10-2025;Daniela Gonzalez
+946717;Ingrid ;Díaz Muñoz ;13437730-5;GYM MENSUAL;19990;inactivo;debito;07-10-2025;Daniela Gonzalez
+946717;Ingrid ;Díaz Muñoz ;13437730-5;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;07-10-2025;Daniela Gonzalez
+946751;Ximena;Soto Vega;15918835-3;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;07-10-2025;Daniela Gonzalez
+946751;Ximena;Soto Vega;15918835-3;GYM MENSUAL;19990;inactivo;debito;07-10-2025;Daniela Gonzalez
+946751;Ximena;Soto Vega;15918835-3;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;07-10-2025;Daniela Gonzalez
+946751;Ximena;Soto Vega;15918835-3;DISEÑO DE RUTINA 1 SESION;15000;inactivo;debito;27-11-2025;Daniela Gonzalez
+946751;Ximena;Soto Vega;15918835-3;GYM TRIMESTRAL;50970;inactivo;debito;04-11-2025;Daniela Gonzalez
+946788;Genoveva ;Chávez Páez ;15233283-1;CLASE DE PRUEBA MUEVETE;5000;activo;transferencia;07-10-2025;Daniela Gonzalez
+946788;Genoveva ;Chávez Páez ;15233283-1;DISEÑO DE RUTINA 1 SESION;15000;activo;debito;07-10-2025;Daniela Gonzalez
+946788;Genoveva ;Chávez Páez ;15233283-1;GYM SEMESTRAL;89940;activo;debito;07-10-2025;Daniela Gonzalez
+195657;Eliset;Roa;;CLASE DE PRUEBA VUELA;7000;activo;transferencia;07-10-2025;Daniela Gonzalez
+195657;Eliset;Roa;;VUELA 4 CLASES AL MES;35000;activo;transferencia;10-10-2025;Daniela Gonzalez
+195657;Eliset;Roa;;VUELA 4 CLASES AL MES;35000;activo;transferencia;30-11-2025;Daniela Gonzalez
+195657;Eliset;Roa;;VUELA 6 CLASES AL MES;48000;activo;mercadopago;05-11-2025;Sin Información
+947975;Esperanza ;Rivera Morán ;22772629-6;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;08-10-2025;Daniela Gonzalez
+947975;Esperanza ;Rivera Morán ;22772629-6;CLASES MUEVETE CON GYM ILIMITADAS ;75000;inactivo;transferencia;22-10-2025;Daniela Gonzalez
+948599;Martina;Valdés;20914824-2;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;10-10-2025;Daniela Gonzalez
+948599;Martina;Valdés;20914824-2;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;12-11-2025;Sin Información
+948599;Martina;Valdés;20914824-2;VUELA 4 CLASES AL MES + GYM;48000;inactivo;mercadopago;25-11-2025;Sin Información
+948599;Martina;Valdés;20914824-2;VUELA 4 CLASES AL MES + GYM;51990;inactivo;mercadopago;26-12-2025;Sin Información
+948901;Ingrid del Carmen;Araya Ponce;14003910-1;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;09-10-2025;Daniela Gonzalez
+948905;Claudia Alejandra ;Rodríguez Cerda ;11482906-4;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;09-10-2025;Daniela Gonzalez
+679311;Eylin ;Pizarro;;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;09-10-2025;Daniela Gonzalez
+679311;Eylin ;Pizarro;;ACCESO DIARIO GYM;4000;inactivo;transferencia;09-10-2025;Daniela Gonzalez
+679311;Eylin ;Pizarro;;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;debito;10-11-2025;Daniela Gonzalez
+951188;Rosa;Fuentes Gutiérrez ;8730514-7;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;13-10-2025;Daniela Gonzalez
+951188;Rosa;Fuentes Gutiérrez ;8730514-7;GYM MENSUAL;19990;inactivo;debito;13-10-2025;Daniela Gonzalez
+951188;Rosa;Fuentes Gutiérrez ;8730514-7;GYM MENSUAL;22500;inactivo;debito;02-12-2025;Daniela Gonzalez
+951200;Francisca ;Muñoz Burgos;19.670.989-4;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;10-10-2025;Daniela Gonzalez
+951444;Javiera  ;Dunoguier;20726084-3;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;13-10-2025;Daniela Gonzalez
+951444;Javiera  ;Dunoguier;20726084-3;VUELA 4 CLASES AL MES;35000;inactivo;debito;13-10-2025;Daniela Gonzalez
+951444;Javiera  ;Dunoguier;20726084-3;VUELA 4 CLASES AL MES;35000;inactivo;debito;10-11-2025;Daniela Gonzalez
+951444;Javiera  ;Dunoguier;20726084-3;VUELA 4 CLASES AL MES;38990;inactivo;mercadopago;13-12-2025;Sin Información
+389860;Claudia ;Ortiz Alvarez;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;13-10-2025;Daniela Gonzalez
+952599;Nicole ;Herrera López;17838039-7;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;13-10-2025;Daniela Gonzalez
+952735;Sofía ;Cortés Murillo;21368132-k;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;14-10-2025;Daniela Gonzalez
+930130;Cote;Mardones;;Clase gratis;;inactivo;efectivo;04-11-2025;Daniela Gonzalez
+953621;Isaura Andrea ;Cid Tessini;20010478-1;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;15-10-2025;Daniela Gonzalez
+953621;Isaura Andrea ;Cid Tessini;20010478-1;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;mercadopago;30-10-2025;Sin Información
+953622;Yigliola Yamilett ;Vega Peña ;19942639-7;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;15-10-2025;Daniela Gonzalez
+953625;Elizabeth natalia ;vega peña ;18901674-3;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;15-10-2025;Daniela Gonzalez
+953630;Gabriela  ;Bahamondez;21553092-2;GYM MENSUAL;19990;inactivo;transferencia;15-10-2025;Daniela Gonzalez
+953630;Gabriela  ;Bahamondez;21553092-2;GYM MENSUAL;19990;inactivo;transferencia;15-11-2025;Daniela Gonzalez
+953630;Gabriela  ;Bahamondez;21553092-2;DISEÑO DE RUTINA 1 SESION;15000;inactivo;debito;22-10-2025;Daniela Gonzalez
+673277;Fernanda;Musleh De Stefano;18059488-4;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;16-10-2025;Daniela Gonzalez
+673277;Fernanda;Musleh De Stefano;18059488-4;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;23-10-2025;Daniela Gonzalez
+642889;Paulina;Álvarez Godoy;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;16-10-2025;Daniela Gonzalez
+642889;Paulina;Álvarez Godoy;;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+642889;Paulina;Álvarez Godoy;;CLASE DE PRUEBA MUEVETE;7000;inactivo;transferencia;26-11-2025;Daniela Gonzalez
+955166;Barbara constanza ;Gonzalez Martinez ;18093869-9;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;17-10-2025;Daniela Gonzalez
+955166;Barbara constanza ;Gonzalez Martinez ;18093869-9;GYM MENSUAL;19990;inactivo;transferencia;23-10-2025;Daniela Gonzalez
+955166;Barbara constanza ;Gonzalez Martinez ;18093869-9;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;23-10-2025;Daniela Gonzalez
+955349;Karin Caro ;Nahuelhual;14192518-0;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;17-10-2025;Daniela Gonzalez
+955349;Karin Caro ;Nahuelhual;14192518-0;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;21-11-2025;Daniela Gonzalez
+956580;Franchesca;Rojas García;18.190.242-6;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;20-10-2025;Daniela Gonzalez
+957187;Javiera Fernanada;Leaño Carvajal;21466881-5;GYM MENSUAL;19990;activo;transferencia;20-10-2025;Daniela Gonzalez
+957187;Javiera Fernanada;Leaño Carvajal;21466881-5;GYM MENSUAL;19990;activo;transferencia;20-11-2025;Daniela Gonzalez
+957187;Javiera Fernanada;Leaño Carvajal;21466881-5;GYM MENSUAL;22500;activo;transferencia;28-12-2025;Daniela Gonzalez
+872047;Sacha;Flores;;CLASE DE PRUEBA VUELA;7000;inactivo;debito;21-10-2025;Daniela Gonzalez
+872047;Sacha;Flores;;GYM MENSUAL;19990;inactivo;debito;21-10-2025;Daniela Gonzalez
+872047;Sacha;Flores;;GYM MENSUAL;19990;inactivo;mercadopago;26-11-2025;Sin Información
+958103;Catalina ;Bustos;20538929-6;GYM MENSUAL;19990;inactivo;debito;21-10-2025;Daniela Gonzalez
+958103;Catalina ;Bustos;20538929-6;GYM MENSUAL;19990;inactivo;transferencia;30-11-2025;Daniela Gonzalez
+934258;isabel;Rayo;224686218;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;21-10-2025;Daniela Gonzalez
+934258;isabel;Rayo;224686218;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;21-10-2025;Daniela Gonzalez
+934258;isabel;Rayo;224686218;VUELA 6 CLASES AL MES;48000;inactivo;mercadopago;07-11-2025;Sin Información
+934258;isabel;Rayo;224686218;MUEVETE 8 CLASES AL MES;44990;inactivo;mercadopago;04-12-2025;Sin Información
+959562;Martina;Ocampo;21784577-7;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;23-10-2025;Daniela Gonzalez
+959562;Martina;Ocampo;21784577-7;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;04-11-2025;Sin Información
+960938;Amanda Jesús ;Echeverría Andrade;20387785-4;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;24-10-2025;Daniela Gonzalez
+960938;Amanda Jesús ;Echeverría Andrade;20387785-4;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;28-10-2025;Sin Información
+960938;Amanda Jesús ;Echeverría Andrade;20387785-4;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;27-11-2025;Sin Información
+960938;Amanda Jesús ;Echeverría Andrade;20387785-4;VUELA 4 CLASES AL MES;38990;inactivo;mercadopago;28-12-2025;Sin Información
+720215;Allyson ;Cornejo Silva ;19846327-2;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;24-10-2025;Daniela Gonzalez
+720215;Allyson ;Cornejo Silva ;19846327-2;MUEVETE 4 CLASES AL MES;25000;inactivo;credito;24-10-2025;Daniela Gonzalez
+720215;Allyson ;Cornejo Silva ;19846327-2;MUEVETE 4 CLASES AL MES;27990;inactivo;mercadopago;26-12-2025;Sin Información
+720215;Allyson ;Cornejo Silva ;19846327-2;Clase gratis;;inactivo;transferencia;11-11-2025;Daniela Gonzalez
+720215;Allyson ;Cornejo Silva ;19846327-2;MUEVETE 6 CLASES AL MES;35000;inactivo;debito;25-11-2025;Daniela Gonzalez
+960949;Berenice ;Miño Arraño ;19376852-0;GYM MENSUAL;19990;inactivo;debito;24-10-2025;Daniela Gonzalez
+960949;Berenice ;Miño Arraño ;19376852-0;GYM MENSUAL;22500;inactivo;transferencia;03-12-2025;Daniela Gonzalez
+960949;Berenice ;Miño Arraño ;19376852-0;CLASE DE PRUEBA VUELA;7000;inactivo;debito;24-10-2025;Daniela Gonzalez
+411804;Macarena;Carrasco;;GYM TRIMESTRAL;50970;inactivo;pago online;13-11-2025;Daniela Gonzalez
+411804;Macarena;Carrasco;;DISEÑO DE RUTINA 1 SESION;15000;inactivo;pago online;13-11-2025;Daniela Gonzalez
+962395;Vene ;Love Sinsmyr ;44276846-3;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;25-10-2025;Daniela Gonzalez
+962395;Vene ;Love Sinsmyr ;44276846-3;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;25-10-2025;Daniela Gonzalez
+443138;Gabriela;Parra Fernández;183913182;GYM TRIMESTRAL;50000;inactivo;transferencia;31-12-2025;Daniela Gonzalez
+963441;Gissela ;Riquelme Valdés ;19283143-1;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;28-10-2025;Daniela Gonzalez
+963441;Gissela ;Riquelme Valdés ;19283143-1;MUEVETE 4 CLASES AL MES;25000;inactivo;debito;15-11-2025;Daniela Gonzalez
+380316;Deysi;Silva Nuñez;192163471;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;28-10-2025;Daniela Gonzalez
+380316;Deysi;Silva Nuñez;192163471;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;09-11-2025;Daniela Gonzalez
+961769;Camila ;Mery;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;28-10-2025;Daniela Gonzalez
+961769;Camila ;Mery;;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;09-11-2025;Daniela Gonzalez
+47774;Vanessa;Albornoz;20.811.815-3;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;28-10-2025;Daniela Gonzalez
+964883;Nicole Fernanda;Estay Rodriguez;18510663-2;CLASE DE PRUEBA MUEVETE;5000;activo;transferencia;29-10-2025;Daniela Gonzalez
+964883;Nicole Fernanda;Estay Rodriguez;18510663-2;MUEVETE 4 CLASES AL MES;25000;activo;transferencia;30-10-2025;Daniela Gonzalez
+964883;Nicole Fernanda;Estay Rodriguez;18510663-2;Clase gratis;;activo;efectivo;04-11-2025;Daniela Gonzalez
+964895;Guadalupe ;Acosta;27892366-5;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;30-10-2025;Daniela Gonzalez
+47711;Karla;Santos Salazar;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;03-11-2025;Daniela Gonzalez
+47711;Karla;Santos Salazar;;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;03-11-2025;Daniela Gonzalez
+47711;Karla;Santos Salazar;;MUEVETE 4 CLASES AL MES;27990;inactivo;mercadopago;02-12-2025;Sin Información
+967412;Martina ;González López ;22743505-4;GYM MENSUAL;19990;inactivo;debito;03-11-2025;Daniela Gonzalez
+967412;Martina ;González López ;22743505-4;GYM MENSUAL;22500;inactivo;debito;03-12-2025;Daniela Gonzalez
+967412;Martina ;González López ;22743505-4;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;03-11-2025;Daniela Gonzalez
+968894;Daniela Alejandra;Campusano Campusano;20544830-6;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;04-11-2025;Daniela Gonzalez
+968894;Daniela Alejandra;Campusano Campusano;20544830-6;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;04-11-2025;Daniela Gonzalez
+969039;Macarena Javiera ;Lastra Osorio;15339516-0;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;04-11-2025;Daniela Gonzalez
+969039;Macarena Javiera ;Lastra Osorio;15339516-0;MUEVETE 8 CLASES AL MES;40000;inactivo;efectivo;13-11-2025;Daniela Gonzalez
+969053;Jennifer ;Huenulef;19730729-3;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;04-11-2025;Daniela Gonzalez
+969053;Jennifer ;Huenulef;19730729-3;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;transferencia;07-11-2025;Daniela Gonzalez
+969053;Jennifer ;Huenulef;19730729-3;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+969053;Jennifer ;Huenulef;19730729-3;CLASES VUELA CON GYM ILIMITADAS ;90000;inactivo;debito;26-11-2025;Daniela Gonzalez
+969790;Yelka ;Leiva carrasco ;18529443-9;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;05-11-2025;Daniela Gonzalez
+969790;Yelka ;Leiva carrasco ;18529443-9;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;14-11-2025;Daniela Gonzalez
+969790;Yelka ;Leiva carrasco ;18529443-9;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;25-11-2025;Daniela Gonzalez
+970115;Fiorella ;Repetto Herrera;19928310-3;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;05-11-2025;Daniela Gonzalez
+970115;Fiorella ;Repetto Herrera;19928310-3;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;18-11-2025;Daniela Gonzalez
+970232;Alicia Miriam ;Ibacache Escobar;19996125-K;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;05-11-2025;Daniela Gonzalez
+970232;Alicia Miriam ;Ibacache Escobar;19996125-K;GYM MENSUAL;19990;inactivo;transferencia;05-11-2025;Daniela Gonzalez
+970232;Alicia Miriam ;Ibacache Escobar;19996125-K;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;10-11-2025;Daniela Gonzalez
+540092;María de los Ángeles;Godoy Zamorano;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;05-11-2025;Daniela Gonzalez
+970245;Victoria;Valenzuela Sepúlveda ;20633266-2;GYM MENSUAL;19990;inactivo;transferencia;03-11-2025;Daniela Gonzalez
+970245;Victoria;Valenzuela Sepúlveda ;20633266-2;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;03-11-2025;Daniela Gonzalez
+764307;Lilian;Meza Rojas;;GYM MENSUAL;19990;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+764307;Lilian;Meza Rojas;;GYM MENSUAL;22500;inactivo;transferencia;10-12-2025;Daniela Gonzalez
+764307;Lilian;Meza Rojas;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+764307;Lilian;Meza Rojas;;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+970881;Valentina;Rios;;Clase gratis;;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+970911;Katheryn;Romero;19525362-5;GYM MENSUAL;22500;inactivo;transferencia;18-12-2025;Daniela Gonzalez
+970911;Katheryn;Romero;19525362-5;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;18-12-2025;Daniela Gonzalez
+971420;Constanza ;Pizarro;;GYM MENSUAL;19990;inactivo;debito;07-11-2025;Daniela Gonzalez
+971420;Constanza ;Pizarro;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;07-11-2025;Daniela Gonzalez
+971488;Javiera;Ortega;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;07-11-2025;Daniela Gonzalez
+971488;Javiera;Ortega;;GYM MENSUAL;19990;inactivo;debito;07-11-2025;Daniela Gonzalez
+830377;Daniela;Moraga Cerda;186225635;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;06-11-2025;Daniela Gonzalez
+830377;Daniela;Moraga Cerda;186225635;MUEVETE 6 CLASES AL MES;35000;inactivo;debito;07-11-2025;Daniela Gonzalez
+971834;Nicole Nathaly;Rivas Arias;19560614-5;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;07-11-2025;Daniela Gonzalez
+221074;Javiera;Troncoso;202148093;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;04-11-2025;Daniela Gonzalez
+221074;Javiera;Troncoso;202148093;VUELA 4 CLASES AL MES;35000;inactivo;transferencia;14-11-2025;Daniela Gonzalez
+221074;Javiera;Troncoso;202148093;CLASE SUELTA PLAN MUÉVETE;9000;inactivo;debito;09-12-2025;Daniela Gonzalez
+972078;Anaís;Huina;20.204.947-8;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;08-11-2025;Daniela Gonzalez
+554938;Maria Belén;Vargas Sepulveda;18164746-9;DIVA URBANA;22000;congelado;transferencia;08-11-2025;Daniela Gonzalez
+554938;Maria Belén;Vargas Sepulveda;18164746-9;CLASE DE PRUEBA MUEVETE;5000;congelado;transferencia;01-12-2025;Daniela Gonzalez
+554938;Maria Belén;Vargas Sepulveda;18164746-9;MUEVETE 4 CLASES AL MES + GYM;40990;congelado;debito;01-12-2025;Daniela Gonzalez
+554938;Maria Belén;Vargas Sepulveda;18164746-9;GYM MENSUAL;;congelado;efectivo;01-12-2025;Daniela Gonzalez
+972318;Maria paz;Orellana;;DIVA URBANA;22000;inactivo;efectivo;09-11-2025;Daniela Gonzalez
+972318;Maria paz;Orellana;;Clase gratis;;inactivo;transferencia;11-11-2025;Daniela Gonzalez
+680493;Carolina;Rojo Ortiz;;GYM MENSUAL;;activo;efectivo;09-11-2025;Daniela Gonzalez
+680493;Carolina;Rojo Ortiz;;VUELA 4 CLASES AL MES + GYM;48000;activo;debito;06-11-2025;Daniela Gonzalez
+680493;Carolina;Rojo Ortiz;;CLASE DE PRUEBA VUELA;7000;activo;debito;08-11-2025;Daniela Gonzalez
+398490;Natalia;Songer;;ACCESO DIARIO GYM;4000;inactivo;transferencia;10-11-2025;Daniela Gonzalez
+754566;Martina;Gallardo;;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;11-11-2025;Daniela Gonzalez
+754566;Martina;Gallardo;;VUELA 8 CLASES AL MES;60000;inactivo;transferencia;17-11-2025;Daniela Gonzalez
+974545;Madeline ;Agurto Figueroa ;18974767-5;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;11-11-2025;Daniela Gonzalez
+974545;Madeline ;Agurto Figueroa ;18974767-5;GYM MENSUAL;19990;inactivo;transferencia;21-11-2025;Daniela Gonzalez
+974545;Madeline ;Agurto Figueroa ;18974767-5;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;21-11-2025;Daniela Gonzalez
+585350;Javiera;Rodriguez Stockar;;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;12-11-2025;Daniela Gonzalez
+585350;Javiera;Rodriguez Stockar;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;11-11-2025;Daniela Gonzalez
+585350;Javiera;Rodriguez Stockar;;VUELA 6 CLASES + GYM;61000;inactivo;transferencia;24-11-2025;Daniela Gonzalez
+585350;Javiera;Rodriguez Stockar;;VUELA 6 CLASES + GYM;62990;inactivo;mercadopago;24-12-2025;Sin Información
+585350;Javiera;Rodriguez Stockar;;GYM MENSUAL;;inactivo;efectivo;24-11-2025;Daniela Gonzalez
+975848;Fabiana ;Rivas Castillo;27078904-8;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;12-11-2025;Daniela Gonzalez
+792670;Maritza;Cubillos;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;11-11-2025;Daniela Gonzalez
+792670;Maritza;Cubillos;;GYM MENSUAL;;inactivo;debito;20-11-2025;Daniela Gonzalez
+792670;Maritza;Cubillos;;MUEVETE 4 CLASES AL MES + GYM;38000;inactivo;efectivo;20-11-2025;Daniela Gonzalez
+702555;Alejandra;Moya;;CLASE SUELTA PLAN MUÉVETE;7000;inactivo;transferencia;13-11-2025;Daniela Gonzalez
+702555;Alejandra;Moya;;MUEVETE 8 CLASES AL MES;40000;inactivo;transferencia;19-11-2025;Daniela Gonzalez
+976375;Fernanda ;Aguirre López;17681443-8;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;12-11-2025;Daniela Gonzalez
+976375;Fernanda ;Aguirre López;17681443-8;MUEVETE 8 CLASES AL MES;40000;inactivo;transferencia;14-11-2025;Daniela Gonzalez
+976375;Fernanda ;Aguirre López;17681443-8;MUEVETE 8 CLASES AL MES;44990;inactivo;transferencia;15-12-2025;Daniela Gonzalez
+976422;María Fernanda ;Romero Avendaño ;16659835-4;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;13-11-2025;Daniela Gonzalez
+976422;María Fernanda ;Romero Avendaño ;16659835-4;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;13-11-2025;Daniela Gonzalez
+976422;María Fernanda ;Romero Avendaño ;16659835-4;MUEVETE 4 CLASES AL MES;25000;inactivo;mercadopago;20-11-2025;Sin Información
+976422;María Fernanda ;Romero Avendaño ;16659835-4;VUELA 4 CLASES AL MES;35000;inactivo;mercadopago;20-11-2025;Sin Información
+976937;Javiera Isidora ;Alcafuz Hernández;19.740.484-1;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;13-11-2025;Daniela Gonzalez
+976937;Javiera Isidora ;Alcafuz Hernández;19.740.484-1;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;22-11-2025;Daniela Gonzalez
+976940;Darlyn Ester;Tapia Lagos ;19.529.395-3;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;13-11-2025;Daniela Gonzalez
+976940;Darlyn Ester;Tapia Lagos ;19.529.395-3;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;23-11-2025;Daniela Gonzalez
+492371;Fernanda;Reyes;20.104.023-K;Clase gratis;;nuevo;efectivo;13-11-2025;Daniela Gonzalez
+411046;María Jesús ;Sánchez bustos ;;GYM MENSUAL;19990;inactivo;transferencia;13-11-2025;Daniela Gonzalez
+411046;María Jesús ;Sánchez bustos ;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;15-11-2025;Daniela Gonzalez
+978600;María Paz ;Carrillo Vásquez;20692022-k;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;15-11-2025;Daniela Gonzalez
+978600;María Paz ;Carrillo Vásquez;20692022-k;GYM MENSUAL;19990;inactivo;debito;18-11-2025;Daniela Gonzalez
+978632;Paola;Ritter Arcos;12432123-9;GYM MENSUAL;19990;inactivo;debito;17-11-2025;Daniela Gonzalez
+978632;Paola;Ritter Arcos;12432123-9;GYM MENSUAL;22500;inactivo;mercadopago;22-12-2025;Sin Información
+980409;Veronica Francisca ;Romero Muñoz;19524617-3;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;19-11-2025;Daniela Gonzalez
+980409;Veronica Francisca ;Romero Muñoz;19524617-3;VUELA 4 CLASES AL MES;38990;inactivo;debito;01-12-2025;Daniela Gonzalez
+543132;Maria Jose;Moraga;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;19-11-2025;Daniela Gonzalez
+543132;Maria Jose;Moraga;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;20-11-2025;Daniela Gonzalez
+460530;Nayo ;Lecaros;;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;19-11-2025;Daniela Gonzalez
+336415;Ignacia;Muñoz;;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;19-11-2025;Daniela Gonzalez
+981178;Keyla Merary;Constanzo Burgos;20.449.488-6;GYM MENSUAL;19990;inactivo;transferencia;20-11-2025;Daniela Gonzalez
+981178;Keyla Merary;Constanzo Burgos;20.449.488-6;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;20-11-2025;Daniela Gonzalez
+981178;Keyla Merary;Constanzo Burgos;20.449.488-6;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;26-11-2025;Daniela Gonzalez
+138138;Carolina;Castro;16.919.148-4 ;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;20-11-2025;Daniela Gonzalez
+138138;Carolina;Castro;16.919.148-4 ;GYM MENSUAL;22500;inactivo;debito;05-12-2025;Daniela Gonzalez
+981915;Camila Belén ;Carrasco Navarro;19422111-8;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;21-11-2025;Daniela Gonzalez
+736027;NYCOLE;CONTRERAS;173468377;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;21-11-2025;Daniela Gonzalez
+736027;NYCOLE;CONTRERAS;173468377;GYM MENSUAL;19990;inactivo;transferencia;21-11-2025;Daniela Gonzalez
+736027;NYCOLE;CONTRERAS;173468377;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;22-11-2025;Daniela Gonzalez
+981920;Alejandra ;Méndez Matamala;16993522-K;GYM MENSUAL;19990;inactivo;debito;21-11-2025;Daniela Gonzalez
+981920;Alejandra ;Méndez Matamala;16993522-K;CLASE DE PRUEBA VUELA;7000;inactivo;debito;21-11-2025;Daniela Gonzalez
+982297;Javiera Belen;López López;20.237.222-8;MUEVETE 4 CLASES AL MES;25000;inactivo;transferencia;23-11-2025;Daniela Gonzalez
+187475;Belén;Gallardo Quintanilla;16.44.681-k;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;24-11-2025;Daniela Gonzalez
+187475;Belén;Gallardo Quintanilla;16.44.681-k;MUEVETE 4 CLASES AL MES;27990;inactivo;transferencia;01-12-2025;Daniela Gonzalez
+265387;Paula;Acuña Poblete;18540947-3;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;24-11-2025;Daniela Gonzalez
+265387;Paula;Acuña Poblete;18540947-3;CLASE SUELTA PLAN MUÉVETE;9000;inactivo;mercadopago;01-12-2025;Sin Información
+768556;Katherine;Saravia;;GYM MENSUAL;19990;inactivo;transferencia;24-11-2025;Daniela Gonzalez
+768556;Katherine;Saravia;;DISEÑO DE RUTINA 1 SESION;15000;inactivo;transferencia;24-11-2025;Daniela Gonzalez
+768556;Katherine;Saravia;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;24-11-2025;Daniela Gonzalez
+982991;Anaís ;García Abarca;23255504-1;GYM MENSUAL;19990;inactivo;debito;20-11-2025;Daniela Gonzalez
+982995;Sofia ;Assef;21404759-4;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;24-11-2025;Daniela Gonzalez
+983673;Constanza ;Velásquez Peña;22720950-K;GYM MENSUAL;19990;inactivo;debito;25-11-2025;Daniela Gonzalez
+983685;Catalina ;Sepulveda Meza;20403930-5;VUELA 4 CLASES AL MES;35000;inactivo;debito;25-11-2025;Daniela Gonzalez
+983685;Catalina ;Sepulveda Meza;20403930-5;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;25-11-2025;Daniela Gonzalez
+983685;Catalina ;Sepulveda Meza;20403930-5;VUELA 6 CLASES AL MES;49990;inactivo;debito;06-12-2025;Daniela Gonzalez
+983691;Antonia Andrea ;Olivares Inostroza ;20047415-5;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;25-11-2025;Daniela Gonzalez
+983691;Antonia Andrea ;Olivares Inostroza ;20047415-5;GYM MENSUAL;19990;inactivo;debito;25-11-2025;Daniela Gonzalez
+983698;Lady katherine ;Rondon Noriega  ;28145360-2;CLASE DE PRUEBA VUELA;7000;inactivo;debito;24-11-2025;Daniela Gonzalez
+983698;Lady katherine ;Rondon Noriega  ;28145360-2;CLASE DE PRUEBA VUELA;7000;inactivo;debito;25-11-2025;Daniela Gonzalez
+270656;Juana;Morande;;DISEÑO DE RUTINA 1 SESION;15000;inactivo;debito;26-11-2025;Daniela Gonzalez
+983949;Ariadna ;Barahona Barrios;18639575-1;CLASE DE PRUEBA MUEVETE;5000;activo;debito;25-11-2025;Daniela Gonzalez
+983949;Ariadna ;Barahona Barrios;18639575-1;MUEVETE 4 CLASES AL MES + GYM;38000;activo;debito;25-11-2025;Daniela Gonzalez
+983949;Ariadna ;Barahona Barrios;18639575-1;GYM MENSUAL;;activo;transferencia;25-11-2025;Daniela Gonzalez
+984426;Mia;Muñoz;;GYM MENSUAL;19990;inactivo;transferencia;26-11-2025;Daniela Gonzalez
+984838;Isis;Escalona;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;26-11-2025;Daniela Gonzalez
+984843;Sofia;Celma;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;26-11-2025;Daniela Gonzalez
+587772;javiera;coron;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;26-11-2025;Daniela Gonzalez
+587772;javiera;coron;;MUEVETE 8 CLASES AL MES;40000;inactivo;transferencia;26-11-2025;Daniela Gonzalez
+984896;Magali;León Guerra;11529896-8;GYM MENSUAL;19990;inactivo;debito;26-11-2025;Daniela Gonzalez
+984896;Magali;León Guerra;11529896-8;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;26-11-2025;Daniela Gonzalez
+24174;paula;vera;130105858;VUELA 4 CLASES AL MES;;inactivo;efectivo;26-11-2025;Daniela Gonzalez
+195658;María Andrea;Roa ;;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;30-11-2025;Daniela Gonzalez
+987509;Diana;Cárdenas;25497034-4;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;28-11-2025;Daniela Gonzalez
+989316;Marly Amaru ;Rodríguez  Torre;25599226-0;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;03-12-2025;Daniela Gonzalez
+989316;Marly Amaru ;Rodríguez  Torre;25599226-0;MUEVETE 4 CLASES AL MES;27990;inactivo;transferencia;10-12-2025;Daniela Gonzalez
+989316;Marly Amaru ;Rodríguez  Torre;25599226-0;MUEVETE 4 CLASES AL MES;27990;inactivo;transferencia;30-12-2025;Daniela Gonzalez
+990525;Valeria Andrea;Puebla Ruvina;19093148-k;GYM MENSUAL;22500;inactivo;transferencia;05-12-2025;Daniela Gonzalez
+992646;Raylimar;Mujica Farias;26260314-8;CLASE DE PRUEBA VUELA;7000;inactivo;debito;09-12-2025;Daniela Gonzalez
+992646;Raylimar;Mujica Farias;26260314-8;MUEVETE 4 CLASES AL MES + GYM;40990;inactivo;debito;09-12-2025;Daniela Gonzalez
+984624;Valentina;Ramirez;201971179;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;12-12-2025;Daniela Gonzalez
+984624;Valentina;Ramirez;201971179;MUEVETE 4 CLASES AL MES;27990;inactivo;transferencia;22-12-2025;Daniela Gonzalez
+993335;Josefina;Ferrari Tagle;20665658-1;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;10-12-2025;Daniela Gonzalez
+993335;Josefina;Ferrari Tagle;20665658-1;MUEVETE 8 CLASES AL MES + GYM;57990;inactivo;debito;10-12-2025;Daniela Gonzalez
+993335;Josefina;Ferrari Tagle;20665658-1;GYM MENSUAL;;inactivo;debito;10-12-2025;Daniela Gonzalez
+993335;Josefina;Ferrari Tagle;20665658-1;DISEÑO DE RUTINA 1 SESION;20000;inactivo;debito;10-12-2025;Daniela Gonzalez
+993919;Maite;Etcheverry Mardones;19081530-7;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;11-12-2025;Daniela Gonzalez
+614649;Rayen;Orellana Lopez;;CLASE DE PRUEBA MUEVETE;5000;inactivo;debito;11-12-2025;Daniela Gonzalez
+994446;Maya ;Saintard Téllez;19296845-3;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;10-12-2025;Daniela Gonzalez
+995374;Valentina;Ardiles Quiroz;17.201.120-9;CLASE DE PRUEBA MUEVETE;5000;activo;transferencia;15-12-2025;Daniela Gonzalez
+995374;Valentina;Ardiles Quiroz;17.201.120-9;VUELA 4 CLASES AL MES;38990;activo;mercadopago;28-12-2025;Sin Información
+438887;Belen Estrella;Cerda Aguilar ;18707032-5;GYM MENSUAL;22500;inactivo;transferencia;14-12-2025;Daniela Gonzalez
+438887;Belen Estrella;Cerda Aguilar ;18707032-5;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;14-12-2025;Daniela Gonzalez
+438887;Belen Estrella;Cerda Aguilar ;18707032-5;DISEÑO DE RUTINA 1 SESION;20000;inactivo;transferencia;14-12-2025;Daniela Gonzalez
+997057;Andrea Tamara ;Collinao Chaparro;19929069-k;CLASE DE PRUEBA MUEVETE;5000;activo;transferencia;17-12-2025;Daniela Gonzalez
+997057;Andrea Tamara ;Collinao Chaparro;19929069-k;MUEVETE 6 CLASES AL MES;38990;activo;debito;20-12-2025;Daniela Gonzalez
+997057;Andrea Tamara ;Collinao Chaparro;19929069-k;DISEÑO DE RUTINA 1 SESION;20000;activo;transferencia;30-12-2025;Daniela Gonzalez
+490351;Valeria;Saavedra;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;17-12-2025;Daniela Gonzalez
+490351;Valeria;Saavedra;;GYM MENSUAL;22500;inactivo;transferencia;09-12-2025;Daniela Gonzalez
+490351;Valeria;Saavedra;;DISEÑO DE RUTINA 1 SESION;20000;inactivo;transferencia;09-12-2025;Daniela Gonzalez
+997606;María Paz  ;Campos;19534645-3;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;18-12-2025;Daniela Gonzalez
+997999;Abigail  ;Mella;20288096-7;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;19-12-2025;Daniela Gonzalez
+572215;María José;Verdugo;;CLASE DE PRUEBA MUEVETE;5000;activo;transferencia;22-12-2025;Daniela Gonzalez
+572215;María José;Verdugo;;MUEVETE 8 CLASES AL MES;44990;activo;mercadopago;28-12-2025;Sin Información
+999257;Lourdes ;Sierra;28816993-4;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;22-12-2025;Daniela Gonzalez
+974087;Belen;Punoñanco;;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;24-12-2025;Daniela Gonzalez
+1000914;María Ignacia ;Espinoza Mella ;20299866-6;CLASE DE PRUEBA MUEVETE;5000;inactivo;transferencia;26-12-2025;Daniela Gonzalez
+696304;Karina ;Vargas;;CLASE DE PRUEBA MUEVETE;5000;inactivo;efectivo;27-12-2025;Daniela Gonzalez
+1003820;Nicole Andrea ;Vallejos tejo ;19546918-0;GYM TRIMESTRAL;50000;activo;transferencia;30-12-2025;Daniela Gonzalez
+856429;Florencia;Vicencio;;GYM TRIMESTRAL;50000;inactivo;transferencia;30-12-2025;Daniela Gonzalez
+443677;Francisca;Parra;;GYM TRIMESTRAL;50000;inactivo;transferencia;30-12-2025;Daniela Gonzalez
+404861;Antonia Sofía;González Bertran;17698104-0;CLASE DE PRUEBA VUELA;7000;inactivo;transferencia;31-12-2025;Daniela Gonzalez
+404861;Antonia Sofía;González Bertran;17698104-0;VUELA 8 CLASES AL MES;32995;inactivo;transferencia;31-12-2025;Daniela Gonzalez
+941306;Belén;Torres;;GYM PLAN ANUAL;150000;activo;transferencia;31-12-2025;Daniela Gonzalez
+1008152;Francisca Renee;Alvarez Gonzalez;19925436-7;TALLER BALLET PARA ADULTAS;29990;inactivo;transferencia;21-12-2025;Daniela Gonzalez
