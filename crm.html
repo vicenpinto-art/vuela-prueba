@@ -132,10 +132,14 @@
     <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-end">
       <div>
         <div style="font-size:12px;font-weight:600;color:var(--gray);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Alumnas</div>
-        <button class="btn btn-secondary" onclick="descargarAlumnas()">📥 Descargar todas las alumnas</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="descargarAlumnas()">📥 Todas las alumnas</button>
+          <button class="btn btn-secondary" onclick="descargarComprasActivas()">📥 Compras activas</button>
+          <button class="btn btn-secondary" onclick="descargarBaseCompleta()">📥 Base completa</button>
+        </div>
       </div>
       <div>
-        <div style="font-size:12px;font-weight:600;color:var(--gray);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Registro de pagos</div>
+        <div style="font-size:12px;font-weight:600;color:var(--gray);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Historial de pagos</div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <select id="filtro-anio" style="padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;background:#fff;cursor:pointer">
             <option value="todos">Todos los años</option>
@@ -655,6 +659,53 @@
       data.map(p => [p.nombre,p.apellido,p.rut,p.plan_nombre,p.plan_categoria,p.incluye_gym?'Sí':'No',p.duracion_meses,p.monto,p.estado,p.tipo_pago,p.fecha_pago,p.vendedor])
     );
     descargarBlob(blob, `pagos_${anio}_${fecha}.csv`);
+  }
+
+  async function descargarComprasActivas() {
+    const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
+    const { data } = await sb.from('compras')
+      .select('usuarios!alumna_id(nombre,apellido,email,rut),planes(nombre,tipo),fecha_inicio,fecha_fin,monto_pagado,incluye_gym,matricula_pagada,addon_gym')
+      .eq('estado','activo').gte('fecha_fin', hoy)
+      .order('fecha_fin', { ascending: true }).limit(5000);
+    if (!data?.length) { alert('No hay compras activas.'); return; }
+    const fecha = new Date().toLocaleDateString('es-CL').replace(/\//g,'-');
+    const blob = csvBlob(
+      ['Nombre','Apellido','Email','RUT','Plan','Tipo','Inicio','Vencimiento','Monto','Gym','Matrícula'],
+      data.map(c => [
+        c.usuarios?.nombre, c.usuarios?.apellido, c.usuarios?.email, c.usuarios?.rut,
+        c.planes?.nombre, c.planes?.tipo,
+        c.fecha_inicio, c.fecha_fin, c.monto_pagado,
+        c.incluye_gym||c.addon_gym?'Sí':'No', c.matricula_pagada?'Sí':'No'
+      ])
+    );
+    descargarBlob(blob, `compras_activas_${fecha}.csv`);
+  }
+
+  async function descargarBaseCompleta() {
+    const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
+    const [{ data: alumnas }, { data: compras }] = await Promise.all([
+      sb.from('usuarios').select('nombre,apellido,email,telefono,rut,fecha_nacimiento,created_at').eq('rol','alumna').order('created_at',{ascending:false}).limit(10000),
+      sb.from('compras').select('usuarios!alumna_id(nombre,apellido,email),planes(nombre,tipo),fecha_inicio,fecha_fin,estado,monto_pagado,incluye_gym,matricula_pagada').order('fecha_fin',{ascending:false}).limit(10000),
+    ]);
+    const fecha = new Date().toLocaleDateString('es-CL').replace(/\//g,'-');
+    // Hoja 1: alumnas
+    const bloqAlumnas = csvBlob(
+      ['Nombre','Apellido','Email','Teléfono','RUT','Fecha Nacimiento','Registrada'],
+      (alumnas||[]).map(a=>[a.nombre,a.apellido,a.email,a.telefono,a.rut,a.fecha_nacimiento,a.created_at?.slice(0,10)])
+    );
+    descargarBlob(bloqAlumnas, `base_completa_alumnas_${fecha}.csv`);
+    // Hoja 2: compras (descarga separada)
+    await new Promise(r => setTimeout(r, 400));
+    const bloqCompras = csvBlob(
+      ['Nombre','Apellido','Email','Plan','Tipo','Inicio','Vencimiento','Estado','Monto','Gym','Matrícula'],
+      (compras||[]).map(c=>[
+        c.usuarios?.nombre,c.usuarios?.apellido,c.usuarios?.email,
+        c.planes?.nombre,c.planes?.tipo,
+        c.fecha_inicio,c.fecha_fin,c.estado,c.monto_pagado,
+        c.incluye_gym?'Sí':'No',c.matricula_pagada?'Sí':'No'
+      ])
+    );
+    descargarBlob(bloqCompras, `base_completa_compras_${fecha}.csv`);
   }
 
   // ══════════════════════════════════════════════════════════════
