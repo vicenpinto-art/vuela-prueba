@@ -151,6 +151,8 @@
 
     /* ACORDEÓN DÍAS */
     .grupo-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 0 6px;border-bottom:2px solid currentColor;margin-bottom:10px}
+    .clases-2col{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    @media(max-width:600px){.clases-2col{grid-template-columns:1fr}}
     .dia-toggle-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;font-family:'Outfit',sans-serif;margin-bottom:6px;transition:border-color .15s;text-align:left}
     .dia-toggle-btn:hover{border-color:rgba(255,78,104,.3)}
     .dia-toggle-btn.open{border-color:var(--coral);border-bottom-left-radius:0;border-bottom-right-radius:0;margin-bottom:0}
@@ -942,17 +944,20 @@
 
     const planes = clases.filter(c => !c.nombre?.startsWith('Gym '));
     const gym    = clases.filter(c =>  c.nombre?.startsWith('Gym '));
-    let html = '';
 
-    if (planes.length) {
-      html += `<div class="grupo-header" style="color:var(--coral)">Clases de planes</div>`;
-      html += renderAcordeonPorDia(planes, 'p');
-    }
-    if (gym.length) {
-      html += `<div class="grupo-header" style="color:#007a82;margin-top:${planes.length ? '20px' : '0'}">Gym</div>`;
-      html += renderAcordeonPorDia(gym, 'g');
-    }
-    cont.innerHTML = html;
+    cont.innerHTML = `
+      <div class="${planes.length && gym.length ? 'clases-2col' : ''}"style="align-items:start">
+        ${planes.length ? `
+          <div>
+            <div class="grupo-header" style="color:var(--coral)">Clases de planes</div>
+            ${renderAcordeonPorDia(planes, 'p')}
+          </div>` : ''}
+        ${gym.length ? `
+          <div>
+            <div class="grupo-header" style="color:#007a82">Gym</div>
+            ${renderAcordeonPorDia(gym, 'g')}
+          </div>` : ''}
+      </div>`;
   }
 
   async function guardarSobrecupo(claseId, sobrecupoActual) {
