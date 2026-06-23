@@ -891,8 +891,8 @@
     if (!lista.length) return '<p style="font-size:13px;color:var(--gray);padding:6px 0">Sin clases en este período.</p>';
     const porDia = {}; const diaLabels = {};
     lista.forEach(c => {
-      const f = new Date(c.fecha_hora);
-      const key = f.toISOString().split('T')[0];
+      const f   = new Date(c.fecha_hora);
+      const key = f.toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
       if (!porDia[key]) {
         porDia[key] = [];
         diaLabels[key] = f.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Santiago' });
