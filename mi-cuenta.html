@@ -676,13 +676,6 @@
       validas.push(c);
     }
 
-    // Mostrar botón gym si tiene cualquier compra activa con acceso gym (no vencida)
-    const tieneGym = compras.some(c =>
-      c.estado === 'activo' && c.fecha_fin >= hoy &&
-      (['gym','addon_gym'].includes(c.planes?.tipo) || c.incluye_gym || c.addon_gym)
-    );
-    const btnGym = document.getElementById('btn-gym-booking');
-    if (btnGym) btnGym.style.display = tieneGym ? 'block' : 'none';
 
     if (validas.length === 0) { mostrarSinPlan(contenedor, badge); return; }
 
