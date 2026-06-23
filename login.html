@@ -248,8 +248,19 @@
     msg.className = 'mensaje ' + tipo;
   }
 
-  // Si ya está logueada, redirigir directo
+  // Procesar código de confirmación de email (PKCE flow)
   (async () => {
+    const code = new URLSearchParams(window.location.search).get('code');
+    if (code) {
+      const { error } = await sb.auth.exchangeCodeForSession(code);
+      if (!error) {
+        mostrar('¡Correo confirmado! Ya puedes iniciar sesión.', 'success');
+        window.history.replaceState({}, '', 'login.html');
+        return;
+      }
+    }
+
+    // Si ya está logueada, redirigir directo
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
       const { data: u } = await sb.from('usuarios').select('rol').eq('id', session.user.id).single();
