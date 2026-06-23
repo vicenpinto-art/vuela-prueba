@@ -1174,11 +1174,35 @@
             ${planHtml}
           </div>
           <div class="toggle-asis">
-            <button class="t-btn ${pOn}" onclick="marcarAsistencia('${ins.alumna_id}','${claseId}',true)"  id="btn-p-${ins.alumna_id}" ${dis}>✓ Presente</button>
-            <button class="t-btn ${aOn}" onclick="marcarAsistencia('${ins.alumna_id}','${claseId}',false)" id="btn-a-${ins.alumna_id}" ${dis}>✗ Ausente</button>
+            <button class="t-btn ${pOn}" onclick="toggleAsistencia('${ins.alumna_id}','${claseId}',true)"  id="btn-p-${ins.alumna_id}">✓ Presente</button>
+            <button class="t-btn ${aOn}" onclick="toggleAsistencia('${ins.alumna_id}','${claseId}',false)" id="btn-a-${ins.alumna_id}">✗ Ausente</button>
           </div>
         </div>`;
     }).join('');
+  }
+
+  function actualizarContadorPresentes() {
+    let cnt = 0;
+    document.querySelectorAll('[id^="btn-p-"]').forEach(b => { if (b.classList.contains('p-on')) cnt++; });
+    const el = document.getElementById('asis-stat-presentes');
+    if (el) el.textContent = cnt;
+  }
+
+  async function toggleAsistencia(alumnaId, claseId, valor) {
+    const btnP = document.getElementById(`btn-p-${alumnaId}`);
+    const btnA = document.getElementById(`btn-a-${alumnaId}`);
+    const yaActivo = valor ? btnP?.classList.contains('p-on') : btnA?.classList.contains('a-on');
+
+    if (yaActivo) {
+      if (btnP) btnP.disabled = true;
+      if (btnA) btnA.disabled = true;
+      await sb.from('asistencias').delete().eq('clase_id', claseId).eq('alumna_id', alumnaId);
+      if (btnP) { btnP.className = 't-btn'; btnP.disabled = false; }
+      if (btnA) { btnA.className = 't-btn'; btnA.disabled = false; }
+      actualizarContadorPresentes();
+      return;
+    }
+    await marcarAsistencia(alumnaId, claseId, valor);
   }
 
   async function marcarAsistencia(alumnaId, claseId, presente) {
@@ -1215,11 +1239,7 @@
     if (btnP) { btnP.className = `t-btn ${presente ? 'p-on' : ''}`; btnP.disabled = false; }
     if (btnA) { btnA.className = `t-btn ${!presente ? 'a-on' : ''}`; btnA.disabled = false; }
     toast(presente ? '✓ Asistencia registrada' : 'Marcada como ausente');
-
-    let cnt = 0;
-    document.querySelectorAll('[id^="btn-p-"]').forEach(b => { if (b.classList.contains('p-on')) cnt++; });
-    const el = document.getElementById('asis-stat-presentes');
-    if (el) el.textContent = cnt;
+    actualizarContadorPresentes();
   }
 
   // ── PROFESORAS ─────────────────────────────────────────────────
