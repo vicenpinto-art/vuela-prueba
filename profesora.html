@@ -801,7 +801,7 @@
           <div class="hor-clase-item">
             <div class="hor-clase-hora">${horCalHoraStr(c.fecha_hora)}</div>
             <div class="hor-clase-info">
-              <div class="hor-clase-nombre">${c.nombre}${esMia?'<span class="hor-clase-mia">Mi clase</span>':''}</div>
+              <div class="hor-clase-nombre" style="display:flex;align-items:center;gap:6px">${c.nombre}${planBadge(c)}${esMia?'<span class="hor-clase-mia">Mi clase</span>':''}</div>
               <div class="hor-clase-meta">👩‍🏫 ${c.profesora} · ${c.duracion_minutos||60} min</div>
               <div style="font-size:11px;color:var(--gray);margin-top:2px">${cupoD<=0?'Clase llena':cupoD<=3?`¡Solo ${cupoD} lugar${cupoD>1?'es':''}!`:`${cupoD}/${cupoM} lugares`}</div>
             </div>
@@ -867,6 +867,13 @@
     list.classList.toggle('open');
   }
 
+  function planBadge(c) {
+    const plan = (c.restriccion_plan || '').toLowerCase();
+    if (plan === 'vuela')   return '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#a183ff;margin-left:6px;vertical-align:middle;flex-shrink:0"></span>';
+    if (plan === 'muevete') return '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#fecb29;margin-left:6px;vertical-align:middle;flex-shrink:0"></span>';
+    return '';
+  }
+
   function renderClaseFilas(c) {
     const esMia     = esMiClase(c.profesora);
     const inscritas = (c.cupo_maximo || 15) - (c.cupo_disponible || 0);
@@ -875,7 +882,7 @@
       <div class="clase-fila${esMia ? ' es-mia' : ''}">
         <span class="clase-hora">${horaStr(c.fecha_hora)}</span>
         <div class="clase-info">
-          <div class="clase-info-nombre">${c.nombre}</div>
+          <div class="clase-info-nombre" style="display:flex;align-items:center">${c.nombre}${planBadge(c)}</div>
           <div class="clase-info-meta">👩‍🏫 ${c.profesora} · 👥 ${inscritas}/${c.cupo_maximo || 15}${scInfo}</div>
         </div>
         ${esMia ? `
