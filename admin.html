@@ -731,13 +731,24 @@
 
       <div class="card">
         <div class="card-header"><div class="card-title">Historial de clases e inscripciones</div></div>
-        <p style="font-size:13px;color:var(--gray);margin-bottom:16px">Elimina clases pasadas junto a sus inscripciones y asistencias. Los compras/pagos no se modifican.</p>
-        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
+        <p style="font-size:13px;color:var(--gray);margin-bottom:16px">Selecciona qué registros eliminar. Los pagos y compras no se tocan.</p>
+        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px">
           <div class="form-group">
-            <label>Eliminar clases anteriores a</label>
+            <label>Clases anteriores a</label>
             <input type="date" id="mant-fecha-corte">
           </div>
           <button class="btn btn-secondary" onclick="previsualizarClasesAntiguas()">Ver cuántos registros</button>
+        </div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:16px;padding:12px 14px;background:var(--light);border-radius:10px">
+          <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer;font-weight:500">
+            <input type="checkbox" id="mant-del-clases" checked style="width:15px;height:15px;accent-color:var(--coral);cursor:pointer"> Clases
+          </label>
+          <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer;font-weight:500">
+            <input type="checkbox" id="mant-del-inscrip" checked style="width:15px;height:15px;accent-color:var(--purple);cursor:pointer"> Inscripciones
+          </label>
+          <label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer;font-weight:500">
+            <input type="checkbox" id="mant-del-asis" checked style="width:15px;height:15px;accent-color:#007a82;cursor:pointer"> Asistencias
+          </label>
         </div>
         <div id="mant-preview" style="display:none;background:var(--light);border-radius:12px;padding:14px;margin-bottom:14px"></div>
         <div id="mant-btn-eliminar" style="display:none">
@@ -991,6 +1002,8 @@ document.querySelectorAll('.sidebar-item').forEach(item=>{
 });
 
 // ── MANTENIMIENTO ─────────────────────────────────────────────
+let _mantProfGrupos = []; // [{prof, ids}] — índice para botones seguros en onclick
+
 function cargarMantenimiento(){
   document.getElementById('mant-fecha-corte').value = hoy();
   document.getElementById('mant-preview').style.display='none';
@@ -1016,7 +1029,7 @@ async function cargarRutinasMantenimiento(){
     return;
   }
 
-  // Agrupar por profesora (campo de texto en clases)
+  // Agrupar por profesora
   const porProf = {};
   rutinas.forEach(r => {
     const prof = r.clases?.profesora || 'Sin asignar';
@@ -1024,14 +1037,17 @@ async function cargarRutinasMantenimiento(){
     porProf[prof].push(r);
   });
 
-  listEl.innerHTML = Object.keys(porProf).sort().map(prof => {
+  // Guardar en variable global indexada para evitar HTML encoding en onclick
+  const profsSorted = Object.keys(porProf).sort();
+  _mantProfGrupos = profsSorted.map(p => ({prof:p, ids:porProf[p].map(i=>i.id)}));
+
+  listEl.innerHTML = profsSorted.map((prof, idx) => {
     const items = porProf[prof];
-    const idsJSON = JSON.stringify(items.map(i=>i.id));
     return `
       <div style="margin-bottom:20px">
         <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;border-bottom:2px solid var(--border);margin-bottom:8px">
           <span style="font-size:13px;font-weight:700">${esc(prof)} <span style="color:var(--gray);font-weight:500">(${items.length} rutina${items.length!==1?'s':''})</span></span>
-          <button class="btn btn-danger btn-sm" onclick="eliminarRutinasProfesora(${idsJSON}, '${prof.replace(/'/g,"\\'").replace(/"/g,'\\"')}')">Eliminar todas</button>
+          <button class="btn btn-danger btn-sm" onclick="eliminarRutinasProfesora(${idx})">Eliminar todas</button>
         </div>
         ${items.map(r=>`
           <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
@@ -1053,9 +1069,10 @@ async function eliminarRutina(id){
   cargarRutinasMantenimiento();
 }
 
-async function eliminarRutinasProfesora(ids, prof){
+async function eliminarRutinasProfesora(idx){
+  const {prof, ids} = _mantProfGrupos[idx];
   if(!confirm(`¿Eliminar todas las rutinas de ${prof}? (${ids.length} rutinas)`)) return;
-  const {error} = await sb.from('rutinas').delete().in('id',ids);
+  const {error} = await sb.from('rutinas').delete().in('id', ids);
   if(error){toast('Error al eliminar','error');return;}
   toast(`Rutinas de ${prof} eliminadas ✓`);
   cargarRutinasMantenimiento();
@@ -1083,7 +1100,6 @@ async function previsualizarClasesAntiguas(){
     return;
   }
 
-  // Contar en lotes de 100 para evitar límites de Supabase
   let cInsc=0, cAsis=0;
   for(let i=0;i<mantClasesIds.length;i+=100){
     const lote=mantClasesIds.slice(i,i+100);
@@ -1095,30 +1111,37 @@ async function previsualizarClasesAntiguas(){
   }
 
   prevEl.innerHTML=`
-    <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:10px">
-      <div><span style="font-size:22px;font-weight:800;color:var(--coral)">${mantClasesIds.length}</span><br><span style="font-size:12px;color:var(--gray)">clases</span></div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:10px">
+      <div><span style="font-size:22px;font-weight:800;color:var(--coral)">${mantClasesIds.length}</span><br><span style="font-size:12px;color:var(--gray)">clases encontradas</span></div>
       <div><span style="font-size:22px;font-weight:800;color:var(--purple)">${cInsc}</span><br><span style="font-size:12px;color:var(--gray)">inscripciones</span></div>
       <div><span style="font-size:22px;font-weight:800;color:#007a82">${cAsis}</span><br><span style="font-size:12px;color:var(--gray)">asistencias</span></div>
     </div>
-    <p style="font-size:12px;color:var(--gray)">Se eliminarán estas clases + inscripciones + asistencias + rutinas asociadas. Los pagos no se tocan.</p>`;
+    <p style="font-size:12px;color:var(--gray)">Selecciona qué quieres eliminar arriba y presiona Confirmar. Los pagos no se tocan.</p>`;
   btnEl.style.display='block';
 }
 
 async function eliminarClasesAntiguas(){
   if(!mantClasesIds.length){toast('Primero presiona "Ver cuántos registros"','error');return;}
-  const n = mantClasesIds.length;
-  if(!confirm(`¿Eliminar ${n} clases y todos sus registros asociados?\n\nEsta acción no se puede deshacer.`)) return;
+  const delClases  = document.getElementById('mant-del-clases').checked;
+  const delInscrip = document.getElementById('mant-del-inscrip').checked;
+  const delAsis    = document.getElementById('mant-del-asis').checked;
+  if(!delClases && !delInscrip && !delAsis){toast('Selecciona al menos una opción','error');return;}
+
+  const partes = [delClases&&'clases',delInscrip&&'inscripciones',delAsis&&'asistencias'].filter(Boolean).join(', ');
+  if(!confirm(`¿Eliminar ${partes} de ${mantClasesIds.length} clases anteriores a la fecha?\n\nEsta acción no se puede deshacer.`)) return;
 
   toast('Eliminando… puede tardar unos segundos');
   for(let i=0;i<mantClasesIds.length;i+=100){
     const lote=mantClasesIds.slice(i,i+100);
-    await sb.from('asistencias').delete().in('clase_id',lote);
-    await sb.from('inscripciones').delete().in('clase_id',lote);
-    await sb.from('rutinas').delete().in('clase_id',lote);
-    await sb.from('clases').delete().in('id',lote);
+    if(delAsis)    await sb.from('asistencias').delete().in('clase_id',lote);
+    if(delInscrip) await sb.from('inscripciones').delete().in('clase_id',lote);
+    if(delClases){
+      await sb.from('rutinas').delete().in('clase_id',lote);
+      await sb.from('clases').delete().in('id',lote);
+    }
   }
 
-  toast(`✓ ${n} clases eliminadas`);
+  toast(`✓ ${partes} eliminadas correctamente`);
   mantClasesIds=[];
   document.getElementById('mant-preview').style.display='none';
   document.getElementById('mant-btn-eliminar').style.display='none';
