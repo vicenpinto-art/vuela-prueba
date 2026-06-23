@@ -523,8 +523,8 @@
     return new Date(ts).toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' });
   }
 
-  function esMiClase(profesoraClase) {
-    return (profesoraClase || '').trim().toLowerCase() === usuarioNombre.toLowerCase();
+  function esMiClase(c) {
+    return c.profesora_id === userId;
   }
 
   // ── NAVEGACIÓN ─────────────────────────────────────────────────
@@ -602,7 +602,7 @@
     const hoyFin    = new Date(); hoyFin.setHours(23, 59, 59, 999);
 
     const { data: clasesHoy } = await sb.from('clases')
-      .select('id, nombre, fecha_hora, profesora, cupo_maximo, cupo_disponible')
+      .select('id, nombre, fecha_hora, profesora, profesora_id, cupo_maximo, cupo_disponible')
       .gte('fecha_hora', hoyInicio.toISOString())
       .lte('fecha_hora', hoyFin.toISOString())
       .eq('cancelada', false);
@@ -610,7 +610,7 @@
     const totalHoy = (clasesHoy || []).length;
     document.getElementById('st-hoy').textContent = totalHoy;
 
-    const misHoy = (clasesHoy || []).filter(c => esMiClase(c.profesora));
+    const misHoy = (clasesHoy || []).filter(c => esMiClase(c));
     document.getElementById('st-mis-hoy').textContent = misHoy.length;
 
     // Inscripciones en todas las clases de hoy
@@ -699,7 +699,7 @@
     const inicio = new Date(anio, mes, 1).toISOString();
     const fin    = new Date(anio, mes + 1, 0, 23, 59, 59).toISOString();
     let q = sb.from('clases').select('*').gte('fecha_hora', inicio).lte('fecha_hora', fin).eq('cancelada', false).not('nombre', 'ilike', 'Gym %').order('fecha_hora');
-    if (horCalFiltroVal === 'mias' && usuarioNombre) q = q.ilike('profesora', `%${usuarioNombre}%`);
+    if (horCalFiltroVal === 'mias') q = q.eq('profesora_id', userId);
     const { data } = await q;
     horCalClases = data || [];
     horCalRenderCal(anio, mes);
@@ -792,7 +792,7 @@
       html += `<div class="hor-sin-clases">No hay clases programadas para este día.</div>`;
     } else {
       html += clases.map(c => {
-        const esMia  = esMiClase(c.profesora);
+        const esMia  = esMiClase(c);
         const cupoD  = c.cupo_disponible ?? 0;
         const cupoM  = c.cupo_maximo ?? 15;
         return `
@@ -873,7 +873,7 @@
   }
 
   function renderClaseFilas(c) {
-    const esMia     = esMiClase(c.profesora);
+    const esMia     = esMiClase(c);
     const inscritas = (c.cupo_maximo || 15) - (c.cupo_disponible || 0);
     const scInfo    = c.sobrecupo ? ` · +${c.sobrecupo} sob` : '';
     return `
@@ -977,7 +977,7 @@
     const en144h = new Date(ahora.getTime() + 144 * 3600 * 1000);
 
     const { data: clases } = await sb.from('clases')
-      .select('id, nombre, fecha_hora, profesora, cupo_maximo, cupo_disponible, duracion_minutos')
+      .select('id, nombre, fecha_hora, profesora, profesora_id, cupo_maximo, cupo_disponible, duracion_minutos')
       .gte('fecha_hora', ahora.toISOString())
       .lte('fecha_hora', en144h.toISOString())
       .eq('cancelada', false)
@@ -998,7 +998,7 @@
     if (!cont) return;
 
     const chipHtml = (c) => {
-      const esMia = esMiClase(c.profesora);
+      const esMia = esMiClase(c);
       return `
         <div class="clase-chip${asistenciaClaseSelId === c.id ? ' sel' : ''}" onclick="seleccionarClaseAsistencia('${c.id}')">
           <div class="chip-hora">${horaStr(c.fecha_hora)}</div>
@@ -1263,7 +1263,7 @@
 
     const { data: clases } = await sb.from('clases')
       .select('*')
-      .ilike('profesora', `%${usuarioNombre}%`)
+      .eq('profesora_id', userId)
       .gte('fecha_hora', ahora.toISOString())
       .lte('fecha_hora', en14d.toISOString())
       .eq('cancelada', false)

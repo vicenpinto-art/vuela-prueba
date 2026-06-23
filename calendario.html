@@ -361,8 +361,8 @@ async function cargarMes(anio, mes){
   let query = sb.from('clases').select('*').gte('fecha_hora',inicio).lte('fecha_hora',fin).eq('cancelada',false).not('nombre','ilike','Gym %').order('fecha_hora');
 
   // Aplicar filtros según rol
-  if(userRol==='profesora' && filtroProfe==='mias' && nombreUsuario){
-    query = query.ilike('profesora',`%${nombreUsuario}%`);
+  if(userRol==='profesora' && filtroProfe==='mias'){
+    query = query.eq('profesora_id', userId);
   } else if(userRol==='admin' && filtroAdminProfe){
     query = query.ilike('profesora',`%${filtroAdminProfe}%`);
   }

@@ -932,6 +932,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── ESTADO ────────────────────────────────────────────────────
 let userId = null;
+let profesorasMap = new Map(); // id → nombre completo
 let todosLosHorarios = [];
 let todasLasClases   = [];
 let todasLasAlumnas  = [];
@@ -1308,23 +1309,17 @@ async function cargarResumen(){
 async function cargarDropdownProfesoras(valorActual){
   const sel = document.getElementById('h-profesora');
   sel.innerHTML = '<option value="">— Seleccionar profesora —</option><option value="pend">Sin asignar (pend)</option>';
-  const {data} = await sb.from('usuarios').select('id,nombre,apellido').eq('rol','profesora').order('nombre');
+  profesorasMap.clear();
+  const {data} = await sb.from('usuarios').select('id,nombre,apellido').in('rol',['profesora','admin']).order('nombre');
   (data||[]).forEach(p => {
     const nombreCompleto = (p.nombre + ' ' + (p.apellido||'')).trim();
+    profesorasMap.set(p.id, nombreCompleto);
     const opt = document.createElement('option');
-    opt.value = nombreCompleto;
+    opt.value = p.id;
     opt.textContent = nombreCompleto;
-    if(valorActual && (nombreCompleto === valorActual || nombreCompleto.includes(valorActual) || valorActual.includes(nombreCompleto.split(' ')[0]))) opt.selected = true;
+    if(valorActual && p.id === valorActual) opt.selected = true;
     sel.appendChild(opt);
   });
-  // Si el valor actual no está en la lista (texto libre antiguo), agregarlo
-  if(valorActual && valorActual !== 'pend' && !sel.querySelector(`option[value="${valorActual}"]`)){
-    const opt = document.createElement('option');
-    opt.value = valorActual;
-    opt.textContent = valorActual + ' (no registrada)';
-    opt.selected = true;
-    sel.appendChild(opt);
-  }
 }
 
 async function cargarHorarios(){
@@ -1393,7 +1388,7 @@ async function editarHorario(id){
   document.getElementById('h-nombre').value=h.nombre;
   document.getElementById('h-restriccion').value=h.restriccion_plan||'muevete';
   // Poblar dropdown de profesoras y seleccionar la asignada
-  await cargarDropdownProfesoras(h.profesora);
+  await cargarDropdownProfesoras(h.profesora_id || h.profesora);
   document.getElementById('h-dia').value=h.dia_semana;
   document.getElementById('h-hora').value=h.hora?.slice(0,5)||'';
   document.getElementById('h-duracion').value=h.duracion_minutos||60;
@@ -1404,18 +1399,21 @@ async function editarHorario(id){
 
 async function guardarHorario(){
   const id = document.getElementById('h-id').value;
+  const profId  = document.getElementById('h-profesora').value.trim();
+  const profNombre = profId && profId !== 'pend' ? (profesorasMap.get(profId) || profId) : profId;
   const datos = {
-    nombre:         document.getElementById('h-nombre').value.trim(),
-    tipo:           document.getElementById('h-restriccion').value,
+    nombre:           document.getElementById('h-nombre').value.trim(),
+    tipo:             document.getElementById('h-restriccion').value,
     restriccion_plan: document.getElementById('h-restriccion').value,
-    profesora:      document.getElementById('h-profesora').value.trim(),
-    dia_semana:     parseInt(document.getElementById('h-dia').value),
-    hora:           document.getElementById('h-hora').value,
+    profesora:        profNombre,
+    profesora_id:     profId && profId !== 'pend' ? profId : null,
+    dia_semana:       parseInt(document.getElementById('h-dia').value),
+    hora:             document.getElementById('h-hora').value,
     duracion_minutos: parseInt(document.getElementById('h-duracion').value),
-    cupo_maximo:    parseInt(document.getElementById('h-cupo').value),
-    activo:         true
+    cupo_maximo:      parseInt(document.getElementById('h-cupo').value),
+    activo:           true
   };
-  if(!datos.nombre||!datos.hora||!datos.profesora){toast('Completa todos los campos','error');return;}
+  if(!datos.nombre||!datos.hora||!profId){toast('Completa todos los campos','error');return;}
 
   let horarioId = id;
   if(id){
@@ -1451,6 +1449,7 @@ async function regenerarTodos(){
       .update({
         tipo:             h.tipo || h.restriccion_plan,
         profesora:        h.profesora,
+        profesora_id:     h.profesora_id || null,
         nombre:           h.nombre,
         duracion_minutos: h.duracion_minutos,
         cupo_maximo:      h.cupo_maximo
@@ -2264,11 +2263,11 @@ async function seleccionarProf(profId, nombre){
 
   const [{data:proximas},{data:pasadas},{data:rutinas}] = await Promise.all([
     sb.from('clases').select('id,nombre,fecha_hora,cupo_disponible,cupo_maximo')
-      .ilike('profesora',`%${nombre}%`)
+      .eq('profesora_id',profId)
       .gte('fecha_hora',ahora.toISOString()).lte('fecha_hora',en30d.toISOString())
       .eq('cancelada',false).order('fecha_hora'),
     sb.from('clases').select('id,nombre,fecha_hora')
-      .ilike('profesora',`%${nombre}%`)
+      .eq('profesora_id',profId)
       .gte('fecha_hora',hace30d.toISOString()).lt('fecha_hora',ahora.toISOString())
       .order('fecha_hora',{ascending:false}).limit(15),
     sb.from('rutinas').select('clase_id,objetivo,descripcion,updated_at,clases(nombre,fecha_hora)')

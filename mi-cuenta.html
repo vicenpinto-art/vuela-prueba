@@ -937,7 +937,7 @@
     const { data: clases } = await sb
       .from('clases')
       .select('id, nombre, fecha_hora, profesora, tipo')
-      .ilike('profesora', `%${nombreCompleto}%`)
+      .eq('profesora_id', userId)
       .gte('fecha_hora', ahora.toISOString())
       .lte('fecha_hora', en7dias.toISOString())
       .order('fecha_hora')
@@ -969,7 +969,7 @@
     const { data: clasesHoy } = await sb
       .from('clases')
       .select('id, nombre, fecha_hora')
-      .ilike('profesora', `%${nombreCompleto}%`)
+      .eq('profesora_id', userId)
       .gte('fecha_hora', ahora.toISOString())
       .lte('fecha_hora', en144h.toISOString())
       .order('fecha_hora');
