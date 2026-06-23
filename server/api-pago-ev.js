@@ -703,12 +703,6 @@ app.post('/actualizar-sobrecupo', async (req, res) => {
   const { clase_id, sobrecupo, cupo_disponible, cupo_maximo } = req.body;
   if (!clase_id) return res.status(400).json({ error: 'Falta clase_id' });
 
-  // Verificar que la clase pertenece a esta profesora (salvo admin)
-  if (u.rol === 'profesora') {
-    const { data: clase } = await sb.from('clases').select('profesora_id').eq('id', clase_id).maybeSingle();
-    if (clase?.profesora_id !== user.id) return res.status(403).json({ error: 'No es tu clase' });
-  }
-
   const { error } = await sb.from('clases').update({ sobrecupo, cupo_disponible, cupo_maximo }).eq('id', clase_id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true });

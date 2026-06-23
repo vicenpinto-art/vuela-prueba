@@ -888,15 +888,13 @@
       <div class="clase-fila${esMia ? ' es-mia' : ''}">
         <span class="clase-hora">${horaStr(c.fecha_hora)}</span>
         <div class="clase-info">
-          <div class="clase-info-nombre" style="display:flex;align-items:center">${c.nombre}${planBadge(c)}</div>
+          <div class="clase-info-nombre" style="display:flex;align-items:center">${c.nombre}${planBadge(c)}${esMia ? '<span class="mi-clase-badge" style="margin-left:6px">Mi clase</span>' : ''}</div>
           <div class="clase-info-meta">👩‍🏫 ${c.profesora} · 👥 ${inscritas}/${c.cupo_maximo || 15}${scInfo}</div>
         </div>
-        ${esMia ? `
-          <span class="mi-clase-badge">Mi clase</span>
-          <div class="sobrecupo-wrap">
-            <input type="number" class="sobrecupo-input" id="sc-${c.id}" min="1" placeholder="+" title="Cantidad a agregar">
-            <button class="btn-sobrecupo" onclick="guardarSobrecupo('${c.id}', ${c.sobrecupo || 0}, ${c.cupo_disponible || 0}, ${c.cupo_maximo || 15})">+ Sob</button>
-          </div>` : ''}
+        <div class="sobrecupo-wrap">
+          <input type="number" class="sobrecupo-input" id="sc-${c.id}" min="1" placeholder="+" title="Cantidad a agregar">
+          <button class="btn-sobrecupo" onclick="guardarSobrecupo('${c.id}', ${c.sobrecupo || 0}, ${c.cupo_disponible || 0}, ${c.cupo_maximo || 15})">+ Sob</button>
+        </div>
       </div>`;
   }
 
@@ -912,18 +910,17 @@
       }
       porDia[key].push(c);
     });
-    return Object.keys(porDia).sort().map((key, idx) => {
+    return Object.keys(porDia).sort().map((key) => {
       const id = prefijo + key.replace(/-/g, '');
-      const open = idx === 0;
       return `
-        <button id="dia-btn-${id}" class="dia-toggle-btn${open ? ' open' : ''}" onclick="toggleDiaClases('${id}')">
+        <button id="dia-btn-${id}" class="dia-toggle-btn" onclick="toggleDiaClases('${id}')">
           <span class="dia-toggle-label">${diaLabels[key]}</span>
           <span class="dia-toggle-meta">
             <span class="dia-toggle-count">${porDia[key].length} clase${porDia[key].length !== 1 ? 's' : ''}</span>
             <span class="dia-toggle-arrow">▼</span>
           </span>
         </button>
-        <div id="dia-list-${id}" class="dia-clases-list${open ? ' open' : ''}">
+        <div id="dia-list-${id}" class="dia-clases-list">
           ${porDia[key].map(renderClaseFilas).join('')}
         </div>`;
     }).join('');
