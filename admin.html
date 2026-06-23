@@ -2433,9 +2433,11 @@ async function cargarTodasUsuarias(){
 function buscarUsuario(){
   const q = document.getElementById('buscar-usuario').value.trim().toLowerCase();
   if(q.length < 1){ renderResultados(_todasUsuariasEliminar); return; }
+  const palabras = q.split(/\s+/).filter(Boolean);
   const filtradas = _todasUsuariasEliminar.filter(u => {
     const nombreCompleto = `${u.nombre||''} ${u.apellido||''}`.toLowerCase();
-    return u.email?.toLowerCase().includes(q) || nombreCompleto.includes(q);
+    const emailLow = (u.email||'').toLowerCase();
+    return palabras.every(p => nombreCompleto.includes(p) || emailLow.includes(p));
   });
   renderResultados(filtradas);
 }
