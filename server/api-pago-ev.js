@@ -7,17 +7,7 @@ const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.set('trust proxy', 1);
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  'https://vuela-prueba.vicenpinto.workers.dev',
-  'https://vuela-prueba.pages.dev',
-  'https://espaciovuela.cl',
-  'https://www.espaciovuela.cl',
-].filter(Boolean);
-app.use(cors({
-  origin: (origin, cb) => cb(null, !origin || allowedOrigins.includes(origin) ? origin || true : false),
-  credentials: true,
-}));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
 const limiterPreferencia = rateLimit({
@@ -79,12 +69,21 @@ app.get('/debug-auth', async (req, res) => {
 
 // ── VERIFICAR JWT SUPABASE ────────────────────────────────────
 async function verificarJWT(req) {
-  const auth = req.headers['authorization'] || '';
+  const auth  = req.headers['authorization'] || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
   if (!token) return null;
   const { data: { user }, error } = await sb.auth.getUser(token);
   if (error || !user) return null;
   return user;
+}
+
+// Verifica que el JWT corresponde a un usuario con rol 'admin' en la DB
+async function verificarAdmin(req) {
+  const user = await verificarJWT(req);
+  if (!user) return null;
+  const { data } = await sb.from('usuarios').select('rol').eq('id', user.id).maybeSingle();
+  if (data?.rol === 'admin') return user;
+  return null;
 }
 
 // ── CREAR PREFERENCIA ─────────────────────────────────────────
@@ -509,16 +508,8 @@ app.post('/webhook', async (req, res) => {
 
 // ── IMPORTACIÓN MASIVA ALUMNAS (CRM) ─────────────────────────
 app.post('/importar-alumnas', async (req, res) => {
-  const userAuth = await verificarJWT(req);
-  console.log(`[importar-alumnas] JWT email: "${userAuth?.email}" | ADMIN_EMAIL: "${process.env.ADMIN_EMAIL}"`);
-  if (!userAuth) {
-    console.warn('[importar-alumnas] Rechazado: JWT inválido o ausente');
-    return res.status(401).json({ error: 'No autenticado' });
-  }
-  if (!process.env.ADMIN_EMAIL || userAuth.email !== process.env.ADMIN_EMAIL) {
-    console.warn(`[importar-alumnas] Rechazado: email no coincide`);
-    return res.status(403).json({ error: 'No autorizado' });
-  }
+  const userAuth = await verificarAdmin(req);
+  if (!userAuth) return res.status(403).json({ error: 'No autorizado' });
 
   const { alumnas } = req.body;
   if (!Array.isArray(alumnas) || alumnas.length === 0) {
@@ -626,9 +617,8 @@ app.post('/importar-alumnas', async (req, res) => {
 
 // ── INGRESOS POR MES ─────────────────────────────────────────
 app.get('/ingresos-mes', async (req, res) => {
-  const userAuth = await verificarJWT(req);
-  if (!userAuth || userAuth.email !== process.env.ADMIN_EMAIL)
-    return res.status(403).json({ error: 'No autorizado' });
+  const userAuth = await verificarAdmin(req);
+  if (!userAuth) return res.status(403).json({ error: 'No autorizado' });
 
   const mes = req.query.mes;
   if (!mes || !/^\d{4}-\d{2}$/.test(mes))
@@ -673,9 +663,8 @@ app.get('/ingresos-mes', async (req, res) => {
 
 // ── REGISTRAR PAGO MANUAL (ADMIN) ────────────────────────────
 app.post('/registrar-pago-manual', async (req, res) => {
-  const userAuth = await verificarJWT(req);
-  if (!userAuth || userAuth.email !== process.env.ADMIN_EMAIL)
-    return res.status(403).json({ error: 'No autorizado' });
+  const userAuth = await verificarAdmin(req);
+  if (!userAuth) return res.status(403).json({ error: 'No autorizado' });
 
   const { alumna_id, plan_nombre, plan_categoria, incluye_gym, monto, tipo_pago, fecha_pago } = req.body;
   if (!alumna_id || !plan_nombre || !fecha_pago)
@@ -705,8 +694,8 @@ app.post('/registrar-pago-manual', async (req, res) => {
 
 // ── DASHBOARD STATS ──────────────────────────────────────────
 app.get('/dashboard-stats', async (req, res) => {
-  const userAuth = await verificarJWT(req);
-  if (!userAuth || userAuth.email !== process.env.ADMIN_EMAIL)
+  const userAuth = await verificarAdmin(req);
+  if (!userAuth)
     return res.status(403).json({ error: 'No autorizado' });
 
   const hoy       = new Date().toISOString().split('T')[0];
@@ -930,10 +919,8 @@ function parsearFecha(str) {
 }
 
 app.post('/importar-pagos-historico', async (req, res) => {
-  const userAuth = await verificarJWT(req);
-  if (!userAuth) return res.status(401).json({ error: 'No autenticado' });
-  if (!process.env.ADMIN_EMAIL || userAuth.email !== process.env.ADMIN_EMAIL)
-    return res.status(403).json({ error: 'No autorizado' });
+  const userAuth = await verificarAdmin(req);
+  if (!userAuth) return res.status(403).json({ error: 'No autorizado' });
 
   const { filas } = req.body;
   if (!Array.isArray(filas) || filas.length === 0)
