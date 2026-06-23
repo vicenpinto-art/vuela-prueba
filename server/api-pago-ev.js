@@ -391,7 +391,7 @@ app.post('/webhook', async (req, res) => {
     const fecha_inicio  = fechaHoyChile;
     const [y, m, d]     = fechaHoyChile.split('-').map(Number);
 
-    const { data: planData } = await sb.from('planes').select('duracion_dias, cantidad_clases, ilimitado').eq('id', meta.plan_id).single();
+    const { data: planData } = await sb.from('planes').select('duracion_dias, cantidad_clases, ilimitado, nombre, tipo').eq('id', meta.plan_id).single();
     const duracion  = planData?.duracion_dias ?? 30;
     const fecha_fin = new Date(Date.UTC(y, m - 1, d + duracion - 1)).toISOString().split('T')[0];
 
@@ -418,6 +418,28 @@ app.post('/webhook', async (req, res) => {
     if (compraError) {
       console.error('Error al guardar compra:', compraError);
       return;
+    }
+
+    // Registrar en pagos_historico para unificación de ingresos
+    try {
+      const { data: alumnaData } = await sb.from('usuarios').select('nombre,apellido,rut').eq('id', meta.usuario_id).maybeSingle();
+      await sb.from('pagos_historico').insert({
+        nombre:         alumnaData?.nombre  || null,
+        apellido:       alumnaData?.apellido || null,
+        rut:            alumnaData?.rut      || null,
+        plan_original:  planData?.nombre     || 'Plan',
+        plan_nombre:    planData?.nombre     || 'Plan',
+        plan_categoria: planData?.tipo       || 'otro',
+        incluye_gym:    !!meta.incluye_addon,
+        duracion_meses: Math.round((planData?.duracion_dias || 30) / 30),
+        monto:          meta.monto_total     || 0,
+        estado:         'aprobado',
+        tipo_pago:      'mercadopago',
+        fecha_pago:     fecha_inicio,
+        vendedor:       'mercadopago',
+      });
+    } catch (e) {
+      console.warn('pagos_historico insert (MP):', e.message);
     }
 
     // Addon gym → compra separada con vencimiento de 30 días fijos
@@ -581,6 +603,85 @@ app.post('/importar-alumnas', async (req, res) => {
   }
 
   res.json({ creadas, saltadas, errores, reporte });
+});
+
+// ── INGRESOS POR MES ─────────────────────────────────────────
+app.get('/ingresos-mes', async (req, res) => {
+  const userAuth = await verificarJWT(req);
+  if (!userAuth || userAuth.email !== process.env.ADMIN_EMAIL)
+    return res.status(403).json({ error: 'No autorizado' });
+
+  const mes = req.query.mes;
+  if (!mes || !/^\d{4}-\d{2}$/.test(mes))
+    return res.status(400).json({ error: 'Parámetro mes inválido' });
+
+  const [y, m] = mes.split('-').map(Number);
+  const startDate = `${y}-${String(m).padStart(2,'0')}-01`;
+  const endY = m === 12 ? y + 1 : y;
+  const endM = m === 12 ? 1  : m + 1;
+  const endDate   = `${endY}-${String(endM).padStart(2,'0')}-01`;
+  const prevY = m === 1 ? y - 1 : y;
+  const prevM = m === 1 ? 12 : m - 1;
+  const prevStart = `${prevY}-${String(prevM).padStart(2,'0')}-01`;
+
+  const [mesRes, prevRes] = await Promise.all([
+    sb.from('pagos_historico')
+      .select('nombre,apellido,plan_nombre,plan_categoria,monto,tipo_pago,fecha_pago,incluye_gym')
+      .gte('fecha_pago', startDate).lt('fecha_pago', endDate)
+      .order('fecha_pago', { ascending: false }).limit(5000),
+    sb.from('pagos_historico')
+      .select('monto')
+      .gte('fecha_pago', prevStart).lt('fecha_pago', startDate).limit(5000),
+  ]);
+
+  const pagos    = mesRes.data  || [];
+  const pagosPrev = prevRes.data || [];
+
+  const totalMes  = pagos.reduce((s,p) => s + (Number(p.monto)||0), 0);
+  const totalPrev = pagosPrev.reduce((s,p) => s + (Number(p.monto)||0), 0);
+  const diff = totalPrev > 0 ? Math.round(((totalMes - totalPrev) / totalPrev) * 100) : null;
+
+  const porCategoria = {};
+  pagos.forEach(p => {
+    const cat = p.plan_categoria || 'otro';
+    if (!porCategoria[cat]) porCategoria[cat] = { total: 0, count: 0 };
+    porCategoria[cat].total += Number(p.monto) || 0;
+    porCategoria[cat].count++;
+  });
+
+  res.json({ total: totalMes, count: pagos.length, totalPrev, diff, porCategoria, detalle: pagos });
+});
+
+// ── REGISTRAR PAGO MANUAL (ADMIN) ────────────────────────────
+app.post('/registrar-pago-manual', async (req, res) => {
+  const userAuth = await verificarJWT(req);
+  if (!userAuth || userAuth.email !== process.env.ADMIN_EMAIL)
+    return res.status(403).json({ error: 'No autorizado' });
+
+  const { alumna_id, plan_nombre, plan_categoria, incluye_gym, monto, tipo_pago, fecha_pago } = req.body;
+  if (!alumna_id || !plan_nombre || !fecha_pago)
+    return res.status(400).json({ error: 'Faltan campos requeridos' });
+
+  const { data: alumna } = await sb.from('usuarios').select('nombre,apellido,rut').eq('id', alumna_id).maybeSingle();
+
+  const { error } = await sb.from('pagos_historico').insert({
+    nombre:         alumna?.nombre   || null,
+    apellido:       alumna?.apellido || null,
+    rut:            alumna?.rut      || null,
+    plan_original:  plan_nombre,
+    plan_nombre,
+    plan_categoria: plan_categoria || 'otro',
+    incluye_gym:    !!incluye_gym,
+    duracion_meses: 1,
+    monto:          Number(monto) || 0,
+    estado:         'aprobado',
+    tipo_pago:      tipo_pago || 'transferencia',
+    fecha_pago,
+    vendedor:       'admin',
+  });
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
 });
 
 // ── DASHBOARD STATS ──────────────────────────────────────────

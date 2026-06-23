@@ -479,12 +479,11 @@
     <!-- INGRESOS -->
     <div class="section" id="sec-ingresos">
       <div class="section-title">Ingresos</div>
-      <div class="section-sub">Total recaudado según planes registrados en el sistema.</div>
+      <div class="section-sub">Historial unificado de pagos 2023–presente (BoxMagic + pagos nuevos).</div>
 
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
         <select id="ing-mes" onchange="cargarIngresos()" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;outline:none">
         </select>
-        <span style="font-size:13px;color:var(--gray)">Mostrando compras registradas en el sistema</span>
       </div>
 
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
@@ -793,6 +792,14 @@
         <label>Monto personalizado (opcional)</label>
         <input type="number" id="asignar-monto-custom" min="0" placeholder="Dejar vacío para usar el precio del plan">
         <span style="font-size:11px;color:var(--gray);margin-top:4px">Solo si vendiste el plan a un precio distinto al oficial</span>
+      </div>
+      <div class="form-group full">
+        <label>Método de pago</label>
+        <select id="asignar-tipo-pago" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;outline:none;width:100%">
+          <option value="transferencia">Transferencia bancaria</option>
+          <option value="efectivo">Efectivo</option>
+          <option value="mercadopago">MercadoPago</option>
+        </select>
       </div>
       <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px">
         <input type="checkbox" id="asignar-no-ingresos" style="width:16px;height:16px;accent-color:var(--purple)">
@@ -1708,6 +1715,24 @@ async function confirmarAsignarPlan(){
     await sb.from('usuarios').update({matricula_pagada:true}).eq('id',alumnaId);
   }
 
+  // Registrar en pagos_historico para unificar con historial
+  if(!noIngresos && monto > 0){
+    const tipoPago = document.getElementById('asignar-tipo-pago').value;
+    await fetch(`${SERVER_URL}/registrar-pago-manual`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${jwtToken}` },
+      body: JSON.stringify({
+        alumna_id:      alumnaId,
+        plan_nombre:    planNombre,
+        plan_categoria: planTipo,
+        incluye_gym:    addon || planTipo === 'gym',
+        monto,
+        tipo_pago:      tipoPago,
+        fecha_pago:     fechaInicio,
+      })
+    }).catch(e => console.warn('pagos_historico manual:', e.message));
+  }
+
   cerrarModal('modal-asignar-plan');
   toast('Plan asignado ✓');
   cargarAlumnas();
@@ -2286,14 +2311,16 @@ function iniciarIngresos(){
     opt.value=val; opt.textContent=label.charAt(0).toUpperCase()+label.slice(1)+' (próximo)';
     sel.appendChild(opt);
   }
-  // Mes actual + últimos 12
-  for(let i=0;i<13;i++){
-    const d = new Date(ahora.getFullYear(), ahora.getMonth()-i, 1);
-    const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    const label = d.toLocaleDateString('es-CL',{month:'long',year:'numeric'});
+  // Desde mes actual hasta enero 2023 (donde comienza el historial)
+  const inicioHistorico = new Date(2023, 0, 1);
+  let cursor = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+  while(cursor >= inicioHistorico){
+    const val = `${cursor.getFullYear()}-${String(cursor.getMonth()+1).padStart(2,'0')}`;
+    const label = cursor.toLocaleDateString('es-CL',{month:'long',year:'numeric'});
     const opt = document.createElement('option');
     opt.value=val; opt.textContent=label.charAt(0).toUpperCase()+label.slice(1);
     sel.appendChild(opt);
+    cursor.setMonth(cursor.getMonth()-1);
   }
   sel.selectedIndex = 3; // mes actual
   cargarIngresos();
@@ -2302,89 +2329,77 @@ function iniciarIngresos(){
 async function cargarIngresos(){
   const mesVal = document.getElementById('ing-mes').value;
   if(!mesVal) return;
-  const [anio,mes] = mesVal.split('-').map(Number);
 
-  const inicio    = new Date(anio,mes-1,1).toISOString();
-  const fin       = new Date(anio,mes,1).toISOString();
-  const inicioAnt = new Date(anio,mes-2,1).toISOString();
+  // Mostrar loading
+  document.getElementById('ing-total').textContent   = '…';
+  document.getElementById('ing-compras').textContent = '…';
+  document.getElementById('ing-vs-anterior').textContent = '…';
+  document.getElementById('ing-por-tipo').innerHTML = '<p style="font-size:13px;padding:16px;color:var(--gray)">Cargando…</p>';
+  document.getElementById('ing-tabla-detalle').innerHTML = '';
 
-  const [{data:compras},{data:comprasAnt}] = await Promise.all([
-    sb.from('compras')
-      .select('id,monto_pagado,created_at,matricula_pagada,addon_gym,alumna_id,planes(nombre,tipo),usuarios!alumna_id(nombre,apellido)')
-      .gte('created_at',inicio).lt('created_at',fin)
-      .gt('monto_pagado',0)
-      .order('created_at',{ascending:false}),
-    sb.from('compras')
-      .select('monto_pagado')
-      .gte('created_at',inicioAnt).lt('created_at',inicio)
-      .gt('monto_pagado',0)
-  ]);
+  let data;
+  try {
+    const resp = await fetch(`${SERVER_URL}/ingresos-mes?mes=${mesVal}`, {
+      headers: { 'Authorization': `Bearer ${jwtToken}` }
+    });
+    if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    data = await resp.json();
+  } catch(e) {
+    document.getElementById('ing-por-tipo').innerHTML = `<p style="font-size:13px;padding:16px;color:var(--coral)">Error al cargar: ${e.message}</p>`;
+    return;
+  }
 
-  const lista = compras||[];
-  const totalMes   = lista.reduce((s,c)=>s+(c.monto_pagado||0),0);
-  const totalAnt   = (comprasAnt||[]).reduce((s,c)=>s+(c.monto_pagado||0),0);
-  const diff       = totalAnt>0 ? Math.round(((totalMes-totalAnt)/totalAnt)*100) : null;
+  const { total, count, diff, porCategoria, detalle } = data;
 
   // Stats
-  document.getElementById('ing-total').textContent    = formatCLP(totalMes);
-  document.getElementById('ing-compras').textContent  = lista.length;
+  document.getElementById('ing-total').textContent   = formatCLP(total);
+  document.getElementById('ing-compras').textContent = count;
   const vsEl = document.getElementById('ing-vs-anterior');
   if(diff===null){ vsEl.textContent='—'; vsEl.style.color='var(--gray)'; }
   else if(diff>=0){ vsEl.textContent=`+${diff}%`; vsEl.style.cssText='font-size:20px;color:#007a82'; }
-  else { vsEl.textContent=`${diff}%`; vsEl.style.cssText='font-size:20px;color:var(--coral)'; }
+  else            { vsEl.textContent=`${diff}%`;  vsEl.style.cssText='font-size:20px;color:var(--coral)'; }
 
-  // Por tipo
-  const porTipo = {};
-  lista.forEach(c=>{
-    const tipo = c.planes?.tipo||'otro';
-    if(!porTipo[tipo]) porTipo[tipo]={total:0,count:0};
-    porTipo[tipo].total+=c.monto_pagado||0;
-    porTipo[tipo].count++;
-  });
+  // Por categoría de plan
   const tipoEl = document.getElementById('ing-por-tipo');
-  if(Object.keys(porTipo).length===0){
-    tipoEl.innerHTML='<p style="font-size:13px;color:var(--gray)">Sin datos este mes.</p>';
+  const cats   = Object.entries(porCategoria).sort((a,b)=>b[1].total-a[1].total);
+  if(!cats.length){
+    tipoEl.innerHTML='<p style="font-size:13px;padding:16px;color:var(--gray)">Sin datos este mes.</p>';
   } else {
-    tipoEl.innerHTML=Object.entries(porTipo)
-      .sort((a,b)=>b[1].total-a[1].total)
-      .map(([tipo,{total,count}])=>`
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
-          <span class="badge badge-${tipo==='vuela'?'activo':tipo==='muevete'?'prof':tipo==='gym'?'alumna':'sin'}" style="min-width:70px;justify-content:center">${tipo}</span>
-          <div style="flex:1">
-            <div style="height:6px;background:var(--light);border-radius:4px;overflow:hidden">
-              <div style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--coral),var(--magenta));width:${totalMes>0?Math.round((total/totalMes)*100):0}%"></div>
-            </div>
+    tipoEl.innerHTML='<div style="padding:0 20px">'+cats.map(([cat,{total:t,count:c}])=>`
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:12px;font-weight:700;color:var(--purple);min-width:150px">${cat}</span>
+        <div style="flex:1">
+          <div style="height:6px;background:var(--light);border-radius:4px;overflow:hidden">
+            <div style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--purple),var(--magenta));width:${total>0?Math.round((t/total)*100):0}%"></div>
           </div>
-          <span style="font-size:13px;color:var(--gray);min-width:40px;text-align:right">${count} venta${count!==1?'s':''}</span>
-          <span style="font-size:14px;font-weight:700;min-width:90px;text-align:right">${formatCLP(total)}</span>
-        </div>`).join('');
+        </div>
+        <span style="font-size:13px;color:var(--gray);min-width:55px;text-align:right">${c} venta${c!==1?'s':''}</span>
+        <span style="font-size:14px;font-weight:700;min-width:90px;text-align:right">${formatCLP(t)}</span>
+      </div>`).join('')+'</div>';
   }
 
   // Tabla detalle
   const tablaEl = document.getElementById('ing-tabla-detalle');
-  if(lista.length===0){
-    tablaEl.innerHTML='<p style="font-size:13px;color:var(--gray)">Sin compras este mes.</p>';
+  if(!detalle.length){
+    tablaEl.innerHTML='<p style="font-size:13px;padding:16px;color:var(--gray)">Sin pagos este mes.</p>';
   } else {
-    tablaEl.innerHTML=`<table class="tabla">
-      <thead><tr><th>Fecha</th><th>Alumna</th><th>Plan</th><th>Extras</th><th style="text-align:right">Monto</th></tr></thead>
-      <tbody>${lista.map(c=>{
-        const u=c.usuarios;
-        const nombre=u?`${u.nombre||''} ${u.apellido||''}`.trim():'—';
-        const extras=[];
-        if(c.matricula_pagada) extras.push('Matrícula');
-        if(c.addon_gym) extras.push('Addon Gym');
+    tablaEl.innerHTML=`<div class="tabla-wrap"><table class="tabla">
+      <thead><tr><th>Fecha</th><th>Alumna</th><th>Plan</th><th>Método</th><th style="text-align:right">Monto</th></tr></thead>
+      <tbody>${detalle.map(p=>{
+        const nombre = [p.nombre,p.apellido].filter(Boolean).join(' ')||'—';
+        const fecha  = p.fecha_pago ? new Date(p.fecha_pago+'T12:00:00').toLocaleDateString('es-CL',{day:'2-digit',month:'short',year:'numeric'}) : '—';
         return `<tr>
-          <td style="font-size:12px;color:var(--gray)">${new Date(c.created_at).toLocaleDateString('es-CL',{day:'2-digit',month:'short'})}</td>
+          <td style="font-size:12px;color:var(--gray)">${fecha}</td>
           <td style="font-weight:600">${nombre}</td>
-          <td style="font-size:13px">${c.planes?.nombre||'—'}</td>
-          <td style="font-size:11px;color:var(--purple)">${extras.join(' + ')||'—'}</td>
-          <td style="font-weight:700;text-align:right;color:var(--coral)">${formatCLP(c.monto_pagado||0)}</td>
+          <td style="font-size:13px">${p.plan_nombre||'—'}</td>
+          <td style="font-size:11px;color:var(--purple)">${p.tipo_pago||'—'}</td>
+          <td style="font-weight:700;text-align:right;color:var(--coral)">${formatCLP(p.monto||0)}</td>
         </tr>`;}).join('')}
         <tr style="border-top:2px solid var(--border)">
           <td colspan="4" style="font-weight:700;padding-top:14px">Total</td>
-          <td style="font-weight:800;text-align:right;padding-top:14px;color:var(--coral);font-size:16px">${formatCLP(totalMes)}</td>
+          <td style="font-weight:800;text-align:right;padding-top:14px;color:var(--coral);font-size:16px">${formatCLP(total)}</td>
         </tr>
-      </tbody></table>`;
+      </tbody></table></div>`;
   }
 }
 
