@@ -1725,10 +1725,11 @@ async function confirmarAsignarPlan(){
   // Registrar en pagos_historico para unificar con historial
   if(!noIngresos && monto > 0){
     const tipoPago = document.getElementById('asignar-tipo-pago').value;
-    const { data:{ session: sesManual } } = await sb.auth.getSession();
+    const tokenManual = await getAdminToken();
+    if (!tokenManual) return;
     await fetch(`${SERVER_URL}/registrar-pago-manual`, {
       method: 'POST',
-      headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${sesManual?.access_token}` },
+      headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${tokenManual}` },
       body: JSON.stringify({
         alumna_id:      alumnaId,
         plan_nombre:    planNombre,
@@ -2351,9 +2352,10 @@ async function cargarIngresos(){
 
   let data;
   try {
-    const { data:{ session: sesIng } } = await sb.auth.getSession();
+    const tokenIng = await getAdminToken();
+    if (!tokenIng) return;
     const resp = await fetch(`${SERVER_URL}/ingresos-mes?mes=${mesVal}`, {
-      headers: { 'Authorization': `Bearer ${sesIng?.access_token}` }
+      headers: { 'Authorization': `Bearer ${tokenIng}` }
     });
     if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
     data = await resp.json();
@@ -2471,6 +2473,17 @@ function formatCLP(n){
 }
 
 // ── ESTADÍSTICAS / DASHBOARD ──────────────────────────────────
+// Obtiene el token de acceso refrescándolo si está vencido
+async function getAdminToken() {
+  let { data: { session } } = await sb.auth.getSession();
+  if (!session?.access_token) {
+    const { data: ref } = await sb.auth.refreshSession();
+    session = ref?.session;
+  }
+  if (!session?.access_token) { window.location.href = 'login.html'; return null; }
+  return session.access_token;
+}
+
 let ingDetalleCompleto = [];
 let ingPagina = 0;
 const ING_POR_PAG = 10;
@@ -2485,9 +2498,10 @@ async function cargarDashboardAdmin(force = false) {
   document.getElementById('dash-loading-admin').style.display   = 'block';
   document.getElementById('dash-contenido-admin').style.display = 'none';
   try {
-    const { data: { session } } = await sb.auth.getSession();
-    const resp = await fetch('https://espacio-vuela-pagos.onrender.com/dashboard-stats', {
-      headers: { 'Authorization': `Bearer ${session.access_token}` }
+    const tokenDash = await getAdminToken();
+    if (!tokenDash) return;
+    const resp = await fetch(`${SERVER_URL}/dashboard-stats`, {
+      headers: { 'Authorization': `Bearer ${tokenDash}` }
     });
     if (!resp.ok) throw new Error();
     dashDataAdmin = await resp.json();
