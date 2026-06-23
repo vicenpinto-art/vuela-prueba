@@ -2346,7 +2346,7 @@ async function seleccionarProf(profId, nombre){
       </div>
 
       <!-- Rutinas -->
-      <div style="padding:16px 24px">
+      <div style="padding:16px 24px;border-bottom:1px solid var(--border)">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--purple);margin-bottom:10px">Rutinas publicadas</div>
         ${(rutinas||[]).length===0
           ? '<p style="font-size:13px;color:var(--gray)">Sin rutinas publicadas.</p>'
@@ -2358,6 +2358,24 @@ async function seleccionarProf(profId, nombre){
                 <div style="font-size:13px;font-weight:600">${esc(cn)}</div>
                 <div style="font-size:11px;color:var(--gray);margin-top:2px">${cf} · ${res}…</div>
               </div>`;}).join('')}
+      </div>
+
+      <!-- Asignar horarios -->
+      <div style="padding:16px 24px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dark)">Asignar horarios recurrentes</div>
+          <button class="btn btn-secondary btn-sm" onclick="verHorariosParaAsignar('${profId}','${nombre.replace(/'/g,"\\'")}')">Ver horarios</button>
+        </div>
+        <div id="horarios-asignar-panel" style="font-size:13px;color:var(--gray)">Presiona "Ver horarios" para cargar.</div>
+      </div>
+
+      <!-- Asignar clases individuales -->
+      <div style="padding:16px 24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dark)">Asignar clases puntuales</div>
+          <button class="btn btn-secondary btn-sm" onclick="verClasesParaAsignar('${profId}','${nombre.replace(/'/g,"\\'")}')">Ver clases</button>
+        </div>
+        <div id="clases-asignar-panel" style="font-size:13px;color:var(--gray)">Presiona "Ver clases" para cargar.</div>
       </div>
     </div>`;
 }
@@ -2375,6 +2393,76 @@ async function irAAsistencia(claseId){
     return;
   }
   selClaseAsis(claseId);
+}
+
+async function verHorariosParaAsignar(profId, profNombre) {
+  const el = document.getElementById('horarios-asignar-panel');
+  if (!el) return;
+  el.innerHTML = '<div class="sk" style="height:36px;margin-bottom:6px"></div><div class="sk" style="height:36px"></div>';
+
+  const { data: horarios } = await sb.from('horarios')
+    .select('id,nombre,dia_semana,hora,profesora,profesora_id')
+    .eq('activo', true).order('dia_semana').order('hora');
+
+  const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  if (!horarios || horarios.length === 0) { el.innerHTML = '<p style="font-size:13px;color:var(--gray)">No hay horarios activos.</p>'; return; }
+
+  el.innerHTML = horarios.map(h => {
+    const esMio = h.profesora_id === profId;
+    const pNom = (h.profesora || 'Sin asignar');
+    return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:12px;font-weight:700;color:var(--coral);min-width:58px">${dias[h.dia_semana]} ${(h.hora||'').slice(0,5)}</span>
+      <span style="flex:1;font-size:13px;font-weight:600">${esc(h.nombre)}</span>
+      <span style="font-size:11px;color:var(--gray);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(pNom)}</span>
+      ${esMio
+        ? '<span style="font-size:11px;color:#007a82;font-weight:700;white-space:nowrap">✓ Asignada</span>'
+        : `<button class="btn btn-primary btn-sm" onclick="asignarHorario('${h.id}','${profId}','${profNombre.replace(/'/g,"\\'")}')">Asignar</button>`}
+    </div>`;
+  }).join('');
+}
+
+async function asignarHorario(horarioId, profId, profNombre) {
+  if (!confirm(`¿Asignar a ${profNombre} en este horario?\nSe actualizarán también todas las clases futuras de ese horario.`)) return;
+  const ahora = new Date().toISOString();
+  const { error } = await sb.from('horarios').update({ profesora_id: profId, profesora: profNombre }).eq('id', horarioId);
+  if (error) { toast('Error al asignar', 'error'); return; }
+  await sb.from('clases').update({ profesora_id: profId, profesora: profNombre }).eq('horario_id', horarioId).gte('fecha_hora', ahora);
+  toast('✓ Horario y clases futuras actualizados');
+  verHorariosParaAsignar(profId, profNombre);
+}
+
+async function verClasesParaAsignar(profId, profNombre) {
+  const el = document.getElementById('clases-asignar-panel');
+  if (!el) return;
+  el.innerHTML = '<div class="sk" style="height:36px;margin-bottom:6px"></div><div class="sk" style="height:36px"></div>';
+
+  const ahora = new Date();
+  const en30d = new Date(ahora.getTime() + 30*24*60*60*1000);
+  const { data: clases } = await sb.from('clases')
+    .select('id,nombre,fecha_hora,profesora,profesora_id')
+    .gte('fecha_hora', ahora.toISOString()).lte('fecha_hora', en30d.toISOString())
+    .eq('cancelada', false).order('fecha_hora');
+
+  if (!clases || clases.length === 0) { el.innerHTML = '<p style="font-size:13px;color:var(--gray)">No hay clases próximas.</p>'; return; }
+
+  el.innerHTML = clases.map(c => {
+    const esMio = c.profesora_id === profId;
+    return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--gray);min-width:90px;white-space:nowrap">${fechaStr(c.fecha_hora)} ${horaStr(c.fecha_hora)}</span>
+      <span style="flex:1;font-size:13px;font-weight:600">${esc(c.nombre)}</span>
+      <span style="font-size:11px;color:var(--gray);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.profesora||'Sin asignar')}</span>
+      ${esMio
+        ? '<span style="font-size:11px;color:#007a82;font-weight:700;white-space:nowrap">✓ Asignada</span>'
+        : `<button class="btn btn-primary btn-sm" onclick="asignarClaseInd('${c.id}','${profId}','${profNombre.replace(/'/g,"\\'")}')">Asignar</button>`}
+    </div>`;
+  }).join('');
+}
+
+async function asignarClaseInd(claseId, profId, profNombre) {
+  const { error } = await sb.from('clases').update({ profesora_id: profId, profesora: profNombre }).eq('id', claseId);
+  if (error) { toast('Error al asignar', 'error'); return; }
+  toast('✓ Clase asignada a ' + profNombre);
+  verClasesParaAsignar(profId, profNombre);
 }
 
 // ── ROLES ─────────────────────────────────────────────────────
