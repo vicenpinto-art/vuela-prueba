@@ -664,8 +664,9 @@
     let tuvoPrueba = false;
     for (const c of compras) {
       if (c.estado === 'activo') {
-        const agotada  = !c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles <= 0;
-        const vencida  = c.fecha_fin < hoy;
+        const esGym   = ['gym','addon_gym'].includes(c.planes?.tipo) || c.addon_gym || c.incluye_gym;
+        const agotada = !esGym && !c.ilimitado && c.clases_disponibles !== null && c.clases_disponibles <= 0;
+        const vencida = c.fecha_fin < hoy;
         if (agotada || vencida) { continue; }
       }
       if (c.clase_prueba) {
@@ -675,14 +676,15 @@
       validas.push(c);
     }
 
-    if (validas.length === 0) { mostrarSinPlan(contenedor, badge); return; }
-
-    // Mostrar tarjeta gym si tiene plan gym, addon_gym o incluye_gym
-    const tieneGym = validas.some(c =>
-      ['gym','addon_gym'].includes(c.planes?.tipo) || c.incluye_gym || c.addon_gym
+    // Mostrar botón gym si tiene cualquier compra activa con acceso gym (no vencida)
+    const tieneGym = compras.some(c =>
+      c.estado === 'activo' && c.fecha_fin >= hoy &&
+      (['gym','addon_gym'].includes(c.planes?.tipo) || c.incluye_gym || c.addon_gym)
     );
     const btnGym = document.getElementById('btn-gym-booking');
     if (btnGym) btnGym.style.display = tieneGym ? 'block' : 'none';
+
+    if (validas.length === 0) { mostrarSinPlan(contenedor, badge); return; }
 
     // compraIdActiva = plan principal (no clase_prueba ni gym), o el primero si solo hay esos
     const principal = validas.find(c => !c.clase_prueba && !['gym','addon_gym'].includes(c.planes?.tipo)) || validas[0];
