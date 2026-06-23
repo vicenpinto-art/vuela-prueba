@@ -2422,21 +2422,22 @@ function renderResultados(data){
     </div>`).join('');
 }
 
+let _todasUsuariasEliminar = [];
+
 async function cargarTodasUsuarias(){
   const {data} = await sb.from('usuarios').select('id,email,nombre,apellido,rol').order('nombre');
-  renderResultados(data);
+  _todasUsuariasEliminar = data || [];
+  renderResultados(_todasUsuariasEliminar);
 }
 
-async function buscarUsuario(){
+function buscarUsuario(){
   const q = document.getElementById('buscar-usuario').value.trim().toLowerCase();
-  if(q.length<1){
-    cargarTodasUsuarias();
-    return;
-  }
-  const {data} = await sb.from('usuarios').select('id,email,nombre,apellido,rol')
-    .or(`email.ilike.%${q}%,nombre.ilike.%${q}%,apellido.ilike.%${q}%`)
-    .order('nombre').limit(20);
-  renderResultados(data);
+  if(q.length < 1){ renderResultados(_todasUsuariasEliminar); return; }
+  const filtradas = _todasUsuariasEliminar.filter(u => {
+    const nombreCompleto = `${u.nombre||''} ${u.apellido||''}`.toLowerCase();
+    return u.email?.toLowerCase().includes(q) || nombreCompleto.includes(q);
+  });
+  renderResultados(filtradas);
 }
 
 async function confirmarEliminar(userId, nombre){
