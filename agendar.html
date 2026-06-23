@@ -56,15 +56,24 @@
     /* MAIN */
     main { max-width: 1100px; margin: 0 auto; padding: 24px 40px 60px; }
 
-    /* GRUPO DÍA */
-    .grupo-dia { margin-bottom: 32px; }
-    .dia-label {
-      font-size: 13px; font-weight: 700; letter-spacing: 1px;
-      text-transform: uppercase; color: var(--gray);
-      margin-bottom: 12px; padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
+    /* GRUPO DÍA ACORDEÓN */
+    .grupo-dia { margin-bottom: 8px; }
+    .dia-toggle-btn {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      background: #fff; border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 13px 16px; cursor: pointer; font-family: 'Outfit', sans-serif;
+      transition: border-color .2s, background .2s;
     }
-    .dia-label span { color: var(--coral); margin-left: 8px; font-weight: 500; font-size: 12px; text-transform: none; letter-spacing: 0; }
+    .dia-toggle-btn:hover { border-color: var(--coral); background: #fff8f7; }
+    .dia-toggle-btn.open { border-color: var(--coral); border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: none; }
+    .dia-toggle-label { font-size: 14px; font-weight: 700; color: var(--dark); text-transform: capitalize; }
+    .dia-toggle-meta { display: flex; align-items: center; gap: 10px; }
+    .dia-toggle-count { font-size: 12px; color: var(--gray); }
+    .dia-toggle-count.inscrita { color: var(--coral); font-weight: 600; }
+    .dia-toggle-arrow { font-size: 11px; color: var(--gray); transition: transform .25s; }
+    .dia-toggle-btn.open .dia-toggle-arrow { transform: rotate(180deg); }
+    .dia-clases-list { display: none; padding: 10px 0 4px; border: 1.5px solid var(--coral); border-top: none; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; padding: 10px 12px 6px; }
+    .dia-clases-list.open { display: block; }
 
     /* CLASE CARD */
     .clase-card {
@@ -475,9 +484,18 @@
     let html = '';
     porDia.forEach((clasesDia, fechaKey) => {
       const inscritasCnt = clasesDia.filter(c => misInscripciones.has(c.id)).length;
+      const id = 'ag-' + fechaKey.replace(/-/g,'');
       html += `<div class="grupo-dia">
-        <div class="dia-label">${diaLabel(fechaKey)} ${inscritasCnt > 0 ? `<span>· ${inscritasCnt} inscrita${inscritasCnt > 1 ? 's' : ''}</span>` : ''}</div>
-        ${clasesDia.map(c => renderCard(c)).join('')}
+        <button class="dia-toggle-btn" onclick="toggleDiaAgendar('${id}')">
+          <span class="dia-toggle-label">${diaLabel(fechaKey)}</span>
+          <span class="dia-toggle-meta">
+            <span class="dia-toggle-count${inscritasCnt > 0 ? ' inscrita' : ''}">${clasesDia.length} hora${clasesDia.length !== 1 ? 's' : ''}${inscritasCnt > 0 ? ` · ${inscritasCnt} inscrita${inscritasCnt > 1 ? 's' : ''}` : ''}</span>
+            <span class="dia-toggle-arrow">▼</span>
+          </span>
+        </button>
+        <div id="${id}" class="dia-clases-list">
+          ${clasesDia.map(c => renderCard(c)).join('')}
+        </div>
       </div>`;
     });
 
@@ -497,6 +515,14 @@
     }
 
     wrap.innerHTML = html;
+  }
+
+  function toggleDiaAgendar(id) {
+    const btn  = document.querySelector(`.dia-toggle-btn[onclick="toggleDiaAgendar('${id}')"]`);
+    const list = document.getElementById(id);
+    if (!btn || !list) return;
+    btn.classList.toggle('open');
+    list.classList.toggle('open');
   }
 
   function abrirIGGym() {
@@ -583,20 +609,7 @@
     claseSeleccionada = todasLasClases.find(c => c.id === claseId);
     if (!claseSeleccionada) return;
 
-    const esGym = claseSeleccionada.nombre?.startsWith('Gym ');
-
-    if (planCongelado && !esGym) {
-      const alertaEl = document.getElementById('alerta-plan');
-      alertaEl.innerHTML = '❄️ Tu plan está congelado. Contacta a Espacio Vuela para reactivarlo.';
-      alertaEl.classList.add('visible');
-      alertaEl.scrollIntoView({behavior:'smooth', block:'center'});
-      return;
-    }
-    if (esGym && !tieneAccesoGym) {
-      window.location.href = 'planes.html';
-      return;
-    }
-    if (!esGym && !tieneplanActivo) {
+    if (!tieneAccesoGym) {
       window.location.href = 'planes.html';
       return;
     }
@@ -660,21 +673,11 @@
     btn.disabled = true;
     btn.textContent = 'Agendando...';
 
-    const esGym = claseSeleccionada.nombre?.startsWith('Gym ');
     let data, error;
-
-    if (esGym) {
-      ({ data, error } = await sb.rpc('agendar_gym', {
-        p_clase_id:  claseSeleccionada.id,
-        p_alumna_id: userId
-      }));
-    } else {
-      ({ data, error } = await sb.rpc('agendar_clase', {
-        p_clase_id:   claseSeleccionada.id,
-        p_alumna_id:  userId,
-        p_compra_id:  compraSeleccionadaId || null
-      }));
-    }
+    ({ data, error } = await sb.rpc('agendar_gym', {
+      p_clase_id:  claseSeleccionada.id,
+      p_alumna_id: userId
+    }));
 
     if (error || !data?.ok) {
       const errores = {
