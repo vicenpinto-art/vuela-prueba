@@ -626,7 +626,7 @@ app.get('/ingresos-mes', async (req, res) => {
 
   const [mesRes, prevRes] = await Promise.all([
     sb.from('pagos_historico')
-      .select('nombre,apellido,plan_nombre,plan_categoria,monto,tipo_pago,fecha_pago,incluye_gym')
+      .select('nombre,apellido,plan_nombre,plan_categoria,monto,tipo_pago,vendedor,fecha_pago,incluye_gym')
       .gte('fecha_pago', startDate).lt('fecha_pago', endDate)
       .order('fecha_pago', { ascending: false }).limit(5000),
     sb.from('pagos_historico')
@@ -695,7 +695,7 @@ app.get('/dashboard-stats', async (req, res) => {
   const mesActual = (new Date().getMonth() + 1).toString().padStart(2, '0');
 
   const [pagosRes, comprasActRes, renovRes, expComprasRes, usuariosRes] = await Promise.all([
-    sb.from('pagos_historico').select('fecha_pago,monto,plan_nombre,tipo_pago'),
+    sb.from('pagos_historico').select('fecha_pago,monto,plan_nombre,tipo_pago,vendedor'),
     sb.from('compras').select('alumna_id').eq('estado','activo').gte('fecha_fin', hoy),
     sb.from('compras').select('alumna_id,fecha_fin,planes(nombre)')
       .eq('estado','activo').gte('fecha_fin', hoy).lte('fecha_fin', en14dias).order('fecha_fin'),
@@ -774,8 +774,9 @@ app.get('/dashboard-stats', async (req, res) => {
 
   // Métodos de pago
   const metodoPago = {};
-  const normalizar = t => {
+  const normalizar = (t, v) => {
     const s = (t||'').trim().toLowerCase();
+    if ((s.includes('mercado') || s === 'mp') && v === 'mercadopago') return 'Pago web';
     if (s.includes('mercado') || s === 'mp') return 'MercadoPago';
     if (s.includes('transfer'))              return 'Transferencia';
     if (s.includes('efectiv'))               return 'Efectivo';
@@ -784,7 +785,7 @@ app.get('/dashboard-stats', async (req, res) => {
     return t.trim();
   };
   pagos.forEach(p => {
-    const key = normalizar(p.tipo_pago);
+    const key = normalizar(p.tipo_pago, p.vendedor);
     if (!metodoPago[key]) metodoPago[key] = { count: 0, total: 0 };
     metodoPago[key].count++;
     metodoPago[key].total += Number(p.monto) || 0;
