@@ -475,19 +475,26 @@
 
       <!-- Columnas por plan -->
       <div id="disc-grid">
-        <div class="card">
+        <div class="card" id="disc-card-vuela">
           <div class="card-header">
             <div class="card-title" style="color:#6b3fd4">🟣 Plan Vuela</div>
             <span style="font-size:12px;color:var(--gray)" id="disc-count-vuela">0 disciplinas</span>
           </div>
           <div id="disc-lista-vuela"></div>
         </div>
-        <div class="card">
+        <div class="card" id="disc-card-muevete">
           <div class="card-header">
             <div class="card-title" style="color:#8a6800">🟡 Plan Muévete</div>
             <span style="font-size:12px;color:var(--gray)" id="disc-count-muevete">0 disciplinas</span>
           </div>
           <div id="disc-lista-muevete"></div>
+        </div>
+        <div class="card" id="disc-card-gym">
+          <div class="card-header">
+            <div class="card-title" style="color:#00897b">🟢 Gym</div>
+            <span style="font-size:12px;color:var(--gray)" id="disc-count-gym">0 disciplinas</span>
+          </div>
+          <div id="disc-lista-gym"></div>
         </div>
       </div>
 
@@ -2622,22 +2629,29 @@ async function restaurarDisciplina(id){
 function renderDisciplinas(){
   const vuela   = todasLasDisciplinas.filter(d=>d.plan==='vuela');
   const muevete = todasLasDisciplinas.filter(d=>d.plan==='muevete');
+  const gym     = todasLasDisciplinas.filter(d=>d.plan==='gym');
 
-  document.getElementById('disc-count-vuela').textContent   = `${vuela.length} disciplinas`;
-  document.getElementById('disc-count-muevete').textContent = `${muevete.length} disciplinas`;
-
-  document.getElementById('disc-lista-vuela').innerHTML   = renderListaDisc(vuela,'vuela');
-  document.getElementById('disc-lista-muevete').innerHTML = renderListaDisc(muevete,'muevete');
+  const sets = {vuela, muevete, gym};
+  Object.entries(sets).forEach(([plan, lista]) => {
+    document.getElementById(`disc-count-${plan}`).textContent = `${lista.length} disciplinas`;
+    document.getElementById(`disc-lista-${plan}`).innerHTML   = renderListaDisc(lista, plan);
+    document.getElementById(`disc-card-${plan}`).style.display = lista.length ? '' : 'none';
+  });
 }
+
+const PLANES_INFO = {
+  vuela:   {label:'Vuela'},
+  muevete: {label:'Muévete'},
+  gym:     {label:'Gym'},
+};
 
 function renderListaDisc(lista, planActual){
   if(!lista.length) return '<p style="font-size:13px;color:var(--gray);padding:8px 0">Sin disciplinas.</p>';
-  const otroPlan = planActual==='vuela'?'muevete':'vuela';
-  const otraLabel = planActual==='vuela'?'Muévete':'Vuela';
+  const otros = Object.entries(PLANES_INFO).filter(([k])=>k!==planActual);
   return lista.map(d=>`
     <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
       <span style="flex:1;font-size:13px;font-weight:500">${d.nombre}</span>
-      <button class="btn btn-secondary btn-sm" onclick="moverDisciplina('${d.id}','${otroPlan}')" title="Mover a ${otraLabel}">→ ${otraLabel}</button>
+      ${otros.map(([k,v])=>`<button class="btn btn-secondary btn-sm" onclick="moverDisciplina('${d.id}','${k}')" title="Mover a ${v.label}">→ ${v.label}</button>`).join('')}
       <button class="btn btn-danger btn-sm" onclick="eliminarDisciplina('${d.id}')">✕</button>
     </div>`).join('');
 }
