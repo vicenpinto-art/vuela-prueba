@@ -206,6 +206,30 @@
       .perfil-grid { grid-template-columns: 1fr; }
       .perfil-field.full, .perfil-divider, .perfil-section-label { grid-column: 1; }
     }
+
+    /* ── HISTORIAL DE PAGOS ── */
+    .pagos-card { margin-top: 20px; }
+    .pago-fila {
+      display: flex; align-items: center; gap: 12px; padding: 11px 0;
+      border-bottom: 1px solid var(--border); flex-wrap: wrap;
+    }
+    .pago-fila:last-child { border-bottom: none; padding-bottom: 0; }
+    .pago-fecha { font-size: 12px; color: var(--gray); min-width: 90px; white-space: nowrap; }
+    .pago-plan { font-size: 14px; font-weight: 600; flex: 1; min-width: 120px; }
+    .pago-monto { font-size: 14px; font-weight: 700; color: var(--dark); white-space: nowrap; }
+    .pago-metodo {
+      font-size: 11px; color: var(--gray);
+      background: var(--light); border-radius: 6px; padding: 3px 8px; white-space: nowrap;
+    }
+    .pago-gym-badge {
+      font-size: 11px; font-weight: 600; color: var(--purple);
+      background: rgba(139,106,255,.1); border-radius: 6px; padding: 3px 8px;
+    }
+    .sin-pagos { text-align: center; padding: 20px 0; color: var(--gray); font-size: 14px; }
+    @media (max-width: 480px) {
+      .pago-plan { font-size: 13px; }
+      .pago-monto { font-size: 13px; }
+    }
 </style>
 </head>
 <body>
@@ -277,6 +301,19 @@
           <a href="https://wa.me/56973841513" target="_blank" class="accion-btn"><span class="accion-icon">💬</span><span class="accion-label">WhatsApp</span></a>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- HISTORIAL DE PAGOS -->
+  <div class="card pagos-card" id="card-pagos-historico">
+    <div class="card-header">
+      <div class="card-titulo">Historial de pagos</div>
+      <div style="font-size:20px;">💳</div>
+    </div>
+    <div id="pagos-historico-contenido">
+      <div class="skeleton" style="height:40px; margin-bottom:8px; border-radius:8px;"></div>
+      <div class="skeleton" style="height:40px; margin-bottom:8px; border-radius:8px;"></div>
+      <div class="skeleton" style="height:40px; border-radius:8px;"></div>
     </div>
   </div>
 
@@ -373,6 +410,7 @@
   function nombreMes(date) { return new Date(date).toLocaleDateString('es-CL', { month: 'short' }).toUpperCase(); }
   function dia(date)        { return new Date(date).getDate(); }
   function horaMinutos(date){ return new Date(date).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false }); }
+  function formatCLP(x)     { return Number(x).toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }); }
 
   let userId         = null;
   let compraIdActiva = null;
@@ -474,6 +512,9 @@
     if (u.foto_url) mostrarFotoPerfil(u.foto_url);
 
     document.getElementById('card-perfil').style.display = 'block';
+
+    // Cargar historial de pagos con los datos del usuario
+    cargarHistorialPagos(u.rut || null, u.nombre || '', u.apellido || '');
   }
 
   function mostrarFotoPerfil(url) {
@@ -549,7 +590,7 @@
   async function cargarUsuario(userId) {
     const { data: u } = await sb.from('usuarios').select('nombre, apellido, rol').eq('id', userId).single();
     if (!u) return;
-    
+
     // Si es admin o profesora, redirigir
     if (u.rol === 'admin') {
       window.location.href = 'admin.html';
@@ -558,7 +599,7 @@
     if (u.rol === 'profesora') {
       adaptarVistaProfesora(u);
     }
-    
+
     const nombre = u.nombre || 'alumna';
     const navNombre = document.getElementById('nav-nombre');
     if (navNombre) navNombre.textContent = nombre;
@@ -686,6 +727,53 @@
         <p>Aún no tienes un plan activo.<br>Elige el que más se ajuste a ti.</p>
         <a href="planes.html" class="btn-primary btn-full">Ver planes disponibles →</a>
       </div>`;
+  }
+
+  async function cargarHistorialPagos(rut, nombre, apellido) {
+    const contenedor = document.getElementById('pagos-historico-contenido');
+    let pagos = null;
+
+    if (rut) {
+      const { data } = await sb.from('pagos_historico')
+        .select('fecha_pago,plan_nombre,plan_categoria,monto,tipo_pago,vendedor,incluye_gym')
+        .eq('rut', rut)
+        .eq('estado', 'aprobado')
+        .order('fecha_pago', { ascending: false })
+        .limit(24);
+      pagos = data;
+    }
+
+    if (!pagos || pagos.length === 0) {
+      // Fallback por nombre + apellido
+      const { data } = await sb.from('pagos_historico')
+        .select('fecha_pago,plan_nombre,plan_categoria,monto,tipo_pago,vendedor,incluye_gym')
+        .ilike('nombre', nombre)
+        .ilike('apellido', apellido)
+        .eq('estado', 'aprobado')
+        .order('fecha_pago', { ascending: false })
+        .limit(24);
+      pagos = data;
+    }
+
+    if (!pagos || pagos.length === 0) {
+      contenedor.innerHTML = `<div class="sin-pagos">No se encontraron pagos registrados.</div>`;
+      return;
+    }
+
+    contenedor.innerHTML = pagos.map(p => {
+      const fecha  = p.fecha_pago
+        ? new Date(p.fecha_pago + 'T12:00:00').toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })
+        : '—';
+      const metodo = p.vendedor === 'mercadopago' ? 'Pago web' : (p.tipo_pago || 'Manual');
+      const gymBadge = p.incluye_gym ? '<span class="pago-gym-badge">🏋️ +Gym</span>' : '';
+      return `<div class="pago-fila">
+        <span class="pago-fecha">${fecha}</span>
+        <span class="pago-plan">${p.plan_nombre || p.plan_categoria || '—'}</span>
+        <span class="pago-monto">${formatCLP(p.monto)}</span>
+        <span class="pago-metodo">${metodo}</span>
+        ${gymBadge}
+      </div>`;
+    }).join('');
   }
 
   async function cargarClases(userId) {
