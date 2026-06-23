@@ -1222,7 +1222,7 @@
     const cont = document.getElementById('profesoras-lista');
     const { data: profesoras } = await sb.from('usuarios')
       .select('id, nombre, apellido, foto_url')
-      .eq('rol', 'profesora')
+      .in('rol', ['profesora', 'admin'])
       .order('nombre', { ascending: true });
 
     if (!profesoras?.length) {

@@ -2237,7 +2237,7 @@ async function cargarProfesoras(){
   const listEl = document.getElementById('prof-lista-panel');
 
   const [{data:profesoras},{data:clasesProxN},{data:rutinas}] = await Promise.all([
-    sb.from('usuarios').select('id,nombre,apellido,email').eq('rol','profesora').order('nombre'),
+    sb.from('usuarios').select('id,nombre,apellido,email').in('rol',['profesora','admin']).order('nombre'),
     sb.from('clases').select('id,profesora')
       .gte('fecha_hora', new Date().toISOString())
       .lte('fecha_hora', new Date(Date.now()+30*24*60*60*1000).toISOString())

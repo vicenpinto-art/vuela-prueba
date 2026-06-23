@@ -299,7 +299,7 @@ function setFiltroAdmin(nombreProfe){
 }
 
 async function cargarDropdownProfesoras(){
-  const {data} = await sb.from('usuarios').select('nombre,apellido').eq('rol','profesora').order('nombre');
+  const {data} = await sb.from('usuarios').select('nombre,apellido').in('rol',['profesora','admin']).order('nombre');
   const sel = document.getElementById('select-profe-admin');
   (data||[]).forEach(p => {
     const nombre = ((p.nombre||'') + ' ' + (p.apellido||'')).trim();
