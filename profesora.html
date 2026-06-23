@@ -108,6 +108,21 @@
     .horario-chip-hora{font-weight:700;color:var(--coral)}
     .horario-chip-prof{font-size:11px;color:var(--gray)}
 
+    /* ACORDEÓN DÍAS */
+    .grupo-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 0 6px;border-bottom:2px solid currentColor;margin-bottom:10px}
+    .dia-toggle-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;font-family:'Outfit',sans-serif;margin-bottom:6px;transition:border-color .15s;text-align:left}
+    .dia-toggle-btn:hover{border-color:rgba(255,78,104,.3)}
+    .dia-toggle-btn.open{border-color:var(--coral);border-bottom-left-radius:0;border-bottom-right-radius:0;margin-bottom:0}
+    .dia-toggle-label{font-size:13px;font-weight:700;color:var(--dark)}
+    .dia-toggle-meta{display:flex;align-items:center;gap:8px}
+    .dia-toggle-count{font-size:12px;color:var(--gray)}
+    .dia-toggle-arrow{font-size:10px;color:var(--gray);transition:transform .2s;display:inline-block}
+    .dia-toggle-btn.open .dia-toggle-arrow{transform:rotate(180deg)}
+    .dia-clases-list{display:none;border:1.5px solid var(--coral);border-top:none;border-radius:0 0 12px 12px;padding:10px;background:#fff;margin-bottom:10px}
+    .dia-clases-list.open{display:block}
+    /* Asistencia: headers de sección */
+    .asis-grupo-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding-bottom:5px;margin-top:10px;border-bottom:1.5px solid currentColor;margin-bottom:6px}
+
     /* PROFESORAS */
     .prof-card{display:flex;align-items:center;gap:14px;background:#fff;border-radius:14px;padding:16px 18px;border:1px solid var(--border);margin-bottom:10px}
     .prof-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--coral),var(--magenta));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;position:relative}
@@ -599,38 +614,107 @@
   async function cargarHorario() {
     const cont = document.getElementById('horario-contenido');
     const { data: horarios, error } = await sb.from('horarios')
-      .select('id, nombre, dia_semana, hora_inicio, profesora, cupo_maximo, duracion_minutos')
+      .select('id, nombre, dia_semana, hora, profesora, cupo_maximo, duracion_minutos, restriccion_plan')
       .eq('activo', true)
-      .order('hora_inicio', { ascending: true });
+      .order('dia_semana', { ascending: true })
+      .order('hora', { ascending: true });
 
     if (error || !horarios?.length) {
       cont.innerHTML = `<div style="padding:20px;text-align:center;color:var(--gray)">No hay horarios activos.</div>`;
       return;
     }
 
-    const diasOrden = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+    // dia_semana es número: 0=Dom 1=Lun 2=Mar 3=Mié 4=Jue 5=Vie 6=Sáb
+    const diasNombre = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const diasOrden  = [1,2,3,4,5,6,0]; // lun→dom
     const porDia = {};
     horarios.forEach(h => {
-      const d = (h.dia_semana || '').toLowerCase();
+      const d = h.dia_semana;
       if (!porDia[d]) porDia[d] = [];
       porDia[d].push(h);
     });
 
+    const planColor = { vuela:'var(--coral)', muevete:'var(--purple)' };
+    const planLabel = { vuela:'Vuela', muevete:'Muévete' };
+
     cont.innerHTML = diasOrden.filter(d => porDia[d]).map(d => `
       <div class="horario-dia-seccion">
-        <div class="horario-dia-label">${d.charAt(0).toUpperCase() + d.slice(1)}</div>
+        <div class="horario-dia-label">${diasNombre[d]}</div>
         <div class="horario-chips">
-          ${porDia[d].map(h => `
+          ${porDia[d].map(h => {
+            const plan = h.restriccion_plan;
+            const badge = plan ? `<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(0,0,0,.05);color:${planColor[plan]||'var(--gray)'}">${planLabel[plan]||plan}</span>` : '';
+            return `
             <div class="horario-chip">
-              <span class="horario-chip-hora">${h.hora_inicio || ''}</span>
-              <span>${h.nombre || ''}</span>
-              <span class="horario-chip-prof">👩‍🏫 ${h.profesora || '—'}</span>
-            </div>`).join('')}
+              <span class="horario-chip-hora">${(h.hora||'').slice(0,5)}</span>
+              <div>
+                <div>${h.nombre || ''} ${badge}</div>
+                <div class="horario-chip-prof">👩‍🏫 ${h.profesora || '—'}</div>
+              </div>
+            </div>`;
+          }).join('')}
         </div>
       </div>`).join('');
   }
 
   // ── CLASES ─────────────────────────────────────────────────────
+  function toggleDiaClases(id) {
+    const btn  = document.getElementById('dia-btn-' + id);
+    const list = document.getElementById('dia-list-' + id);
+    if (!btn || !list) return;
+    btn.classList.toggle('open');
+    list.classList.toggle('open');
+  }
+
+  function renderClaseFilas(c) {
+    const esMia     = esMiClase(c.profesora);
+    const inscritas = (c.cupo_maximo || 15) - (c.cupo_disponible || 0);
+    const scInfo    = c.sobrecupo ? ` · +${c.sobrecupo} sob` : '';
+    return `
+      <div class="clase-fila${esMia ? ' es-mia' : ''}">
+        <span class="clase-hora">${horaStr(c.fecha_hora)}</span>
+        <div class="clase-info">
+          <div class="clase-info-nombre">${c.nombre}</div>
+          <div class="clase-info-meta">👩‍🏫 ${c.profesora} · 👥 ${inscritas}/${c.cupo_maximo || 15}${scInfo}</div>
+        </div>
+        ${esMia ? `
+          <span class="mi-clase-badge">Mi clase</span>
+          <div class="sobrecupo-wrap">
+            <input type="number" class="sobrecupo-input" id="sc-${c.id}" min="1" placeholder="+" title="Cantidad a agregar">
+            <button class="btn-sobrecupo" onclick="guardarSobrecupo('${c.id}', ${c.sobrecupo || 0})">+ Sob</button>
+          </div>` : ''}
+      </div>`;
+  }
+
+  function renderAcordeonPorDia(lista, prefijo) {
+    if (!lista.length) return '<p style="font-size:13px;color:var(--gray);padding:6px 0">Sin clases en este período.</p>';
+    const porDia = {}; const diaLabels = {};
+    lista.forEach(c => {
+      const f = new Date(c.fecha_hora);
+      const key = f.toISOString().split('T')[0];
+      if (!porDia[key]) {
+        porDia[key] = [];
+        diaLabels[key] = f.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Santiago' });
+      }
+      porDia[key].push(c);
+    });
+    return Object.keys(porDia).sort().map((key, idx) => {
+      const id = prefijo + key.replace(/-/g, '');
+      const open = idx === 0;
+      return `
+        <button id="dia-btn-${id}" class="dia-toggle-btn${open ? ' open' : ''}" onclick="toggleDiaClases('${id}')">
+          <span class="dia-toggle-label">${diaLabels[key]}</span>
+          <span class="dia-toggle-meta">
+            <span class="dia-toggle-count">${porDia[key].length} clase${porDia[key].length !== 1 ? 's' : ''}</span>
+            <span class="dia-toggle-arrow">▼</span>
+          </span>
+        </button>
+        <div id="dia-list-${id}" class="dia-clases-list${open ? ' open' : ''}">
+          ${porDia[key].map(renderClaseFilas).join('')}
+        </div>`;
+    }).join('');
+  }
+
   async function cargarClases() {
     const cont  = document.getElementById('clases-contenido');
     const ahora = new Date();
@@ -648,43 +732,19 @@
       return;
     }
 
-    // Agrupar por día (key = YYYY-MM-DD)
-    const porDia    = {};
-    const diaLabels = {};
-    clases.forEach(c => {
-      const f   = new Date(c.fecha_hora);
-      const key = f.toISOString().split('T')[0];
-      if (!porDia[key]) {
-        porDia[key]    = [];
-        diaLabels[key] = f.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
-      }
-      porDia[key].push(c);
-    });
+    const planes = clases.filter(c => !c.nombre?.startsWith('Gym '));
+    const gym    = clases.filter(c =>  c.nombre?.startsWith('Gym '));
+    let html = '';
 
-    const dias = Object.keys(porDia).sort();
-    cont.innerHTML = dias.map(key => `
-      <div class="dia-grupo">
-        <div class="dia-titulo">${diaLabels[key]}</div>
-        ${porDia[key].map(c => {
-          const esMia     = esMiClase(c.profesora);
-          const inscritas = (c.cupo_maximo || 15) - (c.cupo_disponible || 0);
-          const scInfo    = c.sobrecupo ? ` · +${c.sobrecupo} sobrecupo` : '';
-          return `
-            <div class="clase-fila${esMia ? ' es-mia' : ''}">
-              <span class="clase-hora">${horaStr(c.fecha_hora)}</span>
-              <div class="clase-info">
-                <div class="clase-info-nombre">${c.nombre}</div>
-                <div class="clase-info-meta">👩‍🏫 ${c.profesora} &nbsp;·&nbsp; 👥 ${inscritas}/${c.cupo_maximo || 15}${scInfo}</div>
-              </div>
-              ${esMia ? `
-                <span class="mi-clase-badge">Mi clase</span>
-                <div class="sobrecupo-wrap">
-                  <input type="number" class="sobrecupo-input" id="sc-${c.id}" min="1" max="30" placeholder="+" title="Cantidad a agregar">
-                  <button class="btn-sobrecupo" onclick="guardarSobrecupo('${c.id}', ${c.sobrecupo || 0})">+ Sobrecupo</button>
-                </div>` : ''}
-            </div>`;
-        }).join('')}
-      </div>`).join('');
+    if (planes.length) {
+      html += `<div class="grupo-header" style="color:var(--coral)">Clases de planes</div>`;
+      html += renderAcordeonPorDia(planes, 'p');
+    }
+    if (gym.length) {
+      html += `<div class="grupo-header" style="color:#007a82;margin-top:${planes.length ? '20px' : '0'}">Gym</div>`;
+      html += renderAcordeonPorDia(gym, 'g');
+    }
+    cont.innerHTML = html;
   }
 
   async function guardarSobrecupo(claseId, sobrecupoActual) {
@@ -727,7 +787,8 @@
   function renderChipsAsistencia() {
     const cont = document.getElementById('asis-lista-clases');
     if (!cont) return;
-    cont.innerHTML = clasesAsistencia.map(c => {
+
+    const chipHtml = (c) => {
       const esMia = esMiClase(c.profesora);
       return `
         <div class="clase-chip${asistenciaClaseSelId === c.id ? ' sel' : ''}" onclick="seleccionarClaseAsistencia('${c.id}')">
@@ -735,7 +796,21 @@
           <div class="chip-nombre">${c.nombre}</div>
           <div class="chip-meta">📅 ${fechaCorta(c.fecha_hora)} · 👩‍🏫 ${c.profesora}${esMia ? ' ✓' : ''}</div>
         </div>`;
-    }).join('');
+    };
+
+    const planes = clasesAsistencia.filter(c => !c.nombre?.startsWith('Gym '));
+    const gym    = clasesAsistencia.filter(c =>  c.nombre?.startsWith('Gym '));
+    let html = '';
+
+    if (planes.length) {
+      html += `<div class="asis-grupo-label" style="color:var(--coral)">Clases de planes</div>`;
+      html += planes.map(chipHtml).join('');
+    }
+    if (gym.length) {
+      html += `<div class="asis-grupo-label" style="color:#007a82;${planes.length ? 'margin-top:14px' : ''}">Gym</div>`;
+      html += gym.map(chipHtml).join('');
+    }
+    cont.innerHTML = html;
   }
 
   async function seleccionarClaseAsistencia(claseId) {
@@ -1078,7 +1153,8 @@
     const cont = document.getElementById('disciplinas-contenido');
     const { data: disciplinas } = await sb.from('disciplinas')
       .select('id, nombre, plan')
-      .eq('eliminada', false)
+      .eq('activo', true)
+      .order('plan', { ascending: true })
       .order('nombre', { ascending: true });
 
     if (!disciplinas?.length) {
