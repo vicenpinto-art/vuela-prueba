@@ -276,12 +276,17 @@
         <div class="card-header">
           <div class="card-titulo">Próximas clases</div>
           <a href="calendario.html" class="btn-primary" style="font-size:12px; padding:8px 14px;">+ Agendar</a>
-          <a href="agendar.html" class="btn-primary" style="font-size:12px; padding:8px 14px; background:var(--cyan);">🏋️ Gym</a>
         </div>
         <div id="clases-contenido">
           <div class="skeleton" style="height:60px; margin-bottom:10px; border-radius:12px;"></div>
           <div class="skeleton" style="height:60px; border-radius:12px;"></div>
         </div>
+      </div>
+
+      <div class="card" id="card-gym-booking" style="display:none">
+        <a href="agendar.html" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:18px;background:linear-gradient(135deg,#007a82,#00b4c4);border-radius:14px;color:#fff;font-weight:700;font-size:15px;text-decoration:none;letter-spacing:.3px">
+          🏋️ Agenda tu hora en el gym
+        </a>
       </div>
     </div>
 
@@ -675,6 +680,13 @@
     }
 
     if (validas.length === 0) { mostrarSinPlan(contenedor, badge); return; }
+
+    // Mostrar tarjeta gym si tiene plan gym, addon_gym o incluye_gym
+    const tieneGym = validas.some(c =>
+      ['gym','addon_gym'].includes(c.planes?.tipo) || c.incluye_gym || c.addon_gym
+    );
+    const cardGym = document.getElementById('card-gym-booking');
+    if (cardGym) cardGym.style.display = tieneGym ? 'block' : 'none';
 
     // compraIdActiva = plan principal (no clase_prueba ni gym), o el primero si solo hay esos
     const principal = validas.find(c => !c.clase_prueba && !['gym','addon_gym'].includes(c.planes?.tipo)) || validas[0];
