@@ -291,6 +291,7 @@
     <div class="sidebar-item" data-sec="roles"><span class="sidebar-icon">👥</span> Roles</div>
     <div class="sidebar-item" data-sec="disciplinas"><span class="sidebar-icon">🏷️</span> Disciplinas</div>
     <div class="sidebar-item" data-sec="eliminar-usuario"><span class="sidebar-icon">🗑️</span> Eliminar usuaria</div>
+    <div class="sidebar-item" data-sec="mantenimiento"><span class="sidebar-icon">🧹</span> Mantenimiento</div>
     <div class="sidebar-item" data-sec="ingresos"><span class="sidebar-icon">💰</span> Ingresos</div>
     <div class="sidebar-item" data-sec="perfil"><span class="sidebar-icon">👤</span> Mi Perfil</div>
     <a href="calendario.html" style="text-decoration:none"><div class="sidebar-item"><span class="sidebar-icon">📆</span> Calendario</div></a>
@@ -313,6 +314,7 @@
     <div class="admin-mobile-nav-item" onclick="navegarMobile('roles')">👥 Roles</div>
     <div class="admin-mobile-nav-item" onclick="navegarMobile('disciplinas')">🏷️ Disciplinas</div>
     <div class="admin-mobile-nav-item" onclick="navegarMobile('eliminar-usuario')">🗑️ Eliminar usuaria</div>
+    <div class="admin-mobile-nav-item" onclick="navegarMobile('mantenimiento')">🧹 Mantenimiento</div>
     <div class="admin-mobile-nav-item" onclick="navegarMobile('ingresos')">💰 Ingresos</div>
     <div class="admin-mobile-nav-item" onclick="navegarMobile('perfil')">👤 Mi Perfil</div>
     <div class="admin-mobile-nav-item" onclick="navegarMobile('estadisticas')">📊 Estadísticas</div>
@@ -713,6 +715,37 @@
       </div>
     </div>
 
+    <!-- MANTENIMIENTO -->
+    <div class="section" id="sec-mantenimiento">
+      <div class="section-title">Mantenimiento</div>
+      <div class="section-sub">Limpia datos de prueba o históricos. Los pagos nunca se tocan.</div>
+
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div class="card-title">Rutinas publicadas</div>
+          <button class="btn btn-secondary btn-sm" onclick="cargarRutinasMantenimiento()">↻ Recargar</button>
+        </div>
+        <div id="mant-rutinas-cargando" style="text-align:center;padding:20px;color:var(--gray);font-size:13px">Presiona Recargar para ver rutinas</div>
+        <div id="mant-rutinas-lista"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Historial de clases e inscripciones</div></div>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:16px">Elimina clases pasadas junto a sus inscripciones y asistencias. Los compras/pagos no se modifican.</p>
+        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
+          <div class="form-group">
+            <label>Eliminar clases anteriores a</label>
+            <input type="date" id="mant-fecha-corte">
+          </div>
+          <button class="btn btn-secondary" onclick="previsualizarClasesAntiguas()">Ver cuántos registros</button>
+        </div>
+        <div id="mant-preview" style="display:none;background:var(--light);border-radius:12px;padding:14px;margin-bottom:14px"></div>
+        <div id="mant-btn-eliminar" style="display:none">
+          <button class="btn btn-danger" onclick="eliminarClasesAntiguas()">Confirmar y eliminar</button>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -953,8 +986,143 @@ document.querySelectorAll('.sidebar-item').forEach(item=>{
     if(sec==='roles' && todosLosUsuarios.length===0) cargarRoles();
     if(sec==='perfil') cargarPerfilAdmin();
     if(sec==='estadisticas') cargarDashboardAdmin();
+    if(sec==='mantenimiento') cargarMantenimiento();
   });
 });
+
+// ── MANTENIMIENTO ─────────────────────────────────────────────
+function cargarMantenimiento(){
+  document.getElementById('mant-fecha-corte').value = hoy();
+  document.getElementById('mant-preview').style.display='none';
+  document.getElementById('mant-btn-eliminar').style.display='none';
+  cargarRutinasMantenimiento();
+}
+
+async function cargarRutinasMantenimiento(){
+  const listEl = document.getElementById('mant-rutinas-lista');
+  const loadEl = document.getElementById('mant-rutinas-cargando');
+  loadEl.textContent='Cargando...'; loadEl.style.display='block';
+  listEl.innerHTML='';
+
+  const {data: rutinas} = await sb
+    .from('rutinas')
+    .select('id, objetivo, updated_at, clases(nombre, fecha_hora, profesora)')
+    .order('updated_at', {ascending:false});
+
+  loadEl.style.display='none';
+
+  if(!rutinas||rutinas.length===0){
+    listEl.innerHTML='<p style="font-size:13px;color:var(--gray);padding:8px 0">No hay rutinas publicadas.</p>';
+    return;
+  }
+
+  // Agrupar por profesora (campo de texto en clases)
+  const porProf = {};
+  rutinas.forEach(r => {
+    const prof = r.clases?.profesora || 'Sin asignar';
+    if(!porProf[prof]) porProf[prof] = [];
+    porProf[prof].push(r);
+  });
+
+  listEl.innerHTML = Object.keys(porProf).sort().map(prof => {
+    const items = porProf[prof];
+    const idsJSON = JSON.stringify(items.map(i=>i.id));
+    return `
+      <div style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;border-bottom:2px solid var(--border);margin-bottom:8px">
+          <span style="font-size:13px;font-weight:700">${esc(prof)} <span style="color:var(--gray);font-weight:500">(${items.length} rutina${items.length!==1?'s':''})</span></span>
+          <button class="btn btn-danger btn-sm" onclick="eliminarRutinasProfesora(${idsJSON}, '${prof.replace(/'/g,"\\'").replace(/"/g,'\\"')}')">Eliminar todas</button>
+        </div>
+        ${items.map(r=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.clases?.nombre||'—')}</div>
+              <div style="font-size:11px;color:var(--gray)">${r.clases?.fecha_hora ? new Date(r.clases.fecha_hora).toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'America/Santiago'}) : 'Sin fecha'} · ${esc(r.objetivo||'Sin objetivo').slice(0,60)}${(r.objetivo||'').length>60?'…':''}</div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="eliminarRutina('${r.id}')">Eliminar</button>
+          </div>`).join('')}
+      </div>`;
+  }).join('');
+}
+
+async function eliminarRutina(id){
+  if(!confirm('¿Eliminar esta rutina?')) return;
+  const {error} = await sb.from('rutinas').delete().eq('id',id);
+  if(error){toast('Error al eliminar','error');return;}
+  toast('Rutina eliminada ✓');
+  cargarRutinasMantenimiento();
+}
+
+async function eliminarRutinasProfesora(ids, prof){
+  if(!confirm(`¿Eliminar todas las rutinas de ${prof}? (${ids.length} rutinas)`)) return;
+  const {error} = await sb.from('rutinas').delete().in('id',ids);
+  if(error){toast('Error al eliminar','error');return;}
+  toast(`Rutinas de ${prof} eliminadas ✓`);
+  cargarRutinasMantenimiento();
+}
+
+let mantClasesIds = [];
+async function previsualizarClasesAntiguas(){
+  const fechaCorte = document.getElementById('mant-fecha-corte').value;
+  if(!fechaCorte){toast('Selecciona una fecha','error');return;}
+
+  const prevEl = document.getElementById('mant-preview');
+  const btnEl  = document.getElementById('mant-btn-eliminar');
+  prevEl.innerHTML='<span style="color:var(--gray)">Calculando…</span>';
+  prevEl.style.display='block'; btnEl.style.display='none';
+  mantClasesIds = [];
+
+  const {data:clases} = await sb
+    .from('clases').select('id')
+    .lt('fecha_hora', fechaCorte+'T00:00:00');
+
+  mantClasesIds = (clases||[]).map(c=>c.id);
+
+  if(!mantClasesIds.length){
+    prevEl.innerHTML='<span style="color:var(--gray)">No hay clases anteriores a esa fecha.</span>';
+    return;
+  }
+
+  // Contar en lotes de 100 para evitar límites de Supabase
+  let cInsc=0, cAsis=0;
+  for(let i=0;i<mantClasesIds.length;i+=100){
+    const lote=mantClasesIds.slice(i,i+100);
+    const [{count:ci},{count:ca}] = await Promise.all([
+      sb.from('inscripciones').select('id',{count:'exact',head:true}).in('clase_id',lote),
+      sb.from('asistencias').select('id',{count:'exact',head:true}).in('clase_id',lote)
+    ]);
+    cInsc+=(ci||0); cAsis+=(ca||0);
+  }
+
+  prevEl.innerHTML=`
+    <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:10px">
+      <div><span style="font-size:22px;font-weight:800;color:var(--coral)">${mantClasesIds.length}</span><br><span style="font-size:12px;color:var(--gray)">clases</span></div>
+      <div><span style="font-size:22px;font-weight:800;color:var(--purple)">${cInsc}</span><br><span style="font-size:12px;color:var(--gray)">inscripciones</span></div>
+      <div><span style="font-size:22px;font-weight:800;color:#007a82">${cAsis}</span><br><span style="font-size:12px;color:var(--gray)">asistencias</span></div>
+    </div>
+    <p style="font-size:12px;color:var(--gray)">Se eliminarán estas clases + inscripciones + asistencias + rutinas asociadas. Los pagos no se tocan.</p>`;
+  btnEl.style.display='block';
+}
+
+async function eliminarClasesAntiguas(){
+  if(!mantClasesIds.length){toast('Primero presiona "Ver cuántos registros"','error');return;}
+  const n = mantClasesIds.length;
+  if(!confirm(`¿Eliminar ${n} clases y todos sus registros asociados?\n\nEsta acción no se puede deshacer.`)) return;
+
+  toast('Eliminando… puede tardar unos segundos');
+  for(let i=0;i<mantClasesIds.length;i+=100){
+    const lote=mantClasesIds.slice(i,i+100);
+    await sb.from('asistencias').delete().in('clase_id',lote);
+    await sb.from('inscripciones').delete().in('clase_id',lote);
+    await sb.from('rutinas').delete().in('clase_id',lote);
+    await sb.from('clases').delete().in('id',lote);
+  }
+
+  toast(`✓ ${n} clases eliminadas`);
+  mantClasesIds=[];
+  document.getElementById('mant-preview').style.display='none';
+  document.getElementById('mant-btn-eliminar').style.display='none';
+}
 
 // ── PERFIL ADMIN ──────────────────────────────────────────────
 function parsePhone(full) {
@@ -1950,7 +2118,7 @@ function navegarMobile(sec) {
     resumen:'Resumen', horarios:'Horarios', clases:'Clases',
     asistencia:'Asistencia', alumnas:'Alumnas', rutina:'Rutinas',
     roles:'Roles', disciplinas:'Disciplinas', 'eliminar-usuario':'Eliminar usuaria',
-    ingresos:'Ingresos', perfil:'Mi Perfil'
+    ingresos:'Ingresos', perfil:'Mi Perfil', mantenimiento:'Mantenimiento'
   };
 
   // Actualizar sidebar desktop
@@ -1975,6 +2143,7 @@ function navegarMobile(sec) {
   if(sec==='ingresos') iniciarIngresos();
   if(sec==='roles' && todosLosUsuarios.length===0) cargarRoles();
   if(sec==='perfil') cargarPerfilAdmin();
+  if(sec==='mantenimiento') cargarMantenimiento();
   if(sec==='estadisticas') cargarDashboardAdmin();
 
   // Actualizar menú móvil
