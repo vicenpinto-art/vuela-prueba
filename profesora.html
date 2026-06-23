@@ -981,12 +981,13 @@
   // ── ASISTENCIA ─────────────────────────────────────────────────
   async function cargarAsistencia() {
     const listaCont = document.getElementById('asis-lista-clases');
-    const ahora  = new Date();
-    const en144h = new Date(ahora.getTime() + 144 * 3600 * 1000);
+    const ahora   = new Date();
+    const hace8h  = new Date(ahora.getTime() - 8 * 3600 * 1000);
+    const en144h  = new Date(ahora.getTime() + 144 * 3600 * 1000);
 
     const { data: clases } = await sb.from('clases')
       .select('id, nombre, fecha_hora, profesora, profesora_id, cupo_maximo, cupo_disponible, duracion_minutos')
-      .gte('fecha_hora', ahora.toISOString())
+      .gte('fecha_hora', hace8h.toISOString())
       .lte('fecha_hora', en144h.toISOString())
       .eq('cancelada', false)
       .order('fecha_hora', { ascending: true });
@@ -1253,14 +1254,63 @@
         ? `<img src="${p.foto_url}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%" alt="${nombre}">`
         : inicial;
       return `
-        <div class="prof-card">
+        <div class="prof-card" onclick="toggleDetalleProfe('${p.id}')" style="cursor:pointer">
           <div class="prof-avatar">${avatarContent}</div>
-          <div class="prof-info">
+          <div class="prof-info" style="flex:1">
             <div class="prof-nombre">${nombre}</div>
             <div class="prof-detalle">${cnt} clase${cnt !== 1 ? 's' : ''} próxima${cnt !== 1 ? 's' : ''} (14 días)</div>
           </div>
+          <span id="prof-arrow-${p.id}" style="font-size:12px;color:var(--gray);transition:transform .2s">▼</span>
+        </div>
+        <div id="prof-detalle-${p.id}" style="display:none;background:var(--light);border-radius:12px;padding:14px 18px;margin-bottom:10px;font-size:13px">
+          <div style="color:var(--gray);font-size:12px">Cargando...</div>
         </div>`;
     }).join('');
+  }
+
+  const _profDetalleAbierto = {};
+
+  async function toggleDetalleProfe(profId) {
+    const detalle = document.getElementById(`prof-detalle-${profId}`);
+    const arrow   = document.getElementById(`prof-arrow-${profId}`);
+    const abierto = detalle.style.display !== 'none';
+    detalle.style.display = abierto ? 'none' : 'block';
+    arrow.style.transform  = abierto ? '' : 'rotate(180deg)';
+    if (!abierto && !_profDetalleAbierto[profId]) {
+      _profDetalleAbierto[profId] = true;
+      await cargarDetalleProfe(profId);
+    }
+  }
+
+  async function cargarDetalleProfe(profId) {
+    const detalle = document.getElementById(`prof-detalle-${profId}`);
+    const ahora = new Date();
+    const en30d = new Date(ahora.getTime() + 30 * 24 * 3600 * 1000);
+
+    const { data: clases } = await sb.from('clases')
+      .select('id, nombre, fecha_hora, cupo_disponible, cupo_maximo')
+      .eq('profesora_id', profId)
+      .eq('cancelada', false)
+      .gte('fecha_hora', ahora.toISOString())
+      .lte('fecha_hora', en30d.toISOString())
+      .order('fecha_hora', { ascending: true });
+
+    if (!clases?.length) {
+      detalle.innerHTML = `<div style="color:var(--gray)">Sin clases asignadas en los próximos 30 días.</div>`;
+      return;
+    }
+
+    detalle.innerHTML = `
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--coral);margin-bottom:8px">Próximas clases (30 días)</div>
+      ${clases.map(c => {
+        const ocupadas = (c.cupo_maximo || 15) - (c.cupo_disponible || 0);
+        return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:12px;font-weight:700;color:var(--coral);min-width:50px">${horaStr(c.fecha_hora)}</span>
+          <span style="font-size:12px;color:var(--gray);min-width:80px">${fechaCorta(c.fecha_hora)}</span>
+          <span style="flex:1;font-size:13px;font-weight:600">${c.nombre}</span>
+          <span style="font-size:11px;color:var(--gray)">${ocupadas}/${c.cupo_maximo || 15}</span>
+        </div>`;
+      }).join('')}`;
   }
 
   // ── RUTINAS ────────────────────────────────────────────────────
