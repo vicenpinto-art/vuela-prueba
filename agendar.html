@@ -251,17 +251,12 @@
 </div>
 
 <div class="header">
-  <h1>Elige tu <span>próxima clase</span></h1>
-  <p>Clases disponibles para los próximos 14 días</p>
+  <h1>Agenda tu <span>clase de gym</span></h1>
+  <p>Horarios de gym disponibles para los próximos 14 días</p>
 </div>
 
-<div class="filtros-wrap">
-  <div class="filtros">
-    <button class="filtro active" data-tipo="todas">Todas</button>
-    <button class="filtro" data-tipo="vuela">Vuela</button>
-    <button class="filtro" data-tipo="muevete">Muévete</button>
-    <button class="filtro" data-tipo="gym">Gym</button>
-  </div>
+<div id="alerta-sin-gym" style="display:none;background:rgba(255,78,104,.08);border:1px solid rgba(255,78,104,.25);border-radius:12px;padding:14px 18px;margin:0 16px 16px;font-size:14px;color:#b5001f;text-align:center">
+  Necesitas un plan de gym o add-on gym para agendar estas clases. <a href="planes.html" style="color:#ff4e68;font-weight:700">Ver planes →</a>
 </div>
 
 <main id="main-content">
@@ -442,7 +437,8 @@
         .eq('estado', 'confirmada')
     ]);
 
-    todasLasClases = clases || [];
+    // Solo clases de gym
+    todasLasClases = (clases || []).filter(c => c.nombre?.startsWith('Gym ') || (c.tipo||'').toLowerCase().includes('gym'));
     misInscripciones = new Set((inscripciones || []).map(i => i.clase_id));
 
     // Cuáles clases tienen rutina publicada
@@ -454,6 +450,7 @@
 
     document.getElementById('skeleton-wrap').style.display = 'none';
     document.getElementById('clases-wrap').style.display = 'block';
+    if (!tieneAccesoGym) document.getElementById('alerta-sin-gym').style.display = 'block';
     renderClases();
   }
 

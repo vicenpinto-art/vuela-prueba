@@ -635,7 +635,7 @@ app.get('/ingresos-mes', async (req, res) => {
 
   const [mesRes, prevRes] = await Promise.all([
     sb.from('pagos_historico')
-      .select('nombre,apellido,plan_nombre,plan_categoria,monto,tipo_pago,vendedor,fecha_pago,incluye_gym')
+      .select('id,nombre,apellido,plan_nombre,plan_categoria,monto,tipo_pago,vendedor,fecha_pago,incluye_gym')
       .gte('fecha_pago', startDate).lt('fecha_pago', endDate)
       .order('fecha_pago', { ascending: false }).limit(5000),
     sb.from('pagos_historico')
@@ -688,6 +688,16 @@ app.post('/registrar-pago-manual', async (req, res) => {
     vendedor:       'admin',
   });
 
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+});
+
+// ── ELIMINAR PAGO HISTÓRICO (ADMIN) ──────────────────────────
+app.delete('/eliminar-pago/:id', async (req, res) => {
+  const userAuth = await verificarAdmin(req);
+  if (!userAuth) return res.status(403).json({ error: 'No autorizado' });
+
+  const { error } = await sb.from('pagos_historico').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true });
 });

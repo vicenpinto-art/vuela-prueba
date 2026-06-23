@@ -894,7 +894,7 @@
           <span class="mi-clase-badge">Mi clase</span>
           <div class="sobrecupo-wrap">
             <input type="number" class="sobrecupo-input" id="sc-${c.id}" min="1" placeholder="+" title="Cantidad a agregar">
-            <button class="btn-sobrecupo" onclick="guardarSobrecupo('${c.id}', ${c.sobrecupo || 0}, ${c.cupo_disponible || 0})">+ Sob</button>
+            <button class="btn-sobrecupo" onclick="guardarSobrecupo('${c.id}', ${c.sobrecupo || 0}, ${c.cupo_disponible || 0}, ${c.cupo_maximo || 15})">+ Sob</button>
           </div>` : ''}
       </div>`;
   }
@@ -963,13 +963,14 @@
       </div>`;
   }
 
-  async function guardarSobrecupo(claseId, sobrecupoActual, cupoDispActual) {
+  async function guardarSobrecupo(claseId, sobrecupoActual, cupoDispActual, cupoMaxActual) {
     const input   = document.getElementById(`sc-${claseId}`);
     const agregar = parseInt(input.value, 10);
     if (!agregar || agregar <= 0) { toast('Ingresa un número mayor a 0', 'error'); return; }
     const nuevoSobrecupo = sobrecupoActual + agregar;
     const nuevoCupoDisp  = cupoDispActual  + agregar;
-    const { error } = await sb.from('clases').update({ sobrecupo: nuevoSobrecupo, cupo_disponible: nuevoCupoDisp }).eq('id', claseId);
+    const nuevoCupoMax   = cupoMaxActual   + agregar;
+    const { error } = await sb.from('clases').update({ sobrecupo: nuevoSobrecupo, cupo_disponible: nuevoCupoDisp, cupo_maximo: nuevoCupoMax }).eq('id', claseId);
     if (error) { toast('Error al guardar sobrecupo', 'error'); return; }
     toast(`✓ Sobrecupo actualizado: ${nuevoSobrecupo} en total`);
     input.value = '';
