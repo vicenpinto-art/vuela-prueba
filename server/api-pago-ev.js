@@ -594,7 +594,7 @@ app.get('/dashboard-stats', async (req, res) => {
   const mesActual = (new Date().getMonth() + 1).toString().padStart(2, '0');
 
   const [pagosRes, comprasActRes, renovRes, expComprasRes, usuariosRes] = await Promise.all([
-    sb.from('pagos_historico').select('fecha_pago,monto,plan_nombre'),
+    sb.from('pagos_historico').select('fecha_pago,monto,plan_nombre,tipo_pago'),
     sb.from('compras').select('alumna_id').eq('estado','activo').gte('fecha_fin', hoy),
     sb.from('compras').select('alumna_id,fecha_fin,planes(nombre)')
       .eq('estado','activo').gte('fecha_fin', hoy).lte('fecha_fin', en14dias).order('fecha_fin'),
@@ -671,7 +671,32 @@ app.get('/dashboard-stats', async (req, res) => {
     .map(u => ({ nombre: u.nombre, apellido: u.apellido, fecha: u.fecha_nacimiento }))
     .sort((a, b) => parseInt(a.fecha?.slice(8)) - parseInt(b.fecha?.slice(8)));
 
-  res.json({ kpis: { totalIngresos, clientesActivos, totalMembresias }, ventasMensuales, porEstado, top10, renovaciones, porRecuperar, cumpleanos });
+  // Métodos de pago
+  const metodoPago = {};
+  const normalizar = t => {
+    const s = (t||'').trim().toLowerCase();
+    if (s.includes('mercado') || s === 'mp') return 'MercadoPago';
+    if (s.includes('transfer'))              return 'Transferencia';
+    if (s.includes('efectiv'))               return 'Efectivo';
+    if (s.includes('cheque'))                return 'Cheque';
+    if (!s || s.includes('sin'))             return 'Sin datos';
+    return t.trim();
+  };
+  pagos.forEach(p => {
+    const key = normalizar(p.tipo_pago);
+    if (!metodoPago[key]) metodoPago[key] = { count: 0, total: 0 };
+    metodoPago[key].count++;
+    metodoPago[key].total += Number(p.monto) || 0;
+  });
+
+  // Ticket promedio mes actual
+  const anioActual    = new Date().getFullYear();
+  const mesActualStr  = `${anioActual}-${mesActual}`;
+  const pagosMes      = pagos.filter(p => p.fecha_pago?.startsWith(mesActualStr));
+  const ingresosMes   = pagosMes.reduce((s, p) => s + (Number(p.monto) || 0), 0);
+  const ticketPromedio = pagosMes.length > 0 ? Math.round(ingresosMes / pagosMes.length) : 0;
+
+  res.json({ kpis: { totalIngresos, clientesActivos, totalMembresias, ticketPromedio, ingresosMes }, ventasMensuales, porEstado, top10, metodoPago, renovaciones, porRecuperar, cumpleanos });
 });
 
 // ── IMPORTAR PAGOS HISTÓRICOS BOXMAGIC ───────────────────────

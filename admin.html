@@ -558,18 +558,24 @@
           </div>
         </div>
 
-        <!-- Gráfico barras + Top 10 -->
+        <!-- Donut + Barras -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
           <div class="card" style="padding:20px">
-            <div style="font-size:14px;font-weight:700;margin-bottom:12px">Alumnas por estado (BoxMagic)</div>
-            <canvas id="chart-barras-admin" height="180"></canvas>
+            <div style="font-size:14px;font-weight:700;margin-bottom:12px">Métodos de pago</div>
+            <canvas id="chart-donut-admin" height="200"></canvas>
           </div>
           <div class="card" style="padding:20px">
-            <div style="font-size:14px;font-weight:700;margin-bottom:12px">Top 10 membresías más vendidas</div>
-            <div class="tabla-wrap">
-              <table class="tabla"><thead><tr><th>#</th><th>Plan</th><th>Ventas</th><th style="text-align:right">Ingresos</th></tr></thead>
-              <tbody id="dash-top10-admin"></tbody></table>
-            </div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:12px">Alumnas por estado (BoxMagic)</div>
+            <canvas id="chart-barras-admin" height="200"></canvas>
+          </div>
+        </div>
+
+        <!-- Top 10 -->
+        <div class="card" style="padding:20px;margin-bottom:16px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:12px">Top 10 membresías más vendidas</div>
+          <div class="tabla-wrap">
+            <table class="tabla"><thead><tr><th>#</th><th>Plan</th><th>Ventas</th><th style="text-align:right">Ingresos</th></tr></thead>
+            <tbody id="dash-top10-admin"></tbody></table>
           </div>
         </div>
 
@@ -2390,6 +2396,7 @@ function formatCLP(n){
 let dashDataAdmin   = null;
 let chartLineaAdmin = null;
 let chartBarrasAdmin= null;
+let chartDonutAdmin = null;
 
 async function cargarDashboardAdmin(force = false) {
   if (dashDataAdmin && !force) return;
@@ -2414,6 +2421,7 @@ function renderDashboardAdmin() {
   const { kpis, top10, renovaciones, porRecuperar, cumpleanos } = dashDataAdmin;
 
   // KPIs
+  const mesNombre = new Date().toLocaleDateString('es-CL',{month:'long'});
   document.getElementById('dash-kpis-admin').innerHTML = `
     <div class="card" style="padding:16px;text-align:center">
       <div style="font-size:22px;font-weight:800;color:#22c55e">${formatCLP(kpis.totalIngresos)}</div>
@@ -2427,9 +2435,14 @@ function renderDashboardAdmin() {
       <div style="font-size:22px;font-weight:800;color:#f59e0b">${kpis.totalMembresias.toLocaleString('es-CL')}</div>
       <div style="font-size:12px;color:var(--gray);margin-top:4px">Membresías vendidas</div>
     </div>
+    <div class="card" style="padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:800;color:#8b5cf6">${formatCLP(kpis.ticketPromedio)}</div>
+      <div style="font-size:12px;color:var(--gray);margin-top:4px">Ticket promedio · ${mesNombre}</div>
+    </div>
   `;
 
   renderLineChartAdmin();
+  renderDonutChartAdmin();
   renderBarChartAdmin();
 
   // Top 10
@@ -2554,6 +2567,46 @@ function toggleAnioAnterior() {
     chartLineaAdmin.data.datasets[1].hidden = !on;
     chartLineaAdmin.update();
   }
+}
+
+function renderDonutChartAdmin() {
+  if (!dashDataAdmin?.metodoPago) return;
+  const entries = Object.entries(dashDataAdmin.metodoPago).sort(([,a],[,b]) => b.count - a.count);
+  const colors  = ['#8b5cf6','#ff4e68','#3b82f6','#22c55e','#f59e0b','#06b6d4','#ec4899'];
+  if (chartDonutAdmin) chartDonutAdmin.destroy();
+  chartDonutAdmin = new Chart(document.getElementById('chart-donut-admin'), {
+    type: 'doughnut',
+    data: {
+      labels: entries.map(([k]) => k),
+      datasets: [{
+        data: entries.map(([,v]) => v.count),
+        backgroundColor: colors.slice(0, entries.length),
+        borderWidth: 2,
+        borderColor: '#fff',
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '62%',
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10, boxWidth: 12 } },
+        tooltip: {
+          backgroundColor: '#111',
+          titleColor: '#fff',
+          bodyColor: '#ccc',
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: {
+            label: item => {
+              const d = entries[item.dataIndex][1];
+              const pct = Math.round(d.count / entries.reduce((s,[,v])=>s+v.count,0)*100);
+              return ` ${d.count} pagos (${pct}%) · ${formatCLP(d.total)}`;
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 function renderBarChartAdmin() {
