@@ -2371,18 +2371,18 @@ async function seleccionarProf(profId, nombre){
       <div style="padding:16px 24px;border-bottom:1px solid var(--border)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dark)">Asignar horarios recurrentes</div>
-          <button class="btn btn-secondary btn-sm" onclick="verHorariosParaAsignar('${profId}','${nombre.replace(/'/g,"\\'")}')">Ver horarios</button>
+          <button id="btn-ver-horarios" class="btn btn-secondary btn-sm" onclick="verHorariosParaAsignar('${profId}','${nombre.replace(/'/g,"\\'")}')">Ver horarios</button>
         </div>
-        <div id="horarios-asignar-panel" style="font-size:13px;color:var(--gray)">Presiona "Ver horarios" para cargar.</div>
+        <div id="horarios-asignar-panel" style="display:none"></div>
       </div>
 
       <!-- Asignar clases individuales -->
       <div style="padding:16px 24px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dark)">Asignar clases puntuales</div>
-          <button class="btn btn-secondary btn-sm" onclick="verClasesParaAsignar('${profId}','${nombre.replace(/'/g,"\\'")}')">Ver clases</button>
+          <button id="btn-ver-clases" class="btn btn-secondary btn-sm" onclick="verClasesParaAsignar('${profId}','${nombre.replace(/'/g,"\\'")}')">Ver clases</button>
         </div>
-        <div id="clases-asignar-panel" style="font-size:13px;color:var(--gray)">Presiona "Ver clases" para cargar.</div>
+        <div id="clases-asignar-panel" style="display:none"></div>
       </div>
     </div>`;
 }
@@ -2402,9 +2402,19 @@ async function irAAsistencia(claseId){
   selClaseAsis(claseId);
 }
 
-async function verHorariosParaAsignar(profId, profNombre) {
-  const el = document.getElementById('horarios-asignar-panel');
+async function verHorariosParaAsignar(profId, profNombre, force = false) {
+  const el  = document.getElementById('horarios-asignar-panel');
+  const btn = document.getElementById('btn-ver-horarios');
   if (!el) return;
+
+  if (!force && el.style.display !== 'none') {
+    el.style.display = 'none';
+    if (btn) btn.textContent = 'Ver horarios';
+    return;
+  }
+
+  el.style.display = 'block';
+  if (btn) btn.textContent = 'Ocultar horarios';
   el.innerHTML = '<div class="sk" style="height:36px;margin-bottom:6px"></div><div class="sk" style="height:36px"></div>';
 
   const { data: horarios } = await sb.from('horarios')
@@ -2435,12 +2445,22 @@ async function asignarHorario(horarioId, profId, profNombre) {
   if (error) { toast('Error al asignar', 'error'); return; }
   await sb.from('clases').update({ profesora_id: profId, profesora: profNombre }).eq('horario_id', horarioId).gte('fecha_hora', ahora);
   toast('✓ Horario y clases futuras actualizados');
-  verHorariosParaAsignar(profId, profNombre);
+  verHorariosParaAsignar(profId, profNombre, true);
 }
 
-async function verClasesParaAsignar(profId, profNombre) {
-  const el = document.getElementById('clases-asignar-panel');
+async function verClasesParaAsignar(profId, profNombre, force = false) {
+  const el  = document.getElementById('clases-asignar-panel');
+  const btn = document.getElementById('btn-ver-clases');
   if (!el) return;
+
+  if (!force && el.style.display !== 'none') {
+    el.style.display = 'none';
+    if (btn) btn.textContent = 'Ver clases';
+    return;
+  }
+
+  el.style.display = 'block';
+  if (btn) btn.textContent = 'Ocultar clases';
   el.innerHTML = '<div class="sk" style="height:36px;margin-bottom:6px"></div><div class="sk" style="height:36px"></div>';
 
   const ahora = new Date();
@@ -2469,7 +2489,7 @@ async function asignarClaseInd(claseId, profId, profNombre) {
   const { error } = await sb.from('clases').update({ profesora_id: profId, profesora: profNombre }).eq('id', claseId);
   if (error) { toast('Error al asignar', 'error'); return; }
   toast('✓ Clase asignada a ' + profNombre);
-  verClasesParaAsignar(profId, profNombre);
+  verClasesParaAsignar(profId, profNombre, true);
 }
 
 // ── ROLES ─────────────────────────────────────────────────────
