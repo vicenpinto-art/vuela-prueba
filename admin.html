@@ -2626,10 +2626,12 @@ async function toggleEliminadas(){
       el.innerHTML='<p style="font-size:13px;color:var(--gray);padding:8px 0">No hay disciplinas eliminadas.</p>';
       return;
     }
+    const planLabel = {vuela:'Vuela', muevete:'Muévete', gym:'Gym'};
     el.innerHTML = data.map(d=>`
       <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
-        <span style="flex:1;font-size:13px;color:var(--gray)">${d.nombre} <span style="font-size:11px">(${d.plan==='vuela'?'Vuela':'Muévete'})</span></span>
+        <span style="flex:1;font-size:13px;color:var(--gray)">${esc(d.nombre)} <span style="font-size:11px">(${planLabel[d.plan]||d.plan})</span></span>
         <button class="btn btn-cyan btn-sm" onclick="restaurarDisciplina('${d.id}')">Restaurar</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarDefinitivamenteDisciplina('${d.id}','${d.nombre.replace(/'/g,"\\'")}')">Eliminar</button>
       </div>`).join('');
   } else {
     wrap.style.display='none';
@@ -2642,7 +2644,26 @@ async function restaurarDisciplina(id){
   if(error){toast('Error al restaurar','error');return;}
   toast('Disciplina restaurada ✓');
   cargarDisciplinas();
-  toggleEliminadas(); // refrescar lista
+  toggleEliminadas();
+  toggleEliminadas();
+}
+
+async function eliminarDefinitivamenteDisciplina(id, nombre){
+  if(!confirm(`⚠️ Vas a eliminar definitivamente "${nombre}".\n\nEsta acción NO se puede deshacer y la disciplina desaparecerá para siempre.\n\n¿Continuar?`)) return;
+
+  const doble = confirm(`ADVERTENCIA FINAL\n\nVas a borrar permanentemente "${nombre}" de la base de datos.\n\n¿Estás completamente segura?`);
+  if(!doble) return;
+
+  const respuesta = prompt('Escribe "ELIMINAR" para confirmar:');
+  if(respuesta !== 'ELIMINAR'){
+    toast('Cancelado. Nada fue eliminado.','info');
+    return;
+  }
+
+  const {error} = await sb.from('disciplinas').delete().eq('id',id);
+  if(error){toast('Error al eliminar','error');return;}
+  toast('Disciplina eliminada definitivamente ✓');
+  toggleEliminadas();
   toggleEliminadas();
 }
 
