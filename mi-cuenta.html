@@ -343,7 +343,7 @@
       <div class="perfil-section-label">Datos personales</div>
       <div class="perfil-field">
         <label class="perfil-label">RUT</label>
-        <input class="perfil-input" id="perfil-rut" type="text" placeholder="12.345.678-9">
+        <input class="perfil-input" id="perfil-rut" type="text" placeholder="19637714-K" maxlength="10" oninput="this.value=formatearRut(this.value)">
       </div>
       <div class="perfil-field">
         <label class="perfil-label">Fecha de nacimiento</label>
@@ -487,6 +487,12 @@
     }
   }
 
+  function formatearRut(v) {
+    v = v.replace(/[^0-9kK]/g, '').toUpperCase();
+    if (v.length <= 1) return v;
+    return v.slice(0, -1) + '-' + v.slice(-1);
+  }
+
   function parsePhone(full) {
     if (!full) return { code: '+56', local: '' };
     const codes = ['+1809','+593','+591','+595','+598','+506','+503','+502','+504','+505','+507','+54','+55','+56','+57','+51','+52','+53','+58','+34','+1'];
@@ -506,7 +512,7 @@
     const phTel = parsePhone(u.telefono);
     document.getElementById('perfil-tel-code').value = phTel.code;
     document.getElementById('perfil-tel').value       = phTel.local;
-    document.getElementById('perfil-rut').value        = u.rut || '';
+    document.getElementById('perfil-rut').value        = u.rut ? formatearRut(u.rut.replace(/[^0-9kK]/g,'').toUpperCase()) : '';
     document.getElementById('perfil-nacimiento').value = u.fecha_nacimiento || '';
     const phEmerg = parsePhone(u.telefono_emergencia);
     document.getElementById('perfil-tel-emerg-code').value = phEmerg.code;
@@ -566,6 +572,11 @@
     }
     if (emergLocal && telCode + telLocal === emergCode + emergLocal) {
       msg.textContent = 'El teléfono de emergencia no puede ser igual al teléfono personal.'; msg.className = 'perfil-msg err';
+      btn.disabled = false; btn.textContent = 'Guardar cambios'; return;
+    }
+    const rutVal = document.getElementById('perfil-rut').value.trim();
+    if (rutVal && !/^\d{7,8}-[\dK]$/.test(rutVal)) {
+      msg.textContent = 'El RUT debe tener el formato 19637714-K.'; msg.className = 'perfil-msg err';
       btn.disabled = false; btn.textContent = 'Guardar cambios'; return;
     }
 

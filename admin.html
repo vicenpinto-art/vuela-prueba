@@ -679,7 +679,7 @@
           </div>
           <div class="perfil-field">
             <label class="perfil-label">RUT</label>
-            <input class="perfil-input" id="pa-rut" type="text" placeholder="12.345.678-9">
+            <input class="perfil-input" id="pa-rut" type="text" placeholder="19637714-K" maxlength="10" oninput="this.value=formatearRut(this.value)">
           </div>
           <div class="perfil-field">
             <label class="perfil-label">Fecha de nacimiento</label>
@@ -1162,6 +1162,12 @@ async function eliminarClasesAntiguas(){
 }
 
 // ── PERFIL ADMIN ──────────────────────────────────────────────
+function formatearRut(v) {
+  v = v.replace(/[^0-9kK]/g, '').toUpperCase();
+  if (v.length <= 1) return v;
+  return v.slice(0, -1) + '-' + v.slice(-1);
+}
+
 function parsePhone(full) {
   if (!full) return { code: '+56', local: '' };
   const codes = ['+1809','+593','+591','+595','+598','+506','+503','+502','+504','+505','+507','+54','+55','+56','+57','+51','+52','+53','+58','+34','+1'];
@@ -1177,7 +1183,7 @@ async function cargarPerfilAdmin() {
   if (!u) return;
   document.getElementById('pa-nombre').value       = u.nombre || '';
   document.getElementById('pa-apellido').value     = u.apellido || '';
-  document.getElementById('pa-rut').value          = u.rut || '';
+  document.getElementById('pa-rut').value          = u.rut ? formatearRut(u.rut.replace(/[^0-9kK]/g,'').toUpperCase()) : '';
   document.getElementById('pa-nacimiento').value   = u.fecha_nacimiento || '';
   document.getElementById('pa-email').value        = u.email || '';
   document.getElementById('pa-email2').value       = u.email_secundario || '';
@@ -1225,6 +1231,10 @@ async function guardarPerfilAdmin() {
   }
   if (emergLocal && telCode + telLocal === emergCode + emergLocal) {
     msg.className='perfil-msg error'; msg.textContent='El teléfono de emergencia no puede ser igual al teléfono personal.'; return;
+  }
+  const rutVal = document.getElementById('pa-rut').value.trim();
+  if (rutVal && !/^\d{7,8}-[\dK]$/.test(rutVal)) {
+    msg.className='perfil-msg error'; msg.textContent='El RUT debe tener el formato 19637714-K.'; return;
   }
 
   const { error } = await sb.from('usuarios').update({
