@@ -597,7 +597,8 @@
       return;
     }
     if (u.rol === 'profesora') {
-      adaptarVistaProfesora(u);
+      window.location.href = 'profesora.html';
+      return;
     }
 
     const nombre = u.nombre || 'alumna';

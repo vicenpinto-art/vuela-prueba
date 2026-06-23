@@ -100,13 +100,30 @@
     .btn-sobrecupo{padding:5px 12px;background:rgba(139,106,255,.1);color:var(--purple);border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
     .btn-sobrecupo:hover{background:rgba(139,106,255,.2)}
 
-    /* HORARIO */
-    .horario-dia-seccion{margin-bottom:20px}
-    .horario-dia-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--coral);margin-bottom:8px}
-    .horario-chips{display:flex;flex-wrap:wrap;gap:8px}
-    .horario-chip{background:var(--light);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;display:flex;gap:8px;align-items:center}
-    .horario-chip-hora{font-weight:700;color:var(--coral)}
-    .horario-chip-prof{font-size:11px;color:var(--gray)}
+    /* HORARIO — mismo diseño que index.html */
+    .hor-leyenda{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+    .hor-leyenda-item{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#444}
+    .hor-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .hor-dot-vuela{background:#a183ff}.hor-dot-muevete{background:#fecb29}.hor-dot-gym{background:#00c8d4}
+    .hor-tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+    .hor-tab{padding:8px 18px;border-radius:100px;border:1.5px solid rgba(0,0,0,.1);background:transparent;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:#666;transition:all .2s}
+    .hor-tab:hover{border-color:var(--coral);color:var(--coral)}
+    .hor-tab.active{background:var(--coral);border-color:var(--coral);color:#fff}
+    .hor-grid{display:none;max-width:800px;margin:0 auto}
+    .hor-grid.visible{display:block}
+    .hor-salas{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .hor-sala{border-radius:16px;overflow:hidden;border:1.5px solid rgba(0,0,0,.06);background:#fafafa}
+    .hor-sala-head{padding:12px 16px;display:flex;align-items:center;gap:8px}
+    .hor-sala-pelicano .hor-sala-head{background:rgba(255,78,104,.08)}
+    .hor-sala-pinguino .hor-sala-head{background:rgba(254,203,41,.12)}
+    .hor-sala-flamenco .hor-sala-head{background:rgba(0,200,212,.08)}
+    .hor-sala-icon{font-size:18px}
+    .hor-sala-nombre{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#333}
+    .hor-clases{padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+    .hor-clase{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;background:#fff;border:1px solid rgba(0,0,0,.06)}
+    .hor-hora{font-size:12px;font-weight:700;color:#888;min-width:38px;font-variant-numeric:tabular-nums}
+    .hor-nombre{font-size:13px;font-weight:600;flex:1;color:#222}
+    .hor-dot-c{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 
     /* ACORDEÓN DÍAS */
     .grupo-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 0 6px;border-bottom:2px solid currentColor;margin-bottom:10px}
@@ -611,50 +628,77 @@
   }
 
   // ── HORARIO ────────────────────────────────────────────────────
-  async function cargarHorario() {
+  function mostrarDiaHorario(dia, btn) {
+    document.querySelectorAll('.hor-grid').forEach(g => g.classList.remove('visible'));
+    document.querySelectorAll('.hor-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('hor-' + dia).classList.add('visible');
+    btn.classList.add('active');
+  }
+
+  function cargarHorario() {
     const cont = document.getElementById('horario-contenido');
-    const { data: horarios, error } = await sb.from('horarios')
-      .select('id, nombre, dia_semana, hora, profesora, cupo_maximo, duracion_minutos, restriccion_plan')
-      .eq('activo', true)
-      .order('dia_semana', { ascending: true })
-      .order('hora', { ascending: true });
-
-    if (error || !horarios?.length) {
-      cont.innerHTML = `<div style="padding:20px;text-align:center;color:var(--gray)">No hay horarios activos.</div>`;
-      return;
-    }
-
-    // dia_semana es número: 0=Dom 1=Lun 2=Mar 3=Mié 4=Jue 5=Vie 6=Sáb
-    const diasNombre = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-    const diasOrden  = [1,2,3,4,5,6,0]; // lun→dom
-    const porDia = {};
-    horarios.forEach(h => {
-      const d = h.dia_semana;
-      if (!porDia[d]) porDia[d] = [];
-      porDia[d].push(h);
-    });
-
-    const planColor = { vuela:'var(--coral)', muevete:'var(--purple)' };
-    const planLabel = { vuela:'Vuela', muevete:'Muévete' };
-
-    cont.innerHTML = diasOrden.filter(d => porDia[d]).map(d => `
-      <div class="horario-dia-seccion">
-        <div class="horario-dia-label">${diasNombre[d]}</div>
-        <div class="horario-chips">
-          ${porDia[d].map(h => {
-            const plan = h.restriccion_plan;
-            const badge = plan ? `<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(0,0,0,.05);color:${planColor[plan]||'var(--gray)'}">${planLabel[plan]||plan}</span>` : '';
-            return `
-            <div class="horario-chip">
-              <span class="horario-chip-hora">${(h.hora||'').slice(0,5)}</span>
-              <div>
-                <div>${h.nombre || ''} ${badge}</div>
-                <div class="horario-chip-prof">👩‍🏫 ${h.profesora || '—'}</div>
-              </div>
-            </div>`;
-          }).join('')}
+    const sala = (cls, icon, nombre, clases) => `
+      <div class="hor-sala hor-sala-${cls}">
+        <div class="hor-sala-head"><span class="hor-sala-icon">${icon}</span><span class="hor-sala-nombre">${nombre}</span></div>
+        <div class="hor-clases">${clases.map(([h,n,p])=>`
+          <div class="hor-clase">
+            <span class="hor-hora">${h}</span>
+            <span class="hor-nombre">${n}</span>
+            <span class="hor-dot-c" style="background:${p==='v'?'#a183ff':p==='m'?'#fecb29':'#00c8d4'}"></span>
+          </div>`).join('')}
         </div>
-      </div>`).join('');
+      </div>`;
+
+    cont.innerHTML = `
+      <div class="hor-leyenda">
+        <div class="hor-leyenda-item"><span class="hor-dot hor-dot-vuela"></span>Plan Vuela</div>
+        <div class="hor-leyenda-item"><span class="hor-dot hor-dot-muevete"></span>Plan Muévete</div>
+        <div class="hor-leyenda-item"><span class="hor-dot hor-dot-gym"></span>Gym</div>
+      </div>
+      <div class="hor-tabs">
+        <button class="hor-tab active" onclick="mostrarDiaHorario('lunes',this)">Lunes</button>
+        <button class="hor-tab" onclick="mostrarDiaHorario('martes',this)">Martes</button>
+        <button class="hor-tab" onclick="mostrarDiaHorario('miercoles',this)">Miércoles</button>
+        <button class="hor-tab" onclick="mostrarDiaHorario('jueves',this)">Jueves</button>
+        <button class="hor-tab" onclick="mostrarDiaHorario('viernes',this)">Viernes</button>
+        <button class="hor-tab" onclick="mostrarDiaHorario('sabado',this)">Sábado</button>
+      </div>
+
+      <div class="hor-grid visible" id="hor-lunes"><div class="hor-salas">
+        ${sala('pelicano','🦤','Sala Pelícano',[['18:00','Pole Sport','v'],['19:00','Pole Sport','v'],['20:00','E. Funcional','v']])}
+        ${sala('pinguino','🐧','Sala Pingüino',[['18:20','Aerial Yoga','v'],['19:30','Pilates Zen','m'],['20:30','Dancehall','m']])}
+        ${sala('flamenco','🦩','Sala Flamenco — Gym',[['07:00','Apertura Gym','g'],['21:00','Cierre Gym','g']])}
+      </div></div>
+
+      <div class="hor-grid" id="hor-martes"><div class="hor-salas">
+        ${sala('pelicano','🦤','Sala Pelícano',[['11:00','Lira','v'],['18:00','Pole Sport','v'],['19:00','Lira','v'],['20:00','Handstand y Contorsión','m']])}
+        ${sala('pinguino','🐧','Sala Pingüino',[['18:30','K-POP','m'],['19:30','Hip Hop','m']])}
+        ${sala('flamenco','🦩','Sala Flamenco — Gym',[['07:00','Apertura Gym','g'],['21:00','Cierre Gym','g']])}
+      </div></div>
+
+      <div class="hor-grid" id="hor-miercoles"><div class="hor-salas">
+        ${sala('pelicano','🦤','Sala Pelícano',[['18:00','Pole Sport','v'],['19:00','Pole Sport','v'],['20:00','Pilates Zen','m']])}
+        ${sala('pinguino','🐧','Sala Pingüino',[['12:30','K-POP','m'],['14:00','Aerial Yoga','v'],['18:30','Girly','m'],['19:30','Reggaetón Extended','m']])}
+        ${sala('flamenco','🦩','Sala Flamenco — Gym',[['07:00','Apertura Gym','g'],['21:00','Cierre Gym','g']])}
+      </div></div>
+
+      <div class="hor-grid" id="hor-jueves"><div class="hor-salas">
+        ${sala('pelicano','🦤','Sala Pelícano',[['18:00','Lira','v'],['19:00','E. Funcional','v'],['20:00','Flexibilidad','m']])}
+        ${sala('pinguino','🐧','Sala Pingüino',[['12:30','Reggaeton Fem','m'],['18:30','K-POP','m'],['19:30','Hip Hop','m'],['20:30','Girly','m']])}
+        ${sala('flamenco','🦩','Sala Flamenco — Gym',[['07:00','Apertura Gym','g'],['21:00','Cierre Gym','g']])}
+      </div></div>
+
+      <div class="hor-grid" id="hor-viernes"><div class="hor-salas">
+        ${sala('pelicano','🦤','Sala Pelícano',[['17:00','Pilates Zen','m'],['18:00','Tabata','m'],['19:00','Pole Sport','v']])}
+        ${sala('pinguino','🐧','Sala Pingüino',[['17:00','Flexibilidad','m'],['18:20','Aerial Yoga','v'],['19:30','Reggaetón Extended','m']])}
+        ${sala('flamenco','🦩','Sala Flamenco — Gym',[['07:00','Apertura Gym','g'],['21:00','Cierre Gym','g']])}
+      </div></div>
+
+      <div class="hor-grid" id="hor-sabado"><div class="hor-salas">
+        ${sala('pelicano','🦤','Sala Pelícano',[['10:30','Lira','v'],['11:30','Pole Sport','v'],['12:30','Flexibilidad','m']])}
+        ${sala('pinguino','🐧','Sala Pingüino',[['12:30','Heels','m'],['14:00','Reggaetón Extended','m'],['15:30','K-POP','m']])}
+        ${sala('flamenco','🦩','Sala Flamenco — Gym',[['09:00','Apertura Gym','g'],['15:00','Cierre Gym','g']])}
+      </div></div>`;
   }
 
   // ── CLASES ─────────────────────────────────────────────────────
