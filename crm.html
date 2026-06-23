@@ -299,6 +299,8 @@
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'login.html'; return; }
     jwtToken = session.access_token;
+    const { data: perfil } = await sb.from('usuarios').select('rol').eq('id', session.user.id).single();
+    if (!perfil || perfil.rol !== 'admin') { window.location.href = 'mi-cuenta.html'; return; }
   }
 
   // ── COLUMNAS CSV BOXMAGIC (por posición) ──────────────────────
