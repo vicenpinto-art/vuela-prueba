@@ -578,7 +578,7 @@
       .select('nombre, apellido, rol')
       .eq('id', userId).single();
 
-    if (!u || u.rol !== 'profesora') {
+    if (!u || (u.rol !== 'profesora' && u.rol !== 'admin')) {
       window.location.href = 'mi-cuenta.html'; return;
     }
 

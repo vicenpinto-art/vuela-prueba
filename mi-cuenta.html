@@ -472,7 +472,7 @@
     cargarPerfil(userId);
     // Solo cargar plan y clases si es alumna
     const { data: rolCheck } = await sb.from('usuarios').select('rol,nombre,apellido').eq('id', userId).single();
-    if (rolCheck?.rol === 'alumna' || !rolCheck?.rol) {
+    if (rolCheck?.rol === 'alumna' || rolCheck?.rol === 'admin' || !rolCheck?.rol) {
       await Promise.all([cargarPlan(userId), cargarClases(userId), cargarRutina(userId)]);
     } else if (rolCheck?.rol === 'profesora') {
       const nombreCompleto = ((rolCheck.nombre||'') + ' ' + (rolCheck.apellido||'')).trim();
@@ -609,11 +609,7 @@
     const { data: u } = await sb.from('usuarios').select('nombre, apellido, rol').eq('id', userId).single();
     if (!u) return;
 
-    // Si es admin o profesora, redirigir
-    if (u.rol === 'admin') {
-      window.location.href = 'admin.html';
-      return;
-    }
+    // Profesora redirige a su panel (admin puede quedarse para testear)
     if (u.rol === 'profesora') {
       window.location.href = 'profesora.html';
       return;
