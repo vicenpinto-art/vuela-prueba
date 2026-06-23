@@ -1,23 +1,45 @@
 {
+  "id": "/",
   "name": "Espacio Vuela",
   "short_name": "Vuela",
   "description": "Estudio de baile, aéreas y fuerza solo para mujeres",
   "start_url": "/login.html",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#f7f7f9",
   "theme_color": "#ff4e68",
   "orientation": "portrait",
+  "lang": "es",
   "icons": [
     {
       "src": "/apple-touch-icon.png",
       "sizes": "180x180",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/favicon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon-192.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-192.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
