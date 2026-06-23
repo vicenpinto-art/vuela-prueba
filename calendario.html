@@ -258,8 +258,8 @@ let filtroAdminProfe = '';
 let nombreUsuario    = '';
 
 // ── UTILS ─────────────────────────────────────────────────────
-function isoFecha(date){ return date.toISOString().split('T')[0]; }
-function horaStr(ts){ return new Date(ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',hour12:false}); }
+function isoFecha(date){ return date.toLocaleDateString('en-CA',{timeZone:'America/Santiago'}); }
+function horaStr(ts){ return new Date(ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/Santiago'}); }
 function fechaLarga(isoDate){
   const d = new Date(isoDate+'T12:00:00');
   return d.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});

@@ -100,30 +100,46 @@
     .btn-sobrecupo{padding:5px 12px;background:rgba(139,106,255,.1);color:var(--purple);border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
     .btn-sobrecupo:hover{background:rgba(139,106,255,.2)}
 
-    /* HORARIO — mismo diseño que index.html */
-    .hor-leyenda{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
-    .hor-leyenda-item{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#444}
-    .hor-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-    .hor-dot-vuela{background:#a183ff}.hor-dot-muevete{background:#fecb29}.hor-dot-gym{background:#00c8d4}
-    .hor-tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
-    .hor-tab{padding:8px 18px;border-radius:100px;border:1.5px solid rgba(0,0,0,.1);background:transparent;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:#666;transition:all .2s}
-    .hor-tab:hover{border-color:var(--coral);color:var(--coral)}
-    .hor-tab.active{background:var(--coral);border-color:var(--coral);color:#fff}
-    .hor-grid{display:none;max-width:800px;margin:0 auto}
-    .hor-grid.visible{display:block}
-    .hor-salas{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-    .hor-sala{border-radius:16px;overflow:hidden;border:1.5px solid rgba(0,0,0,.06);background:#fafafa}
-    .hor-sala-head{padding:12px 16px;display:flex;align-items:center;gap:8px}
-    .hor-sala-pelicano .hor-sala-head{background:rgba(255,78,104,.08)}
-    .hor-sala-pinguino .hor-sala-head{background:rgba(254,203,41,.12)}
-    .hor-sala-flamenco .hor-sala-head{background:rgba(0,200,212,.08)}
-    .hor-sala-icon{font-size:18px}
-    .hor-sala-nombre{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#333}
-    .hor-clases{padding:10px 12px;display:flex;flex-direction:column;gap:6px}
-    .hor-clase{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;background:#fff;border:1px solid rgba(0,0,0,.06)}
-    .hor-hora{font-size:12px;font-weight:700;color:#888;min-width:38px;font-variant-numeric:tabular-nums}
-    .hor-nombre{font-size:13px;font-weight:600;flex:1;color:#222}
-    .hor-dot-c{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    /* HORARIO — calendario embebido */
+    .hor-filtros{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+    .hor-filtro-btn{padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;color:var(--gray)}
+    .hor-filtro-btn.active{background:var(--coral);color:#fff;border-color:var(--coral)}
+    .hor-cal-layout{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start}
+    .hor-cal-wrap{background:#fff;border-radius:20px;border:1px solid var(--border);padding:20px;position:sticky;top:85px}
+    .hor-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .hor-cal-nav{background:none;border:none;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--gray);transition:background .2s;font-family:'Outfit',sans-serif}
+    .hor-cal-nav:hover{background:var(--light)}
+    .hor-cal-titulo{font-size:15px;font-weight:700}
+    .hor-cal-dias-hdr{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
+    .hor-cal-dia-lbl{text-align:center;font-size:10px;font-weight:700;color:var(--gray);padding:3px 0;text-transform:uppercase;letter-spacing:.5px}
+    .hor-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+    .hor-cal-cell{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px;position:relative;transition:background .15s}
+    .hor-cal-cell:hover:not(.hor-vacio):not(.hor-otro-mes){background:var(--light)}
+    .hor-cal-cell.hor-vacio,.hor-cal-cell.hor-otro-mes{opacity:.2;cursor:default}
+    .hor-cal-cell.hor-hoy .hor-cal-num{background:linear-gradient(135deg,var(--coral),var(--magenta));color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+    .hor-cal-cell.hor-sel{background:rgba(255,78,104,.08);border:1.5px solid var(--coral)}
+    .hor-cal-cell.hor-feriado{background:rgba(255,78,104,.04)}
+    .hor-cal-num{font-size:12px;font-weight:600;line-height:1;margin-bottom:2px}
+    .hor-cal-dots{display:flex;gap:2px;justify-content:center;flex-wrap:wrap;max-width:26px}
+    .hor-cal-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
+    .hor-cal-legend{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;padding-top:14px;border-top:1px solid var(--border)}
+    .hor-cal-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray)}
+    .hor-day-panel{background:#fff;border-radius:20px;border:1px solid var(--border);overflow:hidden;min-height:300px}
+    .hor-day-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;color:var(--gray)}
+    .hor-day-empty .icon{font-size:40px;margin-bottom:12px}
+    .hor-day-header{padding:20px 24px;border-bottom:1px solid var(--border)}
+    .hor-day-fecha{font-family:'Dancing Script',cursive;font-size:24px;color:var(--dark);margin-bottom:4px}
+    .hor-feriado-banner{background:rgba(255,78,104,.08);border:1px solid rgba(255,78,104,.2);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--coral);margin-top:8px}
+    .hor-clase-item{display:flex;align-items:center;gap:12px;padding:14px 24px;border-bottom:1px solid var(--border);transition:background .15s}
+    .hor-clase-item:last-child{border-bottom:none}
+    .hor-clase-hora{font-size:14px;font-weight:800;color:var(--coral);min-width:50px}
+    .hor-clase-info{flex:1;min-width:0}
+    .hor-clase-nombre{font-size:14px;font-weight:700;margin-bottom:2px}
+    .hor-clase-meta{font-size:12px;color:var(--gray)}
+    .hor-clase-mia{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(255,78,104,.1);color:var(--coral);margin-left:8px;vertical-align:middle}
+    .hor-sin-clases{padding:28px 24px;text-align:center;color:var(--gray);font-size:14px}
+    @media(max-width:900px){.hor-cal-layout{grid-template-columns:1fr}}
+    @media(max-width:480px){.hor-cal-wrap{padding:12px 8px}.hor-cal-titulo{font-size:13px}.hor-cal-num{font-size:11px}.hor-clase-item{padding:12px 14px}}
 
     /* ACORDEÓN DÍAS */
     .grupo-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 0 6px;border-bottom:2px solid currentColor;margin-bottom:10px}
@@ -628,77 +644,210 @@
   }
 
   // ── HORARIO ────────────────────────────────────────────────────
-  function mostrarDiaHorario(dia, btn) {
-    document.querySelectorAll('.hor-grid').forEach(g => g.classList.remove('visible'));
-    document.querySelectorAll('.hor-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('hor-' + dia).classList.add('visible');
-    btn.classList.add('active');
+  // ── HORARIO (calendario embebido) ─────────────────────────────
+  const HOR_FERIADOS = {
+    '2026-01-01':'Año Nuevo','2026-04-03':'Viernes Santo','2026-04-04':'Sábado Santo',
+    '2026-05-01':'Día del Trabajo','2026-05-21':'Glorias Navales','2026-06-29':'San Pedro y San Pablo',
+    '2026-07-16':'Virgen del Carmen','2026-08-15':'Asunción de la Virgen',
+    '2026-09-18':'Independencia Nacional','2026-09-19':'Glorias del Ejército',
+    '2026-10-12':'Encuentro de Dos Mundos','2026-10-31':'Iglesias Evangélicas',
+    '2026-11-01':'Todos los Santos','2026-12-08':'Inmaculada Concepción','2026-12-25':'Navidad',
+    '2027-01-01':'Año Nuevo','2027-03-26':'Viernes Santo','2027-03-27':'Sábado Santo',
+    '2027-05-01':'Día del Trabajo','2027-05-21':'Glorias Navales',
+  };
+  const HOR_MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  let horCalMes       = new Date().getMonth();
+  let horCalAnio      = new Date().getFullYear();
+  let horCalClases    = [];
+  let horCalDiaSel    = null;
+  let horCalFiltroVal = 'todas';
+
+  function horCalFechaLocal(ts) {
+    return new Date(ts).toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
+  }
+  function horCalHoraStr(ts) {
+    return new Date(ts).toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'America/Santiago' });
+  }
+  function horCalFechaLarga(isoDate) {
+    const d = new Date(isoDate + 'T12:00:00');
+    return d.toLocaleDateString('es-CL', { weekday:'long', day:'numeric', month:'long' });
+  }
+  function horCalDotCls(tipo) {
+    const t = (tipo||'').toLowerCase();
+    if (t.includes('vuela')||t.includes('pole')||t.includes('lira')||t.includes('aere')) return '#a183ff';
+    if (t.includes('muevete')||t.includes('baile')||t.includes('heels')) return '#fecb29';
+    if (t.includes('gym')||t.includes('fuerza')) return '#00c8d4';
+    return '#aaa';
   }
 
-  function cargarHorario() {
+  function horCalSetFiltro(modo) {
+    horCalFiltroVal = modo;
+    document.getElementById('hor-btn-todas')?.classList.toggle('active', modo === 'todas');
+    document.getElementById('hor-btn-mias')?.classList.toggle('active', modo === 'mias');
+    horCalCargarMes(horCalAnio, horCalMes);
+  }
+
+  async function horCalCargarMes(anio, mes) {
+    const inicio = new Date(anio, mes, 1).toISOString();
+    const fin    = new Date(anio, mes + 1, 0, 23, 59, 59).toISOString();
+    let q = sb.from('clases').select('*').gte('fecha_hora', inicio).lte('fecha_hora', fin).eq('cancelada', false).order('fecha_hora');
+    if (horCalFiltroVal === 'mias' && usuarioNombre) q = q.ilike('profesora', `%${usuarioNombre}%`);
+    const { data } = await q;
+    horCalClases = data || [];
+    horCalRenderCal(anio, mes);
+    if (horCalDiaSel) horCalMostrarDia(horCalDiaSel);
+  }
+
+  function horCalRenderCal(anio, mes) {
+    const tituloEl = document.getElementById('hor-cal-titulo');
+    if (!tituloEl) return;
+    tituloEl.textContent = `${HOR_MESES[mes]} ${anio}`;
+
+    const primerDia   = new Date(anio, mes, 1);
+    const ultimoDia   = new Date(anio, mes + 1, 0);
+    const startOffset = (primerDia.getDay() + 6) % 7;
+    const hoyStr      = new Date().toLocaleDateString('en-CA', { timeZone:'America/Santiago' });
+
+    const porDia = {};
+    horCalClases.forEach(c => {
+      const k = horCalFechaLocal(c.fecha_hora);
+      if (!porDia[k]) porDia[k] = [];
+      porDia[k].push(c);
+    });
+
+    const grid = document.getElementById('hor-cal-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    for (let i = 0; i < startOffset; i++) {
+      const el = document.createElement('div');
+      el.className = 'hor-cal-cell hor-vacio';
+      grid.appendChild(el);
+    }
+
+    for (let d = 1; d <= ultimoDia.getDate(); d++) {
+      const fechaStr  = `${anio}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const esFeriado = !!HOR_FERIADOS[fechaStr];
+      const esHoy     = fechaStr === hoyStr;
+      const esSel     = fechaStr === horCalDiaSel;
+      const clasesDia = porDia[fechaStr] || [];
+
+      const cell = document.createElement('div');
+      cell.className = 'hor-cal-cell' + (esFeriado?' hor-feriado':'') + (esHoy?' hor-hoy':'') + (esSel?' hor-sel':'');
+      cell.onclick = () => horCalSelDia(fechaStr);
+
+      const num = document.createElement('div');
+      num.className = 'hor-cal-num';
+      num.textContent = d;
+      cell.appendChild(num);
+
+      if (clasesDia.length) {
+        const dots = document.createElement('div');
+        dots.className = 'hor-cal-dots';
+        clasesDia.slice(0, 3).forEach(c => {
+          const dot = document.createElement('div');
+          dot.className = 'hor-cal-dot';
+          dot.style.background = horCalDotCls(c.tipo);
+          dots.appendChild(dot);
+        });
+        if (clasesDia.length > 3) {
+          const mas = document.createElement('div');
+          mas.style.cssText = 'font-size:7px;color:var(--gray);line-height:5px';
+          mas.textContent = `+${clasesDia.length-3}`;
+          dots.appendChild(mas);
+        }
+        cell.appendChild(dots);
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  function horCalSelDia(fechaStr) {
+    horCalDiaSel = fechaStr;
+    horCalRenderCal(horCalAnio, horCalMes);
+    horCalMostrarDia(fechaStr);
+  }
+
+  function horCalMostrarDia(fechaStr) {
+    const panel   = document.getElementById('hor-day-panel');
+    if (!panel) return;
+    const feriado = HOR_FERIADOS[fechaStr];
+    const clases  = horCalClases.filter(c => horCalFechaLocal(c.fecha_hora) === fechaStr);
+    const fechaLeg = horCalFechaLarga(fechaStr);
+
+    let html = `<div class="hor-day-header">
+      <div class="hor-day-fecha">${fechaLeg.charAt(0).toUpperCase()+fechaLeg.slice(1)}</div>
+      ${feriado ? `<div class="hor-feriado-banner">🎉 Feriado: ${feriado}</div>` : ''}
+    </div>`;
+
+    if (!clases.length) {
+      html += `<div class="hor-sin-clases">No hay clases programadas para este día.</div>`;
+    } else {
+      html += clases.map(c => {
+        const esMia  = esMiClase(c.profesora);
+        const cupoD  = c.cupo_disponible ?? 0;
+        const cupoM  = c.cupo_maximo ?? 15;
+        return `
+          <div class="hor-clase-item">
+            <div class="hor-clase-hora">${horCalHoraStr(c.fecha_hora)}</div>
+            <div class="hor-clase-info">
+              <div class="hor-clase-nombre">${c.nombre}${esMia?'<span class="hor-clase-mia">Mi clase</span>':''}</div>
+              <div class="hor-clase-meta">👩‍🏫 ${c.profesora} · ${c.duracion_minutos||60} min</div>
+              <div style="font-size:11px;color:var(--gray);margin-top:2px">${cupoD<=0?'Clase llena':cupoD<=3?`¡Solo ${cupoD} lugar${cupoD>1?'es':''}!`:`${cupoD}/${cupoM} lugares`}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+    panel.innerHTML = html;
+  }
+
+  async function cargarHorario() {
     const cont = document.getElementById('horario-contenido');
-    const sala = (cls, icon, nombre, clases) => `
-      <div class="hor-sala hor-sala-${cls}">
-        <div class="hor-sala-head"><span class="hor-sala-icon">${icon}</span><span class="hor-sala-nombre">${nombre}</span></div>
-        <div class="hor-clases">${clases.map(([h,n,p])=>`
-          <div class="hor-clase">
-            <span class="hor-hora">${h}</span>
-            <span class="hor-nombre">${n}</span>
-            <span class="hor-dot-c" style="background:${p==='v'?'#a183ff':p==='m'?'#fecb29':'#00c8d4'}"></span>
-          </div>`).join('')}
+    cont.innerHTML = `
+      <div class="hor-filtros">
+        <button class="hor-filtro-btn active" id="hor-btn-todas" onclick="horCalSetFiltro('todas')">Todas las clases</button>
+        <button class="hor-filtro-btn" id="hor-btn-mias" onclick="horCalSetFiltro('mias')">Solo mis clases</button>
+      </div>
+      <div class="hor-cal-layout">
+        <div class="hor-cal-wrap">
+          <div class="hor-cal-header">
+            <button class="hor-cal-nav" id="hor-cal-prev">‹</button>
+            <div class="hor-cal-titulo" id="hor-cal-titulo">—</div>
+            <button class="hor-cal-nav" id="hor-cal-next">›</button>
+          </div>
+          <div class="hor-cal-dias-hdr">
+            <div class="hor-cal-dia-lbl">Lun</div><div class="hor-cal-dia-lbl">Mar</div>
+            <div class="hor-cal-dia-lbl">Mié</div><div class="hor-cal-dia-lbl">Jue</div>
+            <div class="hor-cal-dia-lbl">Vie</div><div class="hor-cal-dia-lbl">Sáb</div>
+            <div class="hor-cal-dia-lbl">Dom</div>
+          </div>
+          <div class="hor-cal-grid" id="hor-cal-grid"></div>
+          <div class="hor-cal-legend">
+            <div class="hor-cal-legend-item"><div class="hor-cal-dot" style="background:#a183ff"></div> Vuela</div>
+            <div class="hor-cal-legend-item"><div class="hor-cal-dot" style="background:#fecb29"></div> Muévete</div>
+            <div class="hor-cal-legend-item"><div class="hor-cal-dot" style="background:#00c8d4"></div> Gym</div>
+          </div>
+        </div>
+        <div class="hor-day-panel" id="hor-day-panel">
+          <div class="hor-day-empty"><div class="icon">📅</div><p>Selecciona un día para<br>ver las clases</p></div>
         </div>
       </div>`;
 
-    cont.innerHTML = `
-      <div class="hor-leyenda">
-        <div class="hor-leyenda-item"><span class="hor-dot hor-dot-vuela"></span>Plan Vuela</div>
-        <div class="hor-leyenda-item"><span class="hor-dot hor-dot-muevete"></span>Plan Muévete</div>
-        <div class="hor-leyenda-item"><span class="hor-dot hor-dot-gym"></span>Gym</div>
-      </div>
-      <div class="hor-tabs">
-        <button class="hor-tab active" onclick="mostrarDiaHorario('lunes',this)">Lunes</button>
-        <button class="hor-tab" onclick="mostrarDiaHorario('martes',this)">Martes</button>
-        <button class="hor-tab" onclick="mostrarDiaHorario('miercoles',this)">Miércoles</button>
-        <button class="hor-tab" onclick="mostrarDiaHorario('jueves',this)">Jueves</button>
-        <button class="hor-tab" onclick="mostrarDiaHorario('viernes',this)">Viernes</button>
-        <button class="hor-tab" onclick="mostrarDiaHorario('sabado',this)">Sábado</button>
-      </div>
+    document.getElementById('hor-cal-prev').addEventListener('click', () => {
+      if (horCalMes === 0) { horCalMes = 11; horCalAnio--; } else horCalMes--;
+      horCalDiaSel = null;
+      document.getElementById('hor-day-panel').innerHTML = `<div class="hor-day-empty"><div class="icon">📅</div><p>Selecciona un día</p></div>`;
+      horCalCargarMes(horCalAnio, horCalMes);
+    });
+    document.getElementById('hor-cal-next').addEventListener('click', () => {
+      if (horCalMes === 11) { horCalMes = 0; horCalAnio++; } else horCalMes++;
+      horCalDiaSel = null;
+      document.getElementById('hor-day-panel').innerHTML = `<div class="hor-day-empty"><div class="icon">📅</div><p>Selecciona un día</p></div>`;
+      horCalCargarMes(horCalAnio, horCalMes);
+    });
 
-      <div class="hor-grid visible" id="hor-lunes"><div class="hor-salas">
-        ${sala('pelicano','🦤','Sala Pelícano',[['18:00','Pole Sport','v'],['19:00','Pole Sport','v'],['20:00','E. Funcional','v']])}
-        ${sala('pinguino','🐧','Sala Pingüino',[['18:20','Aerial Yoga','v'],['19:30','Pilates Zen','m'],['20:30','Dancehall','m']])}
-        ${sala('flamenco','🦩','Sala Flamenco — Gym',[['07:00','Apertura Gym','g'],['21:00','Cierre Gym','g']])}
-      </div></div>
-
-      <div class="hor-grid" id="hor-martes"><div class="hor-salas">
-        ${sala('pelicano','🦤','Sala Pelícano',[['11:00','Lira','v'],['18:00','Pole Sport','v'],['19:00','Lira','v'],['20:00','Handstand y Contorsión','m']])}
-        ${sala('pinguino','🐧','Sala Pingüino',[['18:30','K-POP','m'],['19:30','Hip Hop','m']])}
-        ${sala('flamenco','🦩','Sala Flamenco — Gym',[['07:00','Apertura Gym','g'],['21:00','Cierre Gym','g']])}
-      </div></div>
-
-      <div class="hor-grid" id="hor-miercoles"><div class="hor-salas">
-        ${sala('pelicano','🦤','Sala Pelícano',[['18:00','Pole Sport','v'],['19:00','Pole Sport','v'],['20:00','Pilates Zen','m']])}
-        ${sala('pinguino','🐧','Sala Pingüino',[['12:30','K-POP','m'],['14:00','Aerial Yoga','v'],['18:30','Girly','m'],['19:30','Reggaetón Extended','m']])}
-        ${sala('flamenco','🦩','Sala Flamenco — Gym',[['07:00','Apertura Gym','g'],['21:00','Cierre Gym','g']])}
-      </div></div>
-
-      <div class="hor-grid" id="hor-jueves"><div class="hor-salas">
-        ${sala('pelicano','🦤','Sala Pelícano',[['18:00','Lira','v'],['19:00','E. Funcional','v'],['20:00','Flexibilidad','m']])}
-        ${sala('pinguino','🐧','Sala Pingüino',[['12:30','Reggaeton Fem','m'],['18:30','K-POP','m'],['19:30','Hip Hop','m'],['20:30','Girly','m']])}
-        ${sala('flamenco','🦩','Sala Flamenco — Gym',[['07:00','Apertura Gym','g'],['21:00','Cierre Gym','g']])}
-      </div></div>
-
-      <div class="hor-grid" id="hor-viernes"><div class="hor-salas">
-        ${sala('pelicano','🦤','Sala Pelícano',[['17:00','Pilates Zen','m'],['18:00','Tabata','m'],['19:00','Pole Sport','v']])}
-        ${sala('pinguino','🐧','Sala Pingüino',[['17:00','Flexibilidad','m'],['18:20','Aerial Yoga','v'],['19:30','Reggaetón Extended','m']])}
-        ${sala('flamenco','🦩','Sala Flamenco — Gym',[['07:00','Apertura Gym','g'],['21:00','Cierre Gym','g']])}
-      </div></div>
-
-      <div class="hor-grid" id="hor-sabado"><div class="hor-salas">
-        ${sala('pelicano','🦤','Sala Pelícano',[['10:30','Lira','v'],['11:30','Pole Sport','v'],['12:30','Flexibilidad','m']])}
-        ${sala('pinguino','🐧','Sala Pingüino',[['12:30','Heels','m'],['14:00','Reggaetón Extended','m'],['15:30','K-POP','m']])}
-        ${sala('flamenco','🦩','Sala Flamenco — Gym',[['09:00','Apertura Gym','g'],['15:00','Cierre Gym','g']])}
-      </div></div>`;
+    await horCalCargarMes(horCalAnio, horCalMes);
   }
 
   // ── CLASES ─────────────────────────────────────────────────────
