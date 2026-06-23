@@ -169,9 +169,8 @@
     </div>
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-legend">
-      <div class="legend-item"><div class="dot dot-vuela"></div> Vuela</div>
-      <div class="legend-item"><div class="dot dot-muevete"></div> Muévete</div>
-      <div class="legend-item"><div class="dot dot-gym"></div> Gym</div>
+      <div class="legend-item"><div class="dot dot-vuela"></div> Plan Vuela</div>
+      <div class="legend-item"><div class="dot dot-muevete"></div> Plan Muévete</div>
       <div class="legend-item"><span style="font-size:9px;color:rgba(255,78,104,.5)">●</span> Feriado</div>
     </div>
   </div>
@@ -264,12 +263,13 @@ function fechaLarga(isoDate){
   const d = new Date(isoDate+'T12:00:00');
   return d.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
 }
-function tipoDot(tipo){
-  const t=(tipo||'').toLowerCase();
-  if(t.includes('vuela')||t.includes('pole')||t.includes('lira')||t.includes('aere')) return 'dot-vuela';
+function tipoDot(c){
+  const plan=(c.restriccion_plan||'').toLowerCase();
+  if(plan==='muevete') return 'dot-muevete';
+  if(plan==='vuela')   return 'dot-vuela';
+  const t=((c.tipo||'')+' '+(c.nombre||'')).toLowerCase();
   if(t.includes('muevete')||t.includes('baile')||t.includes('heels')||t.includes('funky')) return 'dot-muevete';
-  if(t.includes('gym')||t.includes('fuerza')) return 'dot-gym';
-  return 'dot-otro';
+  return 'dot-vuela';
 }
 function toast(msg,tipo='ok'){
   const t=document.getElementById('toast');
@@ -358,7 +358,7 @@ async function cargarMes(anio, mes){
   const inicio = new Date(anio, mes, 1).toISOString();
   const fin    = new Date(anio, mes+1, 0, 23, 59, 59).toISOString();
 
-  let query = sb.from('clases').select('*').gte('fecha_hora',inicio).lte('fecha_hora',fin).eq('cancelada',false).order('fecha_hora');
+  let query = sb.from('clases').select('*').gte('fecha_hora',inicio).lte('fecha_hora',fin).eq('cancelada',false).not('nombre','ilike','Gym %').order('fecha_hora');
 
   // Aplicar filtros según rol
   if(userRol==='profesora' && filtroProfe==='mias' && nombreUsuario){
@@ -434,7 +434,7 @@ function renderCalendario(anio, mes){
       const max=Math.min(clasesHoy.length,3);
       for(let i=0;i<max;i++){
         const dot=document.createElement('div');
-        dot.className=`dot ${tipoDot(clasesHoy[i].tipo)}`;
+        dot.className=`dot ${tipoDot(clasesHoy[i])}`;
         dotsWrap.appendChild(dot);
       }
       if(clasesHoy.length>3){

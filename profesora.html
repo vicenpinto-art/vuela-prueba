@@ -104,42 +104,50 @@
     .hor-filtros{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
     .hor-filtro-btn{padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;color:var(--gray)}
     .hor-filtro-btn.active{background:var(--coral);color:#fff;border-color:var(--coral)}
-    .hor-cal-layout{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start}
-    .hor-cal-wrap{background:#fff;border-radius:20px;border:1px solid var(--border);padding:20px;position:sticky;top:85px}
-    .hor-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-    .hor-cal-nav{background:none;border:none;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--gray);transition:background .2s;font-family:'Outfit',sans-serif}
+    .hor-cal-layout{display:grid;grid-template-columns:minmax(0,280px) minmax(0,1fr);gap:16px;align-items:start}
+    .hor-cal-wrap{background:#fff;border-radius:16px;border:1px solid var(--border);padding:16px;overflow:hidden;min-width:0}
+    .hor-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .hor-cal-nav{background:none;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--gray);transition:background .2s;font-family:'Outfit',sans-serif;flex-shrink:0}
     .hor-cal-nav:hover{background:var(--light)}
-    .hor-cal-titulo{font-size:15px;font-weight:700}
-    .hor-cal-dias-hdr{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
-    .hor-cal-dia-lbl{text-align:center;font-size:10px;font-weight:700;color:var(--gray);padding:3px 0;text-transform:uppercase;letter-spacing:.5px}
-    .hor-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-    .hor-cal-cell{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px;position:relative;transition:background .15s}
+    .hor-cal-titulo{font-size:14px;font-weight:700;text-align:center;flex:1}
+    .hor-cal-dias-hdr{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;width:100%}
+    .hor-cal-dia-lbl{text-align:center;font-size:9px;font-weight:700;color:var(--gray);padding:2px 0;text-transform:uppercase}
+    .hor-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;width:100%}
+    .hor-cal-cell{aspect-ratio:1;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:1px;overflow:hidden;transition:background .15s;min-width:0}
     .hor-cal-cell:hover:not(.hor-vacio):not(.hor-otro-mes){background:var(--light)}
     .hor-cal-cell.hor-vacio,.hor-cal-cell.hor-otro-mes{opacity:.2;cursor:default}
-    .hor-cal-cell.hor-hoy .hor-cal-num{background:linear-gradient(135deg,var(--coral),var(--magenta));color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
-    .hor-cal-cell.hor-sel{background:rgba(255,78,104,.08);border:1.5px solid var(--coral)}
+    .hor-cal-cell.hor-hoy .hor-cal-num{background:linear-gradient(135deg,var(--coral),var(--magenta));color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px}
+    .hor-cal-cell.hor-sel{background:rgba(255,78,104,.08);outline:1.5px solid var(--coral)}
     .hor-cal-cell.hor-feriado{background:rgba(255,78,104,.04)}
-    .hor-cal-num{font-size:12px;font-weight:600;line-height:1;margin-bottom:2px}
-    .hor-cal-dots{display:flex;gap:2px;justify-content:center;flex-wrap:wrap;max-width:26px}
-    .hor-cal-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
-    .hor-cal-legend{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;padding-top:14px;border-top:1px solid var(--border)}
-    .hor-cal-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray)}
-    .hor-day-panel{background:#fff;border-radius:20px;border:1px solid var(--border);overflow:hidden;min-height:300px}
-    .hor-day-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;color:var(--gray)}
-    .hor-day-empty .icon{font-size:40px;margin-bottom:12px}
-    .hor-day-header{padding:20px 24px;border-bottom:1px solid var(--border)}
-    .hor-day-fecha{font-family:'Dancing Script',cursive;font-size:24px;color:var(--dark);margin-bottom:4px}
+    .hor-cal-num{font-size:11px;font-weight:600;line-height:1;margin-bottom:1px}
+    .hor-cal-dots{display:flex;gap:2px;justify-content:center;flex-wrap:wrap;max-width:20px}
+    .hor-cal-dot{width:3px;height:3px;border-radius:50%;flex-shrink:0}
+    .hor-cal-legend{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--border)}
+    .hor-cal-legend-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--gray)}
+    .hor-day-panel{background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;min-height:260px;min-width:0}
+    .hor-day-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;color:var(--gray)}
+    .hor-day-empty .icon{font-size:36px;margin-bottom:10px}
+    .hor-day-header{padding:16px 20px;border-bottom:1px solid var(--border)}
+    .hor-day-fecha{font-family:'Dancing Script',cursive;font-size:22px;color:var(--dark);margin-bottom:4px}
     .hor-feriado-banner{background:rgba(255,78,104,.08);border:1px solid rgba(255,78,104,.2);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--coral);margin-top:8px}
-    .hor-clase-item{display:flex;align-items:center;gap:12px;padding:14px 24px;border-bottom:1px solid var(--border);transition:background .15s}
+    .hor-clase-item{display:flex;align-items:flex-start;gap:10px;padding:12px 20px;border-bottom:1px solid var(--border)}
     .hor-clase-item:last-child{border-bottom:none}
-    .hor-clase-hora{font-size:14px;font-weight:800;color:var(--coral);min-width:50px}
+    .hor-clase-hora{font-size:13px;font-weight:800;color:var(--coral);min-width:44px;flex-shrink:0;padding-top:2px}
     .hor-clase-info{flex:1;min-width:0}
-    .hor-clase-nombre{font-size:14px;font-weight:700;margin-bottom:2px}
-    .hor-clase-meta{font-size:12px;color:var(--gray)}
-    .hor-clase-mia{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(255,78,104,.1);color:var(--coral);margin-left:8px;vertical-align:middle}
-    .hor-sin-clases{padding:28px 24px;text-align:center;color:var(--gray);font-size:14px}
-    @media(max-width:900px){.hor-cal-layout{grid-template-columns:1fr}}
-    @media(max-width:480px){.hor-cal-wrap{padding:12px 8px}.hor-cal-titulo{font-size:13px}.hor-cal-num{font-size:11px}.hor-clase-item{padding:12px 14px}}
+    .hor-clase-nombre{font-size:13px;font-weight:700;margin-bottom:2px}
+    .hor-clase-meta{font-size:11px;color:var(--gray)}
+    .hor-clase-mia{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(255,78,104,.1);color:var(--coral);margin-left:6px;vertical-align:middle}
+    .hor-sin-clases{padding:24px 20px;text-align:center;color:var(--gray);font-size:13px}
+    @media(max-width:860px){.hor-cal-layout{grid-template-columns:1fr}}
+    @media(max-width:480px){
+      .hor-cal-wrap{padding:10px 8px}
+      .hor-cal-titulo{font-size:13px}
+      .hor-cal-num{font-size:10px}
+      .hor-cal-cell.hor-hoy .hor-cal-num{width:18px;height:18px;font-size:10px}
+      .hor-cal-dia-lbl{font-size:8px}
+      .hor-clase-item{padding:10px 14px;gap:8px}
+      .hor-day-fecha{font-size:18px}
+    }
 
     /* ACORDEÓN DÍAS */
     .grupo-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 0 6px;border-bottom:2px solid currentColor;margin-bottom:10px}
@@ -673,12 +681,13 @@
     const d = new Date(isoDate + 'T12:00:00');
     return d.toLocaleDateString('es-CL', { weekday:'long', day:'numeric', month:'long' });
   }
-  function horCalDotCls(tipo) {
-    const t = (tipo||'').toLowerCase();
-    if (t.includes('vuela')||t.includes('pole')||t.includes('lira')||t.includes('aere')) return '#a183ff';
-    if (t.includes('muevete')||t.includes('baile')||t.includes('heels')) return '#fecb29';
-    if (t.includes('gym')||t.includes('fuerza')) return '#00c8d4';
-    return '#aaa';
+  function horCalDotCls(c) {
+    const plan = (c.restriccion_plan || '').toLowerCase();
+    if (plan === 'muevete') return '#fecb29';
+    if (plan === 'vuela')   return '#a183ff';
+    const t = ((c.tipo || '') + ' ' + (c.nombre || '')).toLowerCase();
+    if (t.includes('muevete') || t.includes('baile') || t.includes('heels')) return '#fecb29';
+    return '#a183ff';
   }
 
   function horCalSetFiltro(modo) {
@@ -691,7 +700,7 @@
   async function horCalCargarMes(anio, mes) {
     const inicio = new Date(anio, mes, 1).toISOString();
     const fin    = new Date(anio, mes + 1, 0, 23, 59, 59).toISOString();
-    let q = sb.from('clases').select('*').gte('fecha_hora', inicio).lte('fecha_hora', fin).eq('cancelada', false).order('fecha_hora');
+    let q = sb.from('clases').select('*').gte('fecha_hora', inicio).lte('fecha_hora', fin).eq('cancelada', false).not('nombre', 'ilike', 'Gym %').order('fecha_hora');
     if (horCalFiltroVal === 'mias' && usuarioNombre) q = q.ilike('profesora', `%${usuarioNombre}%`);
     const { data } = await q;
     horCalClases = data || [];
@@ -748,7 +757,7 @@
         clasesDia.slice(0, 3).forEach(c => {
           const dot = document.createElement('div');
           dot.className = 'hor-cal-dot';
-          dot.style.background = horCalDotCls(c.tipo);
+          dot.style.background = horCalDotCls(c);
           dots.appendChild(dot);
         });
         if (clasesDia.length > 3) {
@@ -824,9 +833,8 @@
           </div>
           <div class="hor-cal-grid" id="hor-cal-grid"></div>
           <div class="hor-cal-legend">
-            <div class="hor-cal-legend-item"><div class="hor-cal-dot" style="background:#a183ff"></div> Vuela</div>
-            <div class="hor-cal-legend-item"><div class="hor-cal-dot" style="background:#fecb29"></div> Muévete</div>
-            <div class="hor-cal-legend-item"><div class="hor-cal-dot" style="background:#00c8d4"></div> Gym</div>
+            <div class="hor-cal-legend-item"><div class="hor-cal-dot" style="background:#a183ff"></div> Plan Vuela</div>
+            <div class="hor-cal-legend-item"><div class="hor-cal-dot" style="background:#fecb29"></div> Plan Muévete</div>
           </div>
         </div>
         <div class="hor-day-panel" id="hor-day-panel">
