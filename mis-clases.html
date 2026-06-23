@@ -69,6 +69,12 @@
       .stat-number{font-size:20px}
     }
 </style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ff4e68">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Vuela">
 </head>
 <body>
 
@@ -247,5 +253,6 @@ function renderizar() {
 init();
 </script>
 
+  <script>if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js");</script>
 </body>
 </html>

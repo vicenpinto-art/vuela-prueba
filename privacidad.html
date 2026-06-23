@@ -44,6 +44,12 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="nav.js"></script>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ff4e68">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Vuela">
 </head>
 <body>
 
@@ -117,5 +123,6 @@
   <p style="font-size:12px; color:#888;">© 2026 Espacio Vuela Limitada — RUT 76.843.889-7 &nbsp;·&nbsp; Dr. Luis Middleton 1638, Providencia &nbsp;·&nbsp; <a href="terminos.html" style="color:#ff4e68; text-decoration:none;">Términos y condiciones</a> &nbsp;·&nbsp; <a href="privacidad.html" style="color:#ff4e68; text-decoration:none;">Política de privacidad</a></p>
 </footer>
 
+  <script>if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js");</script>
 </body>
 </html>
