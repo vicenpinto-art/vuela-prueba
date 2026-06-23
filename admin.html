@@ -2433,13 +2433,16 @@ async function verHorariosParaAsignar(profId, profNombre, force = false) {
       <span style="font-size:11px;color:var(--gray);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(pNom)}</span>
       ${esMio
         ? '<span style="font-size:11px;color:#007a82;font-weight:700;white-space:nowrap">✓ Asignada</span>'
-        : `<button class="btn btn-primary btn-sm" onclick="asignarHorario('${h.id}','${profId}','${profNombre.replace(/'/g,"\\'")}')">Asignar</button>`}
+        : `<button class="btn btn-primary btn-sm" onclick="asignarHorario('${h.id}','${profId}','${profNombre.replace(/'/g,"\\'")}','${pNom.replace(/'/g,"\\'")}')">Asignar</button>`}
     </div>`;
   }).join('');
 }
 
-async function asignarHorario(horarioId, profId, profNombre) {
-  if (!confirm(`¿Asignar a ${profNombre} en este horario?\nSe actualizarán también todas las clases futuras de ese horario.`)) return;
+async function asignarHorario(horarioId, profId, profNombre, profAnterior = 'Sin asignar') {
+  const msg = profAnterior && profAnterior !== 'Sin asignar'
+    ? `¿Reemplazar a ${profAnterior} por ${profNombre} en este horario?\nSe actualizarán también todas las clases futuras.`
+    : `¿Asignar a ${profNombre} en este horario?\nSe actualizarán también todas las clases futuras.`;
+  if (!confirm(msg)) return;
   const ahora = new Date().toISOString();
   const { error } = await sb.from('horarios').update({ profesora_id: profId, profesora: profNombre }).eq('id', horarioId);
   if (error) { toast('Error al asignar', 'error'); return; }
@@ -2480,12 +2483,16 @@ async function verClasesParaAsignar(profId, profNombre, force = false) {
       <span style="font-size:11px;color:var(--gray);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.profesora||'Sin asignar')}</span>
       ${esMio
         ? '<span style="font-size:11px;color:#007a82;font-weight:700;white-space:nowrap">✓ Asignada</span>'
-        : `<button class="btn btn-primary btn-sm" onclick="asignarClaseInd('${c.id}','${profId}','${profNombre.replace(/'/g,"\\'")}')">Asignar</button>`}
+        : `<button class="btn btn-primary btn-sm" onclick="asignarClaseInd('${c.id}','${profId}','${profNombre.replace(/'/g,"\\'")}','${(c.profesora||'Sin asignar').replace(/'/g,"\\'")}')">Asignar</button>`}
     </div>`;
   }).join('');
 }
 
-async function asignarClaseInd(claseId, profId, profNombre) {
+async function asignarClaseInd(claseId, profId, profNombre, profAnterior = 'Sin asignar') {
+  const msg = profAnterior && profAnterior !== 'Sin asignar'
+    ? `¿Reemplazar a ${profAnterior} por ${profNombre} en esta clase?`
+    : `¿Asignar a ${profNombre} en esta clase?`;
+  if (!confirm(msg)) return;
   const { error } = await sb.from('clases').update({ profesora_id: profId, profesora: profNombre }).eq('id', claseId);
   if (error) { toast('Error al asignar', 'error'); return; }
   toast('✓ Clase asignada a ' + profNombre);
