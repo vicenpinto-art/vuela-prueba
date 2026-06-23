@@ -994,24 +994,42 @@
       return `
         <div class="clase-chip${asistenciaClaseSelId === c.id ? ' sel' : ''}" onclick="seleccionarClaseAsistencia('${c.id}')">
           <div class="chip-hora">${horaStr(c.fecha_hora)}</div>
-          <div class="chip-nombre">${c.nombre}</div>
-          <div class="chip-meta">📅 ${fechaCorta(c.fecha_hora)} · 👩‍🏫 ${c.profesora}${esMia ? ' ✓' : ''}</div>
+          <div class="chip-nombre">${c.nombre}${esMia ? ' <span style="font-size:10px;color:var(--coral);font-weight:700">✓ Mi clase</span>' : ''}</div>
+          <div class="chip-meta">👩‍🏫 ${c.profesora}</div>
         </div>`;
     };
 
-    const planes = clasesAsistencia.filter(c => !c.nombre?.startsWith('Gym '));
-    const gym    = clasesAsistencia.filter(c =>  c.nombre?.startsWith('Gym '));
-    let html = '';
+    // Agrupar por día (hora local de Santiago)
+    const porDia = {}; const diaLabels = {};
+    clasesAsistencia.forEach(c => {
+      const key = new Date(c.fecha_hora).toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
+      if (!porDia[key]) {
+        porDia[key] = [];
+        const f = new Date(c.fecha_hora);
+        diaLabels[key] = f.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Santiago' });
+      }
+      porDia[key].push(c);
+    });
 
-    if (planes.length) {
-      html += `<div class="asis-grupo-label" style="color:var(--coral)">Clases de planes</div>`;
-      html += planes.map(chipHtml).join('');
-    }
-    if (gym.length) {
-      html += `<div class="asis-grupo-label" style="color:#007a82;${planes.length ? 'margin-top:14px' : ''}">Gym</div>`;
-      html += gym.map(chipHtml).join('');
-    }
-    cont.innerHTML = html;
+    const dias = Object.keys(porDia).sort();
+    cont.innerHTML = dias.map((key, idx) => {
+      const id   = 'as' + key.replace(/-/g, '');
+      const open = idx === 0;
+      const total = porDia[key].length;
+      const mias  = porDia[key].filter(c => esMiClase(c.profesora)).length;
+      const meta  = mias ? `${total} clase${total !== 1 ? 's' : ''} · ${mias} mía${mias !== 1 ? 's' : ''}` : `${total} clase${total !== 1 ? 's' : ''}`;
+      return `
+        <button id="dia-btn-${id}" class="dia-toggle-btn${open ? ' open' : ''}" onclick="toggleDiaClases('${id}')">
+          <span class="dia-toggle-label">${diaLabels[key].charAt(0).toUpperCase() + diaLabels[key].slice(1)}</span>
+          <span class="dia-toggle-meta">
+            <span class="dia-toggle-count">${meta}</span>
+            <span class="dia-toggle-arrow">▼</span>
+          </span>
+        </button>
+        <div id="dia-list-${id}" class="dia-clases-list${open ? ' open' : ''}">
+          ${porDia[key].map(chipHtml).join('')}
+        </div>`;
+    }).join('');
   }
 
   async function seleccionarClaseAsistencia(claseId) {
