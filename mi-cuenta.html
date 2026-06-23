@@ -284,11 +284,6 @@
         </div>
       </div>
 
-      <div class="card" id="card-gym-booking" style="display:none">
-        <a href="agendar.html" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:18px;background:linear-gradient(135deg,#007a82,#00b4c4);border-radius:14px;color:#fff;font-weight:700;font-size:15px;text-decoration:none;letter-spacing:.3px">
-          🏋️ Reserva tu hora de gym
-        </a>
-      </div>
     </div>
 
     <div class="col-right">
@@ -308,7 +303,8 @@
         <div class="card-header">
           <div class="card-titulo">Próximas clases</div>
         </div>
-        <a href="calendario.html" class="btn-primary btn-full" style="margin-bottom:14px;">Agenda tu clase →</a>
+        <a href="calendario.html" class="btn-primary btn-full" style="margin-bottom:10px;">Agenda tu clase →</a>
+        <a href="agendar.html" id="btn-gym-booking" class="btn-primary btn-full" style="display:none;margin-bottom:14px;background:linear-gradient(135deg,#007a82,#00b4c4);">🏋️ Reserva tu hora de gym</a>
         <div id="clases-contenido">
           <div class="skeleton" style="height:60px; margin-bottom:10px; border-radius:12px;"></div>
           <div class="skeleton" style="height:60px; border-radius:12px;"></div>
@@ -685,8 +681,8 @@
     const tieneGym = validas.some(c =>
       ['gym','addon_gym'].includes(c.planes?.tipo) || c.incluye_gym || c.addon_gym
     );
-    const cardGym = document.getElementById('card-gym-booking');
-    if (cardGym) cardGym.style.display = tieneGym ? 'block' : 'none';
+    const btnGym = document.getElementById('btn-gym-booking');
+    if (btnGym) btnGym.style.display = tieneGym ? 'block' : 'none';
 
     // compraIdActiva = plan principal (no clase_prueba ni gym), o el primero si solo hay esos
     const principal = validas.find(c => !c.clase_prueba && !['gym','addon_gym'].includes(c.planes?.tipo)) || validas[0];
