@@ -503,6 +503,7 @@
 <script>
   const SUPABASE_URL = 'https://mcmdsntnbgsmdraeitgt.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_dBivnUgV8EeaoSH9EJVQPQ_d692xRQq';
+  const SERVER_URL   = 'https://espacio-vuela-pagos.onrender.com';
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -970,8 +971,13 @@
     const nuevoSobrecupo = sobrecupoActual + agregar;
     const nuevoCupoDisp  = cupoDispActual  + agregar;
     const nuevoCupoMax   = cupoMaxActual   + agregar;
-    const { error } = await sb.from('clases').update({ sobrecupo: nuevoSobrecupo, cupo_disponible: nuevoCupoDisp, cupo_maximo: nuevoCupoMax }).eq('id', claseId);
-    if (error) { toast('Error al guardar sobrecupo', 'error'); return; }
+    const { data: { session } } = await sb.auth.getSession();
+    const resp = await fetch(`${SERVER_URL}/actualizar-sobrecupo`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ clase_id: claseId, sobrecupo: nuevoSobrecupo, cupo_disponible: nuevoCupoDisp, cupo_maximo: nuevoCupoMax })
+    });
+    if (!resp.ok) { toast('Error al guardar sobrecupo', 'error'); return; }
     toast(`✓ Sobrecupo actualizado: ${nuevoSobrecupo} en total`);
     input.value = '';
     delete loaded['clases'];

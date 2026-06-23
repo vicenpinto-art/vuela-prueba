@@ -692,6 +692,28 @@ app.post('/registrar-pago-manual', async (req, res) => {
   res.json({ ok: true });
 });
 
+// ── SOBRECUPO (PROFESORA/ADMIN) ───────────────────────────────
+app.post('/actualizar-sobrecupo', async (req, res) => {
+  const user = await verificarJWT(req);
+  if (!user) return res.status(401).json({ error: 'No autenticado' });
+
+  const { data: u } = await sb.from('usuarios').select('rol').eq('id', user.id).maybeSingle();
+  if (!['profesora', 'admin'].includes(u?.rol)) return res.status(403).json({ error: 'No autorizado' });
+
+  const { clase_id, sobrecupo, cupo_disponible, cupo_maximo } = req.body;
+  if (!clase_id) return res.status(400).json({ error: 'Falta clase_id' });
+
+  // Verificar que la clase pertenece a esta profesora (salvo admin)
+  if (u.rol === 'profesora') {
+    const { data: clase } = await sb.from('clases').select('profesora_id').eq('id', clase_id).maybeSingle();
+    if (clase?.profesora_id !== user.id) return res.status(403).json({ error: 'No es tu clase' });
+  }
+
+  const { error } = await sb.from('clases').update({ sobrecupo, cupo_disponible, cupo_maximo }).eq('id', clase_id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+});
+
 // ── ELIMINAR PAGO HISTÓRICO (ADMIN) ──────────────────────────
 app.delete('/eliminar-pago/:id', async (req, res) => {
   const userAuth = await verificarAdmin(req);
