@@ -159,8 +159,8 @@
       .tabla .btn{padding:4px 8px;font-size:11px}
 
       /* Stat cards */
-      .stat-card{padding:14px}
-      .stat-card h2,.stat-val{font-size:22px}
+      .stat-card{padding:12px}
+      .stat-card .val{font-size:22px}
 
       /* Modales */
       .modal{padding:20px 16px;max-height:90vh;overflow-y:auto;margin:16px}
@@ -174,12 +174,7 @@
       /* Sección horarios tabla */
       #tabla-horarios .tabla{min-width:600px}
       #tabla-clases .tabla{min-width:500px}
-      .clases-dos-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
-      @media(max-width:900px){.clases-dos-col{grid-template-columns:1fr}}
       #tabla-alumnas .tabla{min-width:400px}
-
-      /* Ingresos */
-      .ing-resumen{flex-direction:column}
 
       /* Botones de acción */
       .modal-btns{flex-direction:column}
@@ -188,9 +183,6 @@
       /* Admin-main-menu-btn */
       .admin-mobile-menu-btn{width:100%;justify-content:center;margin-bottom:12px}
 
-      /* Disciplinas: colapsar las 2 columnas a 1 en móvil */
-      #disc-grid{grid-template-columns:1fr !important}
-
       /* Roles y Disciplinas: tabla con scroll horizontal propio */
       #tabla-roles .tabla{min-width:420px}
       #sec-disciplinas .disc-row{flex-wrap:wrap;gap:4px}
@@ -198,7 +190,7 @@
     }
     @media(max-width:480px){
       .stats-grid{grid-template-columns:1fr 1fr;gap:8px}
-      .stat-card{padding:12px}
+      .stat-card{padding:10px}
       .admin-main{padding:10px}
       .card{padding:12px}
       .tabla{font-size:11px}
@@ -250,6 +242,35 @@
     .perfil-msg.ok{color:#007a82}
     .perfil-msg.error{color:var(--coral)}
     @media(max-width:600px){.perfil-grid{grid-template-columns:1fr}}
+
+    /* ── LAYOUTS HORIZONTALES ── */
+    /* Resumen: stats a la izquierda, clases de hoy a la derecha */
+    .resumen-layout{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+    .resumen-layout .stats-grid{grid-template-columns:1fr 1fr;margin-bottom:0;width:260px}
+    @media(max-width:700px){
+      .resumen-layout{grid-template-columns:1fr}
+      .resumen-layout .stats-grid{width:100%;grid-template-columns:repeat(4,1fr)}
+    }
+    @media(max-width:480px){
+      .resumen-layout .stats-grid{grid-template-columns:1fr 1fr}
+    }
+
+    /* Clases: siempre 2 columnas hasta 560px */
+    .clases-dos-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+    @media(max-width:560px){.clases-dos-col{grid-template-columns:1fr}}
+
+    /* Rutinas: grid de 2 columnas */
+    #lista-rutinas{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    #lista-rutinas > div{margin-bottom:0}
+    @media(max-width:650px){#lista-rutinas{grid-template-columns:1fr}}
+
+    /* Disciplinas: mantener 2 columnas hasta 500px */
+    #disc-grid{grid-template-columns:1fr 1fr}
+    @media(max-width:500px){#disc-grid{grid-template-columns:1fr}}
+
+    /* Ingresos stats: siempre en fila */
+    #sec-ingresos .stats-grid{grid-template-columns:repeat(3,1fr) !important}
+    @media(max-width:480px){#sec-ingresos .stats-grid{grid-template-columns:1fr 1fr !important}}
 </style>
 </head>
 <body>
@@ -299,15 +320,17 @@
     <div class="section active" id="sec-resumen">
       <div class="section-title">Resumen</div>
       <div class="section-sub" id="resumen-fecha">Cargando...</div>
-      <div class="stats-grid">
-        <div class="stat-card"><div class="val" id="st-alumnas">—</div><div class="lbl">Alumnas activas</div></div>
-        <div class="stat-card"><div class="val" id="st-planes">—</div><div class="lbl">Planes activos</div></div>
-        <div class="stat-card"><div class="val" id="st-hoy">—</div><div class="lbl">Clases hoy</div></div>
-        <div class="stat-card"><div class="val" id="st-inscritas">—</div><div class="lbl">Inscripciones hoy</div></div>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">Clases de hoy</div></div>
-        <div id="resumen-clases-hoy"><div class="sk" style="height:50px;margin-bottom:8px"></div><div class="sk" style="height:50px"></div></div>
+      <div class="resumen-layout">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="val" id="st-alumnas">—</div><div class="lbl">Alumnas activas</div></div>
+          <div class="stat-card"><div class="val" id="st-planes">—</div><div class="lbl">Planes activos</div></div>
+          <div class="stat-card"><div class="val" id="st-hoy">—</div><div class="lbl">Clases hoy</div></div>
+          <div class="stat-card"><div class="val" id="st-inscritas">—</div><div class="lbl">Inscritas hoy</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Clases de hoy</div></div>
+          <div id="resumen-clases-hoy"><div class="sk" style="height:50px;margin-bottom:8px"></div><div class="sk" style="height:50px"></div></div>
+        </div>
       </div>
     </div>
 
@@ -2690,6 +2713,7 @@ function renderDonutChartAdmin() {
     },
     options: {
       responsive: true,
+      aspectRatio: 1.6,
       cutout: '62%',
       plugins: {
         legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10, boxWidth: 12 } },
