@@ -337,6 +337,10 @@
       mostrar('El teléfono de emergencia debe tener exactamente 9 dígitos.', 'error');
       return;
     }
+    if (emergLocal && telCode + telLocal === emergCode + emergLocal) {
+      mostrar('El teléfono de emergencia no puede ser igual al teléfono personal.', 'error');
+      return;
+    }
     if (password !== password2) {
       mostrar('Las contraseñas no coinciden.', 'error');
       return;
