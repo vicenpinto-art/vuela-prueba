@@ -1135,6 +1135,7 @@ async function eliminarClasesAntiguas(){
 
   const partes = [delClases&&'clases',delInscrip&&'inscripciones',delAsis&&'asistencias'].filter(Boolean).join(', ');
   if(!confirm(`¿Eliminar ${partes} de ${mantClasesIds.length} clases anteriores a la fecha?\n\nEsta acción no se puede deshacer.`)) return;
+  if(!confirm(`⚠️ ADVERTENCIA FINAL\n\nVas a eliminar permanentemente ${mantClasesIds.length} registros (${partes}).\n\nEsta acción NO se puede deshacer.\n\n¿Estás COMPLETAMENTE segura?`)) return;
 
   toast('Eliminando… puede tardar unos segundos');
   for(let i=0;i<mantClasesIds.length;i+=100){
