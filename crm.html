@@ -104,7 +104,7 @@
 
 <div class="topbar">
   <a href="admin.html">← Admin</a>
-  <h1>CRM · Importar Alumnas</h1>
+  <h1>CRM</h1>
 </div>
 
 <div class="container">
@@ -202,6 +202,77 @@
           <tbody id="resultado-body"></tbody>
         </table>
       </div>
+    </div>
+  </div>
+
+  <!-- ── SEPARADOR ── -->
+  <div style="border-top:2px solid var(--border);margin:8px 0 32px"></div>
+
+  <!-- ── IMPORTAR PAGOS HISTÓRICOS ── -->
+  <div id="pago-paso-upload">
+    <div class="card">
+      <h2>Importar Pagos Históricos</h2>
+      <p class="subtitle">
+        Sube el CSV de "Reporte Pagos y Membresías" exportado de BoxMagic.<br>
+        Los datos se guardan como historial — no modifican planes activos.
+      </p>
+      <div class="drop-zone" id="pago-drop-zone" onclick="document.getElementById('pago-file-input').click()">
+        <div class="dz-icon">💳</div>
+        <div class="dz-title">Arrastra el CSV de pagos aquí</div>
+        <div class="dz-hint">o haz clic para seleccionar · separador punto y coma (;)</div>
+      </div>
+      <input type="file" id="pago-file-input" accept=".csv,.txt">
+    </div>
+  </div>
+
+  <div id="pago-paso-preview" style="display:none">
+    <div class="card">
+      <h2>Vista previa — Pagos</h2>
+      <p class="subtitle">Revisa los datos antes de importar.</p>
+      <div class="stats-grid" id="pago-stats-preview"></div>
+      <div class="tabla-wrap" style="margin-bottom:16px">
+        <table>
+          <thead><tr><th>Nombre</th><th>Plan</th><th>Normalizado</th><th>Monto</th><th>Fecha</th></tr></thead>
+          <tbody id="pago-preview-body"></tbody>
+        </table>
+      </div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:20px">
+        Mostrando 10 primeras de <strong id="pago-total-txt">0</strong> filas.
+      </p>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="iniciarImportacionPagos()">
+          Importar <span id="pago-btn-total">0</span> pagos →
+        </button>
+        <button class="btn btn-secondary" onclick="reiniciarPagos()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pago-paso-progreso" style="display:none">
+    <div class="card">
+      <h2>Importando pagos…</h2>
+      <p class="subtitle">No cierres esta pestaña hasta que termine.</p>
+      <div class="progress-track"><div class="progress-fill" id="pago-progress-fill"></div></div>
+      <div class="progress-label" id="pago-progress-label">Iniciando…</div>
+      <div class="stats-grid" style="margin-top:20px">
+        <div class="stat-box verde"><div class="num" id="pago-live-ins">0</div><div class="lbl">Insertadas</div></div>
+        <div class="stat-box naranja"><div class="num" id="pago-live-dup">0</div><div class="lbl">Duplicadas</div></div>
+        <div class="stat-box rojo"><div class="num" id="pago-live-err">0</div><div class="lbl">Errores</div></div>
+      </div>
+      <div style="margin-top:20px">
+        <button class="btn btn-secondary" onclick="cancelarPagos()" id="pago-btn-cancelar">Detener</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pago-paso-resultados" style="display:none">
+    <div class="card">
+      <h2>Importación de pagos completada</h2>
+      <div class="stats-grid" id="pago-stats-final"></div>
+      <div class="btn-row" style="margin-bottom:20px;margin-top:16px">
+        <button class="btn btn-secondary" onclick="reiniciarPagos()">Importar otro archivo</button>
+      </div>
+      <div class="alerta alerta-warn" id="pago-alerta-errores" style="display:none"></div>
     </div>
   </div>
 
@@ -494,6 +565,191 @@
 
   setupDropZone();
   init();
+
+  // ══════════════════════════════════════════════════════════════
+  // IMPORTAR PAGOS HISTÓRICOS
+  // ══════════════════════════════════════════════════════════════
+  const PAGO_BATCH = 200;
+  let pagosParsed  = [];
+  let pagoCancelado = false;
+  let pagoAbortCtrl = null;
+
+  function parsearCSVPagos(texto) {
+    const lineas = texto.split(/\r?\n/).filter(l => l.trim());
+    const datos  = lineas.slice(1); // skip encabezado
+    return datos.map(l => {
+      const cols = l.split(';');
+      return {
+        id:        cols[0]?.trim(),
+        nombre:    cols[1]?.trim(),
+        apellido:  cols[2]?.trim(),
+        rut:       cols[3]?.trim(),
+        plan:      cols[4]?.trim(),
+        monto:     cols[5]?.trim(),
+        estado:    cols[6]?.trim(),
+        tipo_pago: cols[7]?.trim(),
+        fecha_pago:cols[8]?.trim(),
+        vendedor:  cols[9]?.trim(),
+      };
+    }).filter(r => r.plan && r.fecha_pago);
+  }
+
+  document.getElementById('pago-file-input').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => mostrarPreviewPagos(ev.target.result);
+    reader.readAsText(file, 'UTF-8');
+  });
+
+  const pagoDropZone = document.getElementById('pago-drop-zone');
+  pagoDropZone.addEventListener('dragover',  e => { e.preventDefault(); pagoDropZone.classList.add('drag-over'); });
+  pagoDropZone.addEventListener('dragleave', () => pagoDropZone.classList.remove('drag-over'));
+  pagoDropZone.addEventListener('drop', e => {
+    e.preventDefault(); pagoDropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => mostrarPreviewPagos(ev.target.result);
+    reader.readAsText(file, 'UTF-8');
+  });
+
+  function mostrarPreviewPagos(texto) {
+    pagosParsed = parsearCSVPagos(texto);
+    if (!pagosParsed.length) { alert('No se encontraron filas válidas en el archivo.'); return; }
+
+    document.getElementById('pago-paso-upload').style.display   = 'none';
+    document.getElementById('pago-paso-preview').style.display  = 'block';
+    document.getElementById('pago-total-txt').textContent = pagosParsed.length.toLocaleString('es-CL');
+    document.getElementById('pago-btn-total').textContent = pagosParsed.length.toLocaleString('es-CL');
+
+    const fechas = pagosParsed.map(r => r.fecha_pago).filter(Boolean).sort();
+    document.getElementById('pago-stats-preview').innerHTML = `
+      <div class="stat-box azul"><div class="num">${pagosParsed.length.toLocaleString('es-CL')}</div><div class="lbl">Total filas</div></div>
+      <div class="stat-box verde"><div class="num">${fechas[0] || '—'}</div><div class="lbl">Primer pago</div></div>
+      <div class="stat-box verde"><div class="num">${fechas[fechas.length-1] || '—'}</div><div class="lbl">Último pago</div></div>
+    `;
+
+    document.getElementById('pago-preview-body').innerHTML = pagosParsed.slice(0, 10).map(r => `
+      <tr>
+        <td>${r.nombre || ''} ${r.apellido || ''}</td>
+        <td style="font-size:11px;color:var(--gray)">${r.plan || '—'}</td>
+        <td style="font-size:11px;color:#3b82f6">${normalizarPlanJS(r.plan)}</td>
+        <td>$${Number(r.monto||0).toLocaleString('es-CL')}</td>
+        <td style="font-size:12px">${r.fecha_pago || '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  const PLAN_MAP_JS = {
+    'VUELA 4 CLASES AL MES':'Vuela 4 clases','VUELA 4 CLASES AL MES + GYM':'Vuela 4 clases + Gym',
+    'VUELA 6 CLASES AL MES':'Vuela 6 clases','VUELA 6 CLASES + GYM':'Vuela 6 clases + Gym',
+    'VUELA 8 CLASES AL MES':'Vuela 8 clases','VUELA 8 CLASES AL MES + GYM':'Vuela 8 clases + Gym',
+    'VUELA 12 CLASES AL MES':'Vuela 12 clases','VUELA 12 CLASES + GYM':'Vuela 12 clases + Gym',
+    'CLASES VUELA CON GYM ILIMITADAS':'Vuela Ilimitado + Gym',
+    'CLASES (SIN GYM) VUELA ILIMITADAS':'Vuela Ilimitado','FULL PASS + GYM':'Vuela Ilimitado + Gym',
+    'TRIMESTRAL (SIN GYM) VUELA CLASES ILIMITADAS':'Vuela Ilimitado Trimestral',
+    'TRIMESTRAL VUELA CON GYM CLASES ILIMITADAS':'Vuela Ilimitado Trimestral + Gym',
+    'MUEVETE 4 CLASES AL MES':'Muévete 4 clases','MUEVETE 4 CLASES AL MES + GYM':'Muévete 4 clases + Gym',
+    'MUEVETE 6 CLASES AL MES':'Muévete 6 clases','MUEVETE 6 CLASES + GYM':'Muévete 6 clases + Gym',
+    'MUEVETE 8 CLASES AL MES':'Muévete 8 clases','MUEVETE 8 CLASES AL MES + GYM':'Muévete 8 clases + Gym',
+    'MUEVETE 12 CLASES AL MES':'Muévete 12 clases','MUEVETE 12 CLASES AL MES + GYM':'Muévete 12 clases + Gym',
+    'CLASES MUEVETE CON GYM ILIMITADAS':'Muévete Ilimitado + Gym',
+    'CLASES (SIN GYM) MUEVETE ILIMITADAS':'Muévete Ilimitado',
+    'TRIMESTRAL (SIN GYM) MUEVETE CLASES ILIMITADAS':'Muévete Ilimitado Trimestral',
+    'TRIMESTRAL MUEVETE CON GYM CLASES ILIMITADAS':'Muévete Ilimitado Trimestral + Gym',
+    'GYM MENSUAL':'Gym Mensual','GYM TRIMESTRAL':'Gym Trimestral',
+    'GYM SEMESTRAL':'Gym Semestral','GYM PLAN ANUAL':'Gym Anual','PROMO GYM ANUAL':'Promo Gym Anual',
+    'ACCESO DIARIO GYM':'Pase Diario Gym','INGRESO GYM':'Ingreso Gym',
+    'CLASE SUELTA':'Clase Suelta','CLASE SUELTA PLAN VUELA':'Clase Suelta Vuela',
+    'CLASE SUELTA PLAN MUÉVETE':'Clase Suelta Muévete','CLASE SUELTA PLAN MUEVETE':'Clase Suelta Muévete',
+    'Clase de Prueba':'Clase de Prueba','CLASE DE PRUEBA VUELA':'Clase de Prueba Vuela',
+    'CLASE DE PRUEBA MUEVETE':'Clase de Prueba Muévete',
+  };
+  function normalizarPlanJS(plan) { return PLAN_MAP_JS[plan?.trim()] || plan || '—'; }
+
+  async function iniciarImportacionPagos() {
+    if (!pagosParsed.length) return;
+    pagoCancelado = false;
+    document.getElementById('pago-paso-preview').style.display  = 'none';
+    document.getElementById('pago-paso-progreso').style.display = 'block';
+
+    let insertadas = 0, duplicadas = 0, errores = 0;
+    const total = pagosParsed.length;
+
+    for (let i = 0; i < total; i += PAGO_BATCH) {
+      if (pagoCancelado) break;
+      const batch = pagosParsed.slice(i, i + PAGO_BATCH);
+      const pct   = Math.round(((i + batch.length) / total) * 100);
+
+      document.getElementById('pago-progress-fill').style.width  = pct + '%';
+      document.getElementById('pago-progress-label').textContent =
+        `${Math.min(i + PAGO_BATCH, total).toLocaleString('es-CL')} de ${total.toLocaleString('es-CL')} procesadas… (${pct}%)`;
+
+      pagoAbortCtrl = new AbortController();
+      try {
+        const resp = await fetch(`${SERVER_URL}/importar-pagos-historico`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
+          body: JSON.stringify({ filas: batch }),
+          signal: pagoAbortCtrl.signal,
+        });
+        const result = await resp.json();
+        if (resp.ok) {
+          insertadas += result.insertadas || 0;
+          duplicadas += result.duplicadas || 0;
+          errores    += result.errores    || 0;
+        } else {
+          errores += batch.length;
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') break;
+        errores += batch.length;
+      }
+
+      document.getElementById('pago-live-ins').textContent = insertadas;
+      document.getElementById('pago-live-dup').textContent = duplicadas;
+      document.getElementById('pago-live-err').textContent = errores;
+    }
+
+    document.getElementById('pago-progress-fill').style.width  = pagoCancelado ? document.getElementById('pago-progress-fill').style.width : '100%';
+    document.getElementById('pago-progress-label').textContent = pagoCancelado ? 'Detenido.' : 'Completado.';
+    mostrarResultadosPagos(insertadas, duplicadas, errores);
+  }
+
+  function cancelarPagos() {
+    pagoCancelado = true;
+    if (pagoAbortCtrl) pagoAbortCtrl.abort();
+    document.getElementById('pago-btn-cancelar').disabled    = true;
+    document.getElementById('pago-btn-cancelar').textContent = 'Deteniendo…';
+  }
+
+  function mostrarResultadosPagos(insertadas, duplicadas, errores) {
+    document.getElementById('pago-paso-progreso').style.display   = 'none';
+    document.getElementById('pago-paso-resultados').style.display = 'block';
+    document.getElementById('pago-stats-final').innerHTML = `
+      <div class="stat-box verde"><div class="num">${insertadas.toLocaleString('es-CL')}</div><div class="lbl">✅ Insertadas</div></div>
+      <div class="stat-box naranja"><div class="num">${duplicadas.toLocaleString('es-CL')}</div><div class="lbl">⚠️ Duplicadas</div></div>
+      <div class="stat-box rojo"><div class="num">${errores.toLocaleString('es-CL')}</div><div class="lbl">❌ Errores</div></div>
+    `;
+    if (errores > 0) {
+      const el = document.getElementById('pago-alerta-errores');
+      el.style.display = 'block';
+      el.textContent   = `⚠️ ${errores} filas tuvieron errores. Intenta importar el mismo archivo de nuevo — las duplicadas se saltan automáticamente.`;
+    }
+  }
+
+  function reiniciarPagos() {
+    pagosParsed = [];
+    document.getElementById('pago-file-input').value = '';
+    document.getElementById('pago-paso-upload').style.display     = 'block';
+    document.getElementById('pago-paso-preview').style.display    = 'none';
+    document.getElementById('pago-paso-progreso').style.display   = 'none';
+    document.getElementById('pago-paso-resultados').style.display = 'none';
+    document.getElementById('pago-alerta-errores').style.display  = 'none';
+    document.getElementById('pago-btn-cancelar').disabled         = false;
+    document.getElementById('pago-btn-cancelar').textContent      = 'Detener';
+  }
 </script>
 </body>
 </html>

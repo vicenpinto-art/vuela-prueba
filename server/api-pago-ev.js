@@ -583,6 +583,163 @@ app.post('/importar-alumnas', async (req, res) => {
   res.json({ creadas, saltadas, errores, reporte });
 });
 
+// ── IMPORTAR PAGOS HISTÓRICOS BOXMAGIC ───────────────────────
+const PLAN_MAP = {
+  // VUELA
+  'VUELA 4 CLASES AL MES':                        { nombre: 'Vuela 4 clases',                      categoria: 'vuela_4',           gym: false, meses: 1 },
+  'VUELA 4 CLASES AL MES + GYM':                  { nombre: 'Vuela 4 clases',                      categoria: 'vuela_4',           gym: true,  meses: 1 },
+  'VUELA 6 CLASES AL MES':                        { nombre: 'Vuela 6 clases',                      categoria: 'vuela_6',           gym: false, meses: 1 },
+  'VUELA 6 CLASES + GYM':                         { nombre: 'Vuela 6 clases',                      categoria: 'vuela_6',           gym: true,  meses: 1 },
+  'VUELA 8 CLASES AL MES':                        { nombre: 'Vuela 8 clases',                      categoria: 'vuela_8',           gym: false, meses: 1 },
+  'VUELA 8 CLASES AL MES + GYM':                  { nombre: 'Vuela 8 clases',                      categoria: 'vuela_8',           gym: true,  meses: 1 },
+  'VUELA 12 CLASES AL MES':                       { nombre: 'Vuela 12 clases',                     categoria: 'vuela_12',          gym: false, meses: 1 },
+  'VUELA 12 CLASES + GYM':                        { nombre: 'Vuela 12 clases',                     categoria: 'vuela_12',          gym: true,  meses: 1 },
+  'CLASES VUELA CON GYM ILIMITADAS':              { nombre: 'Vuela Ilimitado',                     categoria: 'vuela_ilimitado',   gym: true,  meses: 1 },
+  'CLASES (SIN GYM) VUELA ILIMITADAS':            { nombre: 'Vuela Ilimitado',                     categoria: 'vuela_ilimitado',   gym: false, meses: 1 },
+  'FULL PASS + GYM':                              { nombre: 'Vuela Ilimitado',                     categoria: 'vuela_ilimitado',   gym: true,  meses: 1 },
+  'TRIMESTRAL (SIN GYM) VUELA CLASES ILIMITADAS': { nombre: 'Vuela Ilimitado Trimestral',          categoria: 'vuela_ilimitado',   gym: false, meses: 3 },
+  'TRIMESTRAL VUELA CON GYM CLASES ILIMITADAS':   { nombre: 'Vuela Ilimitado Trimestral',          categoria: 'vuela_ilimitado',   gym: true,  meses: 3 },
+  'PROMO VUELA CYBER 2023':                       { nombre: 'Promo Vuela Cyber 2023',              categoria: 'vuela_8',           gym: false, meses: 1 },
+  // MUÉVETE
+  'MUEVETE 4 CLASES AL MES':                      { nombre: 'Muévete 4 clases',                    categoria: 'muevete_4',         gym: false, meses: 1 },
+  'MUEVETE 4 CLASES AL MES + GYM':                { nombre: 'Muévete 4 clases',                    categoria: 'muevete_4',         gym: true,  meses: 1 },
+  'MUEVETE 4 CLASES (MAYOR/DUOC)':                { nombre: 'Muévete 4 clases (Mayor/Duoc)',        categoria: 'muevete_4',         gym: false, meses: 1 },
+  'MUEVETE 6 CLASES AL MES':                      { nombre: 'Muévete 6 clases',                    categoria: 'muevete_6',         gym: false, meses: 1 },
+  'MUEVETE 6 CLASES + GYM':                       { nombre: 'Muévete 6 clases',                    categoria: 'muevete_6',         gym: true,  meses: 1 },
+  'MUEVETE 8 CLASES AL MES':                      { nombre: 'Muévete 8 clases',                    categoria: 'muevete_8',         gym: false, meses: 1 },
+  'MUEVETE 8 CLASES AL MES + GYM':                { nombre: 'Muévete 8 clases',                    categoria: 'muevete_8',         gym: true,  meses: 1 },
+  'MUEVETE 12 CLASES AL MES':                     { nombre: 'Muévete 12 clases',                   categoria: 'muevete_12',        gym: false, meses: 1 },
+  'MUEVETE 12 CLASES AL MES + GYM':               { nombre: 'Muévete 12 clases',                   categoria: 'muevete_12',        gym: true,  meses: 1 },
+  'CLASES MUEVETE CON GYM ILIMITADAS':            { nombre: 'Muévete Ilimitado',                   categoria: 'muevete_ilimitado', gym: true,  meses: 1 },
+  'CLASES (SIN GYM) MUEVETE ILIMITADAS':          { nombre: 'Muévete Ilimitado',                   categoria: 'muevete_ilimitado', gym: false, meses: 1 },
+  'TRIMESTRAL (SIN GYM) MUEVETE CLASES ILIMITADAS': { nombre: 'Muévete Ilimitado Trimestral',      categoria: 'muevete_ilimitado', gym: false, meses: 3 },
+  'TRIMESTRAL MUEVETE CON GYM CLASES ILIMITADAS': { nombre: 'Muévete Ilimitado Trimestral',        categoria: 'muevete_ilimitado', gym: true,  meses: 3 },
+  // ARMA TU PLAN
+  'ARMA TU PLAN 12 clases mensual':               { nombre: 'Arma tu plan 12 clases',              categoria: 'arma_tu_plan',      gym: false, meses: 1 },
+  'ARMA TU PLAN + GYM - 12 Clases al mes':        { nombre: 'Arma tu plan 12 clases',              categoria: 'arma_tu_plan',      gym: true,  meses: 1 },
+  'A TU RITMO - 4 Clases al mes + acceso al GYM - SEMESTRAL': { nombre: 'A tu ritmo 4 clases + Gym semestral', categoria: 'arma_tu_plan', gym: true, meses: 6 },
+  // CLASES SUELTAS
+  'CLASE SUELTA':                                 { nombre: 'Clase Suelta',                        categoria: 'clase_suelta',      gym: false, meses: 1 },
+  'CLASE SUELTA PLAN VUELA':                      { nombre: 'Clase Suelta Vuela',                  categoria: 'clase_suelta_vuela',gym: false, meses: 1 },
+  'CLASE SUELTA PLAN MUÉVETE':                    { nombre: 'Clase Suelta Muévete',                categoria: 'clase_suelta_muevete', gym: false, meses: 1 },
+  'CLASE SUELTA PLAN MUEVETE':                    { nombre: 'Clase Suelta Muévete',                categoria: 'clase_suelta_muevete', gym: false, meses: 1 },
+  // CLASES DE PRUEBA
+  'Clase de Prueba':                              { nombre: 'Clase de Prueba',                     categoria: 'clase_prueba',      gym: false, meses: 1 },
+  'CLASE DE PRUEBA VUELA':                        { nombre: 'Clase de Prueba Vuela',               categoria: 'clase_prueba_vuela',gym: false, meses: 1 },
+  'CLASE DE PRUEBA MUEVETE':                      { nombre: 'Clase de Prueba Muévete',             categoria: 'clase_prueba_muevete', gym: false, meses: 1 },
+  'Clase gratis':                                 { nombre: 'Clase gratis',                        categoria: 'clase_prueba',      gym: false, meses: 1 },
+  'Clase prueba Regalo':                          { nombre: 'Clase de Prueba (regalo)',             categoria: 'clase_prueba',      gym: false, meses: 1 },
+  'SEMANA ILIMITRADA DE PRUEBA VUELA (SIN GYM)':  { nombre: 'Semana Ilimitada de Prueba Vuela',    categoria: 'semana_prueba_vuela', gym: false, meses: 1 },
+  // GYM
+  'GYM MENSUAL':                                  { nombre: 'Gym Mensual',                         categoria: 'gym',               gym: false, meses: 1 },
+  'Gym Mensual (Duoc/Mayor)':                     { nombre: 'Gym Mensual (Mayor/Duoc)',             categoria: 'gym',               gym: false, meses: 1 },
+  'GYM TRIMESTRAL':                               { nombre: 'Gym Trimestral',                      categoria: 'gym',               gym: false, meses: 3 },
+  'GYM SEMESTRAL':                                { nombre: 'Gym Semestral',                       categoria: 'gym',               gym: false, meses: 6 },
+  'GYM Semestral cuota 1':                        { nombre: 'Gym Semestral (cuota 1)',              categoria: 'gym',               gym: false, meses: 6 },
+  'GYM PLAN ANUAL':                               { nombre: 'Gym Anual',                           categoria: 'gym',               gym: false, meses: 12 },
+  'PROMO GYM ANUAL':                              { nombre: 'Promo Gym Anual',                     categoria: 'gym',               gym: false, meses: 12 },
+  'INGRESO GYM':                                  { nombre: 'Ingreso Gym',                         categoria: 'gym',               gym: false, meses: 1 },
+  'ACCESO DIARIO GYM':                            { nombre: 'Pase Diario Gym',                     categoria: 'gym',               gym: false, meses: 1 },
+  // POLE
+  'POLE SPORT 4 clases al mes':                   { nombre: 'Pole Sport 4 clases',                 categoria: 'pole',              gym: false, meses: 1 },
+  'POLE SPORT 8 Clases por mes':                  { nombre: 'Pole Sport 8 clases',                 categoria: 'pole',              gym: false, meses: 1 },
+  'POLE SPORT 8 CLASES':                          { nombre: 'Pole Sport 8 clases',                 categoria: 'pole',              gym: false, meses: 1 },
+  'POLE SPORT + GYM - 4 Clases al mes':           { nombre: 'Pole Sport 4 clases',                 categoria: 'pole',              gym: true,  meses: 1 },
+  'POLE SPORT - 8 Clases al Mes + GYM':           { nombre: 'Pole Sport 8 clases',                 categoria: 'pole',              gym: true,  meses: 1 },
+  'Diferido 4 Clases Pole':                       { nombre: 'Pole Sport 4 clases (diferido)',       categoria: 'pole',              gym: false, meses: 1 },
+  // AERIAL
+  'AERIAL YOGA 4 Clases al mes':                  { nombre: 'Aerial Yoga 4 clases',                categoria: 'aerial',            gym: false, meses: 1 },
+  'AERIAL YOGA 8 Clases al mes':                  { nombre: 'Aerial Yoga 8 clases',                categoria: 'aerial',            gym: false, meses: 1 },
+  'AERIAL YOGA + GYM - 4 Clases al mes':          { nombre: 'Aerial Yoga 4 clases',                categoria: 'aerial',            gym: true,  meses: 1 },
+  // KICKBOXING
+  'KICK BOXING 4 Clases al Mes':                  { nombre: 'Kick Boxing 4 clases',                categoria: 'kickboxing',        gym: false, meses: 1 },
+  // K-POP
+  'K-POP 4 Clases al mes':                        { nombre: 'K-Pop 4 clases',                      categoria: 'kpop',              gym: false, meses: 1 },
+  'K-POP 8 clases por mes':                       { nombre: 'K-Pop 8 clases',                      categoria: 'kpop',              gym: false, meses: 1 },
+  // PERSONAL TRAINER
+  'PERSONAL TRAINER - Pack 4 clases al mes':      { nombre: 'Personal Trainer 4 clases',           categoria: 'personal_trainer',  gym: false, meses: 1 },
+  'PERSONAL TRAINER - PACK 8 CLASES':             { nombre: 'Personal Trainer 8 clases',           categoria: 'personal_trainer',  gym: false, meses: 1 },
+  'PERSONAL TRAINER - 3 MESES':                   { nombre: 'Personal Trainer 3 meses',            categoria: 'personal_trainer',  gym: false, meses: 3 },
+  // ASESORÍA
+  'DISEÑO DE RUTINA 1 SESION':                    { nombre: 'Diseño de rutina 1 sesión',            categoria: 'asesoria',          gym: false, meses: 1 },
+  '2 SESIONES DISEÑO DE RUTINA':                  { nombre: 'Diseño de rutina 2 sesiones',          categoria: 'asesoria',          gym: false, meses: 1 },
+  'DISEÑO DE RUTINA 3 SESIONES':                  { nombre: 'Diseño de rutina 3 sesiones',          categoria: 'asesoria',          gym: false, meses: 1 },
+  '4 DISEÑOS DE RUTINA':                          { nombre: 'Diseño de rutina 4 sesiones',          categoria: 'asesoria',          gym: false, meses: 1 },
+  'DISEÑO DE RUTINA 5 SESIONES':                  { nombre: 'Diseño de rutina 5 sesiones',          categoria: 'asesoria',          gym: false, meses: 1 },
+  // TALLERES
+  'TALLER INTRODUCCIÓN A HEELS':                  { nombre: 'Taller Introducción a Heels',          categoria: 'taller',            gym: false, meses: 1 },
+  'TALLER BALLET PARA ADULTAS':                   { nombre: 'Taller Ballet para Adultas',           categoria: 'taller',            gym: false, meses: 1 },
+  'TALLER ENTRENAMIENTO PARA VOLAR':              { nombre: 'Taller Entrenamiento para Volar',      categoria: 'taller',            gym: false, meses: 1 },
+  'TALLER DE CUECA':                              { nombre: 'Taller de Cueca',                      categoria: 'taller',            gym: false, meses: 1 },
+  'TALLER FUSIÓN URBANA':                         { nombre: 'Taller Fusión Urbana',                 categoria: 'taller',            gym: false, meses: 1 },
+  'TALLER DE HIP HOP':                            { nombre: 'Taller de Hip Hop',                    categoria: 'taller',            gym: false, meses: 1 },
+  'DIVA URBANA':                                  { nombre: 'Diva Urbana',                          categoria: 'taller',            gym: false, meses: 1 },
+  'D-U Street & girly':                           { nombre: 'D-U Street & Girly',                   categoria: 'taller',            gym: false, meses: 1 },
+  // OTRO
+  'Plan de Profe':                                { nombre: 'Plan de Profe',                        categoria: 'otro',              gym: false, meses: 1 },
+  'Toma de Hora para Usuario':                    { nombre: 'Toma de hora',                         categoria: 'otro',              gym: false, meses: 1 },
+};
+
+function normalizarPlan(planOriginal) {
+  const key = planOriginal?.trim();
+  return PLAN_MAP[key] || { nombre: key, categoria: 'otro', gym: false, meses: 1 };
+}
+
+function parsearFecha(str) {
+  if (!str) return null;
+  const [d, m, y] = str.trim().split('-');
+  if (!d || !m || !y) return null;
+  return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+}
+
+app.post('/importar-pagos-historico', async (req, res) => {
+  const userAuth = await verificarJWT(req);
+  if (!userAuth) return res.status(401).json({ error: 'No autenticado' });
+  if (!process.env.ADMIN_EMAIL || userAuth.email !== process.env.ADMIN_EMAIL)
+    return res.status(403).json({ error: 'No autorizado' });
+
+  const { filas } = req.body;
+  if (!Array.isArray(filas) || filas.length === 0)
+    return res.status(400).json({ error: 'Sin filas' });
+
+  let insertadas = 0, duplicadas = 0, errores = 0;
+  const errDetalle = [];
+
+  for (const fila of filas) {
+    const planInfo = normalizarPlan(fila.plan);
+    const fechaPago = parsearFecha(fila.fecha_pago);
+    const monto = parseFloat(fila.monto) || 0;
+
+    const { error } = await sb.from('pagos_historico').insert({
+      boxmagic_id:    fila.id?.trim() || null,
+      nombre:         fila.nombre?.trim() || null,
+      apellido:       fila.apellido?.trim() || null,
+      rut:            fila.rut?.trim() || null,
+      plan_original:  fila.plan?.trim() || null,
+      plan_nombre:    planInfo.nombre,
+      plan_categoria: planInfo.categoria,
+      incluye_gym:    planInfo.gym,
+      duracion_meses: planInfo.meses,
+      monto,
+      estado:         fila.estado?.trim() || null,
+      tipo_pago:      fila.tipo_pago?.trim() || null,
+      fecha_pago:     fechaPago,
+      vendedor:       fila.vendedor?.trim() || null,
+    });
+
+    if (!error) {
+      insertadas++;
+    } else if (error.code === '23505') {
+      duplicadas++;
+    } else {
+      errores++;
+      errDetalle.push(`${fila.nombre} ${fila.apellido} (${fila.plan}): ${error.message}`);
+    }
+  }
+
+  res.json({ insertadas, duplicadas, errores, errDetalle });
+});
+
 // ── MANEJO DE ERRORES GLOBAL ──────────────────────────────────
 app.use((err, req, res, next) => {
   console.error('Error no controlado:', err);
