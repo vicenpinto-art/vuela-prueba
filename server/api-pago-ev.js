@@ -195,6 +195,19 @@ app.post('/crear-preferencia', limiterPreferencia, async (req, res) => {
     }
   }
 
+  // Bloquear planes regulares si la usuaria no tiene matrícula ni clase de prueba
+  const planRequiereAcceso = !['clase_prueba', 'matricula', 'addon_gym', 'boost'].includes(plan.tipo);
+  if (planRequiereAcceso && !incluye_matricula) {
+    const { data: acceso } = await sb
+      .from('usuarios')
+      .select('matricula_pagada, clase_prueba_tomada')
+      .eq('id', usuario_id)
+      .maybeSingle();
+    if (!acceso?.matricula_pagada && !acceso?.clase_prueba_tomada) {
+      return res.status(403).json({ error: 'Debes pagar la matrícula o tomar una clase de prueba antes de contratar un plan.' });
+    }
+  }
+
   const planMatricula = planesDB.find(p => p.tipo === 'matricula');
   const planAddon     = planesDB.find(p => p.tipo === 'addon_gym');
 

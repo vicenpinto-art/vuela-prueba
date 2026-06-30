@@ -617,7 +617,6 @@
 <!-- MODAL: MATRÍCULA -->
 <div class="modal-overlay" id="modal-matricula">
   <div class="modal">
-    <button class="modal-close" onclick="cerrarModal('modal-matricula')">✕</button>
     <h2>Una cosa antes de continuar</h2>
     <div class="modal-sub">Como es tu primera vez en Espacio Vuela, necesitas elegir una de estas opciones para comenzar:</div>
     <div class="opciones-matricula">
@@ -987,7 +986,7 @@
   }
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', e => {
-      if (e.target === overlay) cerrarModal(overlay.id);
+      if (e.target === overlay && overlay.id !== 'modal-matricula') cerrarModal(overlay.id);
     });
   });
 
