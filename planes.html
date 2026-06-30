@@ -713,6 +713,7 @@
   let planSeleccionado = null;
   let incluyeMatricula = false;
   let incluyeAddon    = false;
+  let incluyePrueba   = null;   // plan de clase_prueba cuando se compra junto al plan principal
   let usuarioDatos    = null;
   let sesionActiva    = null;
 
@@ -848,6 +849,7 @@
     planSeleccionado = todosLosPlanes.find(p => String(p.id) === String(planId));
     incluyeMatricula = false;
     incluyeAddon    = false;
+    incluyePrueba   = null;
 
     if (!planSeleccionado) return;
 
@@ -906,13 +908,22 @@
   }
 
   function seleccionarPrueba(planId) {
-    const plan = todosLosPlanes.find(p => String(p.id) === String(planId));
-    if (!plan) return;
-    planSeleccionado = plan;
+    const prueba = todosLosPlanes.find(p => String(p.id) === String(planId));
+    if (!prueba) return;
+    incluyePrueba    = prueba;   // el plan original sigue siendo planSeleccionado
     incluyeMatricula = false;
     incluyeAddon     = false;
     cerrarModal('modal-matricula');
     abrirModalResumen();
+  }
+
+  function quitarPlanDelCarrito() {
+    // La alumna quiere solo la clase de prueba sin el plan original
+    planSeleccionado = incluyePrueba;
+    incluyePrueba    = null;
+    incluyeAddon     = false;
+    document.getElementById('addon-wrap').style.display = 'none';
+    actualizarResumen();
   }
 
   function abrirModalResumen() {
@@ -949,8 +960,17 @@
     let items = [];
     let total = 0;
 
-    items.push({ nombre: plan.nombre, precio: plan.precio });
-    total += plan.precio;
+    if (incluyePrueba) {
+      // Clase de prueba (requerida, no se puede quitar)
+      items.push({ nombre: incluyePrueba.nombre, precio: incluyePrueba.precio, etiqueta: 'Clase de prueba' });
+      total += incluyePrueba.precio;
+      // Plan original (opcional, se puede quitar)
+      items.push({ nombre: plan.nombre, precio: plan.precio, removible: true });
+      total += plan.precio;
+    } else {
+      items.push({ nombre: plan.nombre, precio: plan.precio });
+      total += plan.precio;
+    }
 
     if (incluyeMatricula) {
       items.push({ nombre: 'Matrícula Espacio Vuela', precio: 12000 });
@@ -964,8 +984,14 @@
 
     document.getElementById('resumen-items').innerHTML = items.map(item => `
       <div class="resumen-item">
-        <span class="item-nombre">${item.nombre}</span>
-        <span class="item-precio">${formatPrecio(item.precio)}</span>
+        <div style="display:flex;align-items:center;gap:6px;min-width:0">
+          <span class="item-nombre" style="min-width:0">${item.nombre}</span>
+          ${item.etiqueta ? `<span style="font-size:10px;background:#e8f7f8;color:#007a82;border-radius:6px;padding:2px 6px;font-weight:700;white-space:nowrap;flex-shrink:0">${item.etiqueta}</span>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <span class="item-precio">${formatPrecio(item.precio)}</span>
+          ${item.removible ? `<button onclick="quitarPlanDelCarrito()" title="Quitar del carrito" style="background:none;border:1.5px solid rgba(0,0,0,0.18);border-radius:6px;cursor:pointer;color:#999;font-size:11px;padding:2px 7px;line-height:1.4;font-family:'Outfit',sans-serif">✕</button>` : ''}
+        </div>
       </div>
     `).join('');
 
@@ -993,7 +1019,8 @@
           usuario_email: usuarioDatos.email,
           usuario_nombre: `${usuarioDatos.nombre || ''} ${usuarioDatos.apellido || ''}`.trim(),
           incluye_matricula: incluyeMatricula,
-          incluye_addon: incluyeAddon
+          incluye_addon: incluyeAddon,
+          incluye_prueba_id: incluyePrueba?.id || null
         })
       });
 

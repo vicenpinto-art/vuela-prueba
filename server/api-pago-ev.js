@@ -84,7 +84,8 @@ async function verificarAdmin(req) {
 // ── CREAR PREFERENCIA ─────────────────────────────────────────
 app.post('/crear-preferencia', limiterPreferencia, async (req, res) => {
   const { plan_id, usuario_id, usuario_email, usuario_nombre,
-          incluye_matricula, incluye_addon, boost, compra_id } = req.body;
+          incluye_matricula, incluye_addon, boost, compra_id,
+          incluye_prueba_id } = req.body;
 
   // Verificar que el JWT pertenece al usuario que hace la solicitud
   const userAuth = await verificarJWT(req);
@@ -196,8 +197,9 @@ app.post('/crear-preferencia', limiterPreferencia, async (req, res) => {
   }
 
   // Bloquear planes regulares si la usuaria no tiene matrícula ni clase de prueba
+  // (se permite cuando viene con incluye_matricula o incluye_prueba_id en la misma compra)
   const planRequiereAcceso = !['clase_prueba', 'matricula', 'addon_gym', 'boost'].includes(plan.tipo);
-  if (planRequiereAcceso && !incluye_matricula) {
+  if (planRequiereAcceso && !incluye_matricula && !incluye_prueba_id) {
     const { data: acceso } = await sb
       .from('usuarios')
       .select('matricula_pagada, clase_prueba_tomada')
@@ -205,6 +207,15 @@ app.post('/crear-preferencia', limiterPreferencia, async (req, res) => {
       .maybeSingle();
     if (!acceso?.matricula_pagada && !acceso?.clase_prueba_tomada) {
       return res.status(403).json({ error: 'Debes pagar la matrícula o tomar una clase de prueba antes de contratar un plan.' });
+    }
+  }
+
+  // Validar que incluye_prueba_id sea realmente un plan de tipo clase_prueba
+  let planPrueba = null;
+  if (incluye_prueba_id) {
+    planPrueba = planesDB.find(p => String(p.id) === String(incluye_prueba_id) && p.tipo === 'clase_prueba');
+    if (!planPrueba) {
+      return res.status(400).json({ error: 'Clase de prueba no válida.' });
     }
   }
 
@@ -225,6 +236,11 @@ app.post('/crear-preferencia', limiterPreferencia, async (req, res) => {
   if (incluye_addon && planAddon) {
     items.push({ id: 'addon_gym', title: planAddon.nombre, quantity: 1, unit_price: planAddon.precio, currency_id: 'CLP' });
     monto_total += planAddon.precio;
+  }
+
+  if (planPrueba) {
+    items.push({ id: String(planPrueba.id), title: planPrueba.nombre, quantity: 1, unit_price: planPrueba.precio, currency_id: 'CLP' });
+    monto_total += planPrueba.precio;
   }
 
   try {
@@ -248,6 +264,7 @@ app.post('/crear-preferencia', limiterPreferencia, async (req, res) => {
           plan_ilimitado:    plan.ilimitado   ?? false,
           incluye_matricula: !!incluye_matricula,
           incluye_addon:     !!incluye_addon,
+          incluye_prueba_id: planPrueba ? String(planPrueba.id) : null,
           monto_total:       monto_total
         }
       }
@@ -505,6 +522,35 @@ app.post('/webhook', async (req, res) => {
     // Si es clase de prueba → marcar en usuarios
     if (meta.plan_tipo === 'clase_prueba') {
       await sb.from('usuarios').update({ clase_prueba_tomada: true }).eq('id', meta.usuario_id);
+    }
+
+    // Si vino bundleada con una clase de prueba → crear su compra separada y marcar acceso
+    if (meta.incluye_prueba_id) {
+      const { data: pruebaData } = await sb.from('planes').select('duracion_dias, cantidad_clases, ilimitado, nombre, tipo').eq('id', meta.incluye_prueba_id).single();
+      if (pruebaData) {
+        const pruebaDuracion = pruebaData.duracion_dias ?? 30;
+        const pruebaFechaFin = new Date(Date.UTC(y, m - 1, d + pruebaDuracion - 1)).toISOString().split('T')[0];
+        const { error: pruebaErr } = await sb.from('compras').insert({
+          alumna_id:          meta.usuario_id,
+          plan_id:            meta.incluye_prueba_id,
+          fecha_inicio,
+          fecha_fin:          pruebaFechaFin,
+          estado:             'activo',
+          clases_disponibles: pruebaData.cantidad_clases ?? null,
+          clases_usadas:      0,
+          ilimitado:          pruebaData.ilimitado ?? false,
+          incluye_gym:        false,
+          addon_gym:          false,
+          congelado_desde:    null,
+          dias_congelados:    0,
+          monto_pagado:       0,
+          matricula_pagada:   false,
+          clase_prueba:       true,
+          mp_payment_id:      String(pago.id) + '_prueba'
+        });
+        if (pruebaErr) console.error(`❌ CLASE PRUEBA BUNDLEADA NO GUARDADA — pago ${pago.id} | alumna ${meta.usuario_id} | error: ${pruebaErr.message}`);
+        await sb.from('usuarios').update({ clase_prueba_tomada: true }).eq('id', meta.usuario_id);
+      }
     }
 
     console.log(`✅ Compra registrada — alumna: ${meta.usuario_id} | plan: ${meta.plan_id} | pago: ${pago.id}`);
