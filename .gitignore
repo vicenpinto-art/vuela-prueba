@@ -1,3 +1,10 @@
 node_modules/
 server/node_modules/.claude/
 registro de ingresos espacio vuela/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
