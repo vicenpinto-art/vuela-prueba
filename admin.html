@@ -429,7 +429,15 @@
     <div class="section" id="sec-alumnas">
       <div class="section-title">Alumnas</div>
       <div class="section-sub">Gestiona planes, congela o extiende días.</div>
-      <div style="margin-bottom:16px"><input class="search-input" placeholder="Buscar por nombre o correo..." id="alumnas-search" oninput="filtrarAlumnas()"></div>
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <input class="search-input" placeholder="Buscar por nombre o correo..." id="alumnas-search" oninput="filtrarAlumnas()" style="flex:1;min-width:200px">
+        <select id="alumnas-filtro-plan" onchange="filtrarAlumnas()" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;outline:none;background:#fff;cursor:pointer">
+          <option value="">Todas</option>
+          <option value="activo">Con plan activo</option>
+          <option value="congelado">Plan congelado</option>
+          <option value="sin_plan">Sin plan</option>
+        </select>
+      </div>
       <div class="card">
         <div id="tabla-alumnas"><div class="sk" style="height:60px;margin-bottom:8px"></div><div class="sk" style="height:60px"></div></div>
       </div>
@@ -916,7 +924,11 @@
     </div>
     <div id="asignar-plan-msg" style="font-size:13px;margin-top:10px;color:var(--coral)"></div>
 
-    <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border)">
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <button class="btn btn-secondary" onclick="abrirHistorialAlumna()" style="width:100%">📋 Ver / editar historial completo</button>
+    </div>
+
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:10px">Zona peligrosa</div>
       <button class="btn btn-danger" onclick="resetearHistorialAlumna()" id="btn-resetear-alumna">
         🗑️ Borrar todo el historial de esta alumna
@@ -939,6 +951,60 @@
     <div class="modal-btns">
       <button class="btn btn-secondary" onclick="cerrarModal('modal-extender')">Cancelar</button>
       <button class="btn btn-primary" onclick="confirmarExtender()">Extender</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL HISTORIAL ALUMNA -->
+<div class="modal-overlay" id="modal-historial-alumna">
+  <div class="modal" style="max-width:660px;max-height:88vh;overflow-y:auto">
+    <button class="modal-close" onclick="cerrarModal('modal-historial-alumna')">✕</button>
+    <h2 style="margin-bottom:4px">Historial</h2>
+    <p style="font-size:14px;font-weight:600;color:var(--coral);margin-bottom:20px" id="hist-alumna-nombre">—</p>
+
+    <!-- Flags de acceso -->
+    <div style="margin-bottom:20px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:8px">Acceso al estudio</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div style="flex:1;min-width:190px;background:var(--light);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <div>
+            <div style="font-size:12px;font-weight:700">Matrícula</div>
+            <div style="font-size:11px" id="hist-flag-mat-estado">—</div>
+          </div>
+          <button class="btn btn-danger btn-sm" id="hist-btn-mat" onclick="resetearFlagHist('matricula_pagada')" style="display:none;flex-shrink:0">Marcar no pagada</button>
+        </div>
+        <div style="flex:1;min-width:190px;background:var(--light);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <div>
+            <div style="font-size:12px;font-weight:700">Clase de prueba</div>
+            <div style="font-size:11px" id="hist-flag-prueba-estado">—</div>
+          </div>
+          <button class="btn btn-danger btn-sm" id="hist-btn-prueba" onclick="resetearFlagHist('clase_prueba_tomada')" style="display:none;flex-shrink:0">Marcar no tomada</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compras -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:6px">Compras (<span id="hist-count-compras">—</span>)</div>
+      <div id="hist-lista-compras" style="max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+    </div>
+
+    <!-- Pagos histórico -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:6px">Pagos histórico (<span id="hist-count-pagos">—</span>)</div>
+      <div id="hist-lista-pagos" style="max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+    </div>
+
+    <!-- Inscripciones -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:6px">Inscripciones (<span id="hist-count-inscrip">—</span>)</div>
+      <div id="hist-lista-inscrip" style="max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+    </div>
+
+    <!-- Asistencias -->
+    <div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:6px">Asistencias (<span id="hist-count-asis">—</span>)</div>
+      <div id="hist-lista-asis" style="max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
     </div>
   </div>
 </div>
@@ -1753,8 +1819,15 @@ async function cargarAlumnas(){
   renderAlumnas();
 }
 function filtrarAlumnas(){
-  const q = document.getElementById('alumnas-search').value.toLowerCase();
-  alumnasFiltradas = q ? todasLasAlumnas.filter(a=>`${a.nombre} ${a.apellido} ${a.email}`.toLowerCase().includes(q)) : todasLasAlumnas;
+  const q    = document.getElementById('alumnas-search').value.toLowerCase();
+  const plan = document.getElementById('alumnas-filtro-plan').value;
+  alumnasFiltradas = todasLasAlumnas.filter(a => {
+    if (q && !`${a.nombre} ${a.apellido} ${a.email}`.toLowerCase().includes(q)) return false;
+    if (plan === 'activo'    && !(a.compra && a.compra.estado === 'activo'))    return false;
+    if (plan === 'congelado' && !(a.compra && a.compra.estado === 'congelado')) return false;
+    if (plan === 'sin_plan'  && a.compra)                                       return false;
+    return true;
+  });
   paginaAlumnas = 1;
   renderAlumnas();
 }
@@ -2076,6 +2149,153 @@ async function resetearHistorialAlumna(){
   toast(`Historial de ${nombre} borrado ✓`);
   cerrarModal('modal-asignar-plan');
   cargarAlumnas();
+}
+
+// ── HISTORIAL ALUMNA ──────────────────────────────────────────
+let histAlumnaId = null, histAlumnaRut = null;
+
+async function abrirHistorialAlumna() {
+  histAlumnaId = document.getElementById('asignar-alumna-id').value;
+  document.getElementById('hist-alumna-nombre').textContent = document.getElementById('asignar-alumna-nombre').textContent;
+  ['compras','pagos','inscrip','asis'].forEach(s => {
+    document.getElementById(`hist-lista-${s}`).innerHTML = '<div style="padding:10px 12px;font-size:12px;color:var(--gray)">Cargando...</div>';
+    document.getElementById(`hist-count-${s}`).textContent = '—';
+  });
+  cerrarModal('modal-asignar-plan');
+  abrirModal('modal-historial-alumna');
+  await cargarHistorial();
+}
+
+async function cargarHistorial() {
+  const id = histAlumnaId;
+  const { data: u } = await sb.from('usuarios').select('matricula_pagada,clase_prueba_tomada,rut').eq('id',id).maybeSingle();
+  histAlumnaRut = u?.rut || null;
+
+  // Flags
+  const setFlag = (campo, valor, btnId, estadoId, txtSi, txtNo, btnTxt) => {
+    document.getElementById(estadoId).textContent = valor ? txtSi : txtNo;
+    document.getElementById(estadoId).style.color  = valor ? '#007a82' : '#888';
+    document.getElementById(btnId).style.display   = valor ? 'inline-flex' : 'none';
+  };
+  setFlag('matricula_pagada',    u?.matricula_pagada,    'hist-btn-mat',   'hist-flag-mat-estado',   '✓ Pagada',  'No pagada',  'Marcar no pagada');
+  setFlag('clase_prueba_tomada', u?.clase_prueba_tomada, 'hist-btn-prueba','hist-flag-prueba-estado','✓ Tomada',  'No tomada',  'Marcar no tomada');
+
+  // Compras
+  const { data: compras } = await sb.from('compras')
+    .select('id,planes(nombre),fecha_inicio,fecha_fin,estado,monto_pagado')
+    .eq('alumna_id', id).order('fecha_inicio',{ascending:false});
+  renderHist('compras', (compras||[]).map(c => ({
+    id: c.id,
+    texto: c.planes?.nombre || '—',
+    sub:   `${c.fecha_inicio||''} → ${c.fecha_fin||''}`,
+    badge: c.estado,
+    extra: c.monto_pagado ? `$${Number(c.monto_pagado).toLocaleString('es-CL')}` : ''
+  })));
+
+  // Pagos histórico
+  if (!histAlumnaRut) {
+    document.getElementById('hist-lista-pagos').innerHTML = '<div style="padding:10px 12px;font-size:12px;color:var(--gray)">Sin RUT registrado — no se pueden identificar los pagos históricos individualmente.</div>';
+    document.getElementById('hist-count-pagos').textContent = '?';
+  } else {
+    const { data: pagos } = await sb.from('pagos_historico')
+      .select('id,plan_nombre,fecha_pago,monto,tipo_pago')
+      .eq('rut', histAlumnaRut).order('fecha_pago',{ascending:false});
+    renderHist('pagos', (pagos||[]).map(p => ({
+      id: p.id,
+      texto: p.plan_nombre || '—',
+      sub:   p.tipo_pago || '',
+      extra: p.monto ? `$${Number(p.monto).toLocaleString('es-CL')}` : '',
+      badge: p.fecha_pago || ''
+    })));
+  }
+
+  // Inscripciones
+  const { data: inscrip } = await sb.from('inscripciones')
+    .select('id,clases(nombre,fecha_hora)').eq('alumna_id',id).limit(300);
+  renderHist('inscrip', (inscrip||[]).map(i => ({
+    id: i.id,
+    texto: i.clases?.nombre || '—',
+    sub:   i.clases?.fecha_hora ? new Date(i.clases.fecha_hora).toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',timeZone:'America/Santiago'}) : ''
+  })));
+
+  // Asistencias
+  const { data: asis } = await sb.from('asistencias')
+    .select('id,presente,clases(nombre,fecha_hora)').eq('alumna_id',id).limit(300);
+  renderHist('asis', (asis||[]).map(a => ({
+    id: a.id,
+    texto: a.clases?.nombre || '—',
+    sub:   a.clases?.fecha_hora ? new Date(a.clases.fecha_hora).toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short',timeZone:'America/Santiago'}) : '',
+    badge: a.presente ? 'presente' : 'ausente'
+  })));
+}
+
+const _histFn = { compras:'eliminarCompraHist', pagos:'eliminarPagoHist', inscrip:'eliminarInscripHist', asis:'eliminarAsiHist' };
+
+function renderHist(sec, items) {
+  const el = document.getElementById(`hist-lista-${sec}`);
+  document.getElementById(`hist-count-${sec}`).textContent = items.length;
+  if (!items.length) { el.innerHTML='<div style="padding:10px 12px;font-size:12px;color:var(--gray)">Sin registros.</div>'; return; }
+  el.innerHTML = items.map(it => `
+    <div id="hrow-${sec}-${it.id}" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(it.texto)}</div>
+        ${it.sub  ? `<div style="font-size:11px;color:var(--gray)">${esc(it.sub)}</div>` : ''}
+      </div>
+      ${it.extra ? `<span style="font-size:11px;font-weight:600;color:var(--dark);flex-shrink:0">${esc(it.extra)}</span>` : ''}
+      ${it.badge ? `<span class="badge badge-${it.badge==='activo'?'activo':it.badge==='vencido'?'vencido':it.badge==='congelado'?'congelado':'sin'}" style="flex-shrink:0;font-size:10px">${esc(it.badge)}</span>` : ''}
+      <button class="btn btn-danger btn-sm" onclick="${_histFn[sec]}('${it.id}')" style="flex-shrink:0;padding:3px 8px">✕</button>
+    </div>`).join('');
+}
+
+function _quitarFila(sec, id) {
+  const row = document.getElementById(`hrow-${sec}-${id}`);
+  if (row) row.remove();
+  const cnt = document.getElementById(`hist-count-${sec}`);
+  cnt.textContent = Math.max(0, (parseInt(cnt.textContent)||0) - 1);
+}
+
+async function eliminarCompraHist(id) {
+  if (!confirm('¿Eliminar esta compra? También se desvincularán sus inscripciones.')) return;
+  const {data:{session}} = await sb.auth.getSession();
+  const r = await fetch(`${SERVER_URL}/eliminar-compra/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${session.access_token}`}});
+  if (!r.ok){toast('Error al eliminar compra','error');return;}
+  _quitarFila('compras',id); toast('Compra eliminada ✓');
+}
+async function eliminarPagoHist(id) {
+  if (!confirm('¿Eliminar este pago del historial?')) return;
+  const {data:{session}} = await sb.auth.getSession();
+  const r = await fetch(`${SERVER_URL}/eliminar-pago/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${session.access_token}`}});
+  if (!r.ok){toast('Error al eliminar pago','error');return;}
+  _quitarFila('pagos',id); toast('Pago eliminado ✓');
+}
+async function eliminarInscripHist(id) {
+  if (!confirm('¿Eliminar esta inscripción?')) return;
+  const {error} = await sb.from('inscripciones').delete().eq('id',id);
+  if (error){toast('Error al eliminar inscripción','error');return;}
+  _quitarFila('inscrip',id); toast('Inscripción eliminada ✓');
+}
+async function eliminarAsiHist(id) {
+  if (!confirm('¿Eliminar este registro de asistencia?')) return;
+  const {error} = await sb.from('asistencias').delete().eq('id',id);
+  if (error){toast('Error al eliminar asistencia','error');return;}
+  _quitarFila('asis',id); toast('Asistencia eliminada ✓');
+}
+async function resetearFlagHist(campo) {
+  const label = campo==='matricula_pagada' ? 'matrícula como no pagada' : 'clase de prueba como no tomada';
+  if (!confirm(`¿Marcar la ${label}?`)) return;
+  const {error} = await sb.from('usuarios').update({[campo]:false}).eq('id',histAlumnaId);
+  if (error){toast('Error al actualizar','error');return;}
+  if (campo==='matricula_pagada'){
+    document.getElementById('hist-flag-mat-estado').textContent='No pagada';
+    document.getElementById('hist-flag-mat-estado').style.color='#888';
+    document.getElementById('hist-btn-mat').style.display='none';
+    toast('Matrícula marcada como no pagada ✓');
+  } else {
+    document.getElementById('hist-flag-prueba-estado').textContent='No tomada';
+    document.getElementById('hist-flag-prueba-estado').style.color='#888';
+    document.getElementById('hist-btn-prueba').style.display='none';
+    toast('Clase de prueba marcada como no tomada ✓');
+  }
 }
 
 async function congelarPlan(compraId){
