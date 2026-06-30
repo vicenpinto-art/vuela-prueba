@@ -617,23 +617,33 @@
 <!-- MODAL: MATRÍCULA -->
 <div class="modal-overlay" id="modal-matricula">
   <div class="modal">
-    <h2>Una cosa antes de continuar</h2>
-    <div class="modal-sub">Como es tu primera vez en Espacio Vuela, necesitas elegir una de estas opciones para comenzar:</div>
-    <div class="opciones-matricula">
-      <button class="opcion-btn" onclick="elegirMatricula()">
-        <span class="opcion-icon">📋</span>
-        <div class="opcion-texto">
-          <strong>Pagar matrícula — $12.000</strong>
-          <span>Se agrega a tu compra de hoy. Pago único, para siempre.</span>
-        </div>
-      </button>
-      <button class="opcion-btn" onclick="irAClasePrueba()">
-        <span class="opcion-icon">✨</span>
-        <div class="opcion-texto">
-          <strong>Tomar una clase de prueba primero</strong>
-          <span>Prueba el estudio desde $5.000. Exime la matrícula para siempre.</span>
-        </div>
-      </button>
+    <!-- Vista A: elegir entre matrícula o clase de prueba -->
+    <div id="mat-vista-a">
+      <h2>Una cosa antes de continuar</h2>
+      <div class="modal-sub">Como es tu primera vez en Espacio Vuela, necesitas elegir una de estas opciones para comenzar:</div>
+      <div class="opciones-matricula">
+        <button class="opcion-btn" onclick="elegirMatricula()">
+          <span class="opcion-icon">📋</span>
+          <div class="opcion-texto">
+            <strong>Pagar matrícula — $12.000</strong>
+            <span>Se agrega a tu compra de hoy. Pago único, para siempre.</span>
+          </div>
+        </button>
+        <button class="opcion-btn" onclick="mostrarOpcionesPrueba()">
+          <span class="opcion-icon">✨</span>
+          <div class="opcion-texto">
+            <strong>Tomar una clase de prueba primero</strong>
+            <span>Desde $5.000. Exime la matrícula para siempre.</span>
+          </div>
+        </button>
+      </div>
+    </div>
+    <!-- Vista B: seleccionar qué clase de prueba comprar -->
+    <div id="mat-vista-b" style="display:none">
+      <h2>Elige tu clase de prueba</h2>
+      <div class="modal-sub">Una vez que la tomes, podrás contratar cualquier plan sin pagar matrícula.</div>
+      <div class="opciones-matricula" id="opciones-prueba-lista"></div>
+      <button onclick="volverVistaMatricula()" style="margin-top:14px;background:none;border:none;color:var(--gray);font-size:13px;cursor:pointer;padding:4px 0">← Volver</button>
     </div>
   </div>
 </div>
@@ -860,6 +870,7 @@
     const tieneAcceso = u?.matricula_pagada || u?.clase_prueba_tomada;
 
     if (!esPrueba && !tieneAcceso) {
+      volverVistaMatricula();
       abrirModal('modal-matricula');
     } else {
       abrirModalResumen();
@@ -872,9 +883,36 @@
     abrirModalResumen();
   }
 
-  function irAClasePrueba() {
+  function mostrarOpcionesPrueba() {
+    const pruebas = todosLosPlanes.filter(p => p.tipo === 'clase_prueba');
+    const lista = document.getElementById('opciones-prueba-lista');
+    lista.innerHTML = pruebas.length
+      ? pruebas.map(p => `
+          <button class="opcion-btn" onclick="seleccionarPrueba('${p.id}')">
+            <span class="opcion-icon">✨</span>
+            <div class="opcion-texto">
+              <strong>${p.nombre}</strong>
+              <span>$${Number(p.precio).toLocaleString('es-CL')}</span>
+            </div>
+          </button>`).join('')
+      : '<p style="font-size:13px;color:var(--gray)">No hay clases de prueba disponibles en este momento.</p>';
+    document.getElementById('mat-vista-a').style.display = 'none';
+    document.getElementById('mat-vista-b').style.display = '';
+  }
+
+  function volverVistaMatricula() {
+    document.getElementById('mat-vista-b').style.display = 'none';
+    document.getElementById('mat-vista-a').style.display = '';
+  }
+
+  function seleccionarPrueba(planId) {
+    const plan = todosLosPlanes.find(p => String(p.id) === String(planId));
+    if (!plan) return;
+    planSeleccionado = plan;
+    incluyeMatricula = false;
+    incluyeAddon     = false;
     cerrarModal('modal-matricula');
-    document.querySelector('.tab[data-tab="clases_sueltas"]').click();
+    abrirModalResumen();
   }
 
   function abrirModalResumen() {
