@@ -716,6 +716,38 @@ app.post('/actualizar-sobrecupo', async (req, res) => {
   res.json({ ok: true });
 });
 
+// ── RESETEAR HISTORIAL ALUMNA (ADMIN) ────────────────────────
+app.post('/resetear-alumna', async (req, res) => {
+  const userAuth = await verificarAdmin(req);
+  if (!userAuth) return res.status(403).json({ error: 'No autorizado' });
+
+  const { alumna_id } = req.body;
+  if (!alumna_id) return res.status(400).json({ error: 'Falta alumna_id' });
+
+  const { data: alumna } = await sb.from('usuarios')
+    .select('rut, nombre, apellido')
+    .eq('id', alumna_id)
+    .maybeSingle();
+  if (!alumna) return res.status(404).json({ error: 'Alumna no encontrada' });
+
+  // Orden importante: inscripciones referencia compras via FK
+  await sb.from('asistencias').delete().eq('alumna_id', alumna_id);
+  await sb.from('inscripciones').delete().eq('alumna_id', alumna_id);
+  await sb.from('compras').delete().eq('alumna_id', alumna_id);
+
+  if (alumna.rut) {
+    await sb.from('pagos_historico').delete().eq('rut', alumna.rut);
+  }
+
+  await sb.from('usuarios').update({
+    matricula_pagada:    false,
+    clase_prueba_tomada: false
+  }).eq('id', alumna_id);
+
+  console.log(`🗑️ Historial reseteado — alumna: ${alumna_id} (${alumna.nombre} ${alumna.apellido})`);
+  res.json({ ok: true });
+});
+
 // ── ELIMINAR PAGO HISTÓRICO (ADMIN) ──────────────────────────
 app.delete('/eliminar-pago/:id', async (req, res) => {
   const userAuth = await verificarAdmin(req);

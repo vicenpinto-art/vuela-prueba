@@ -915,6 +915,14 @@
       <button class="btn btn-primary" onclick="confirmarAsignarPlan()">Asignar plan</button>
     </div>
     <div id="asignar-plan-msg" style="font-size:13px;margin-top:10px;color:var(--coral)"></div>
+
+    <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);margin-bottom:10px">Zona peligrosa</div>
+      <button class="btn btn-danger" onclick="resetearHistorialAlumna()" id="btn-resetear-alumna">
+        🗑️ Borrar todo el historial de esta alumna
+      </button>
+      <div style="font-size:11px;color:var(--gray);margin-top:6px">Elimina compras, inscripciones, asistencias y pagos. Restablece matrícula a no pagada. Esta acción no se puede deshacer.</div>
+    </div>
   </div>
 </div>
 
@@ -2040,6 +2048,33 @@ async function confirmarAsignarPlan(){
 
   cerrarModal('modal-asignar-plan');
   toast('Plan asignado ✓');
+  cargarAlumnas();
+}
+
+async function resetearHistorialAlumna(){
+  const alumnaId  = document.getElementById('asignar-alumna-id').value;
+  const nombre    = document.getElementById('asignar-alumna-nombre').textContent;
+  if(!confirm(`¿Borrar TODO el historial de ${nombre}?\n\nSe eliminarán sus compras, inscripciones, asistencias y pagos. Su matrícula quedará como no pagada.\n\nEsta acción NO se puede deshacer.`)) return;
+  if(!confirm(`⚠️ CONFIRMACIÓN FINAL\n\n¿Estás segura de que quieres borrar todo el historial de ${nombre}?`)) return;
+
+  const btn = document.getElementById('btn-resetear-alumna');
+  btn.disabled = true;
+  btn.textContent = 'Borrando...';
+
+  const {data:{session}} = await sb.auth.getSession();
+  const resp = await fetch(`${SERVER_URL}/resetear-alumna`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+    body: JSON.stringify({ alumna_id: alumnaId })
+  });
+  const json = await resp.json();
+
+  btn.disabled = false;
+  btn.textContent = '🗑️ Borrar todo el historial de esta alumna';
+
+  if(!resp.ok){ toast(json.error || 'Error al resetear', 'error'); return; }
+  toast(`Historial de ${nombre} borrado ✓`);
+  cerrarModal('modal-asignar-plan');
   cargarAlumnas();
 }
 
